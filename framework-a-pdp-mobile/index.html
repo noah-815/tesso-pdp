@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>나이키스킴스 리프트 메쉬 — Mobile</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* ============================================================
+   Framework A — Product Detail Mobile (393 기준, 가변)
+   갤러리: 나이키 모바일 방식 스와이프 캐러셀 + 다이내믹 도트
+   ============================================================ */
+:root {
+  --c-text: #111;
+  --c-sub: #6a6a6a;
+  --c-soft: #707070;
+  --c-red: #ef0000;
+  --line-10: rgba(0, 0, 0, 0.1);
+  --line-12: rgba(0, 0, 0, 0.12);
+  --bg-gray: #f9f9f9;
+  --header-h: 56px;
+  --px: 24px;
+  --font-kr: "Noto Sans KR", "Noto Sans", "Pretendard Variable", Pretendard, sans-serif;
+  --font-en: "Noto Sans", "Noto Sans KR", sans-serif;
+  --font-detail: "Pretendard Variable", Pretendard, "Noto Sans KR", sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-kr);
+  color: var(--c-text);
+  background: #fff;
+  padding-top: var(--header-h);
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+  max-width: 640px;
+  margin: 0 auto;
+}
+img { display: block; }
+button { font-family: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+/* ---------- 헤더 ---------- */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: #fff;
+  z-index: 100;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.header__inner {
+  height: 100%;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+.header__logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-en);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--c-text);
+  text-decoration: none;
+}
+.header__group { display: flex; }
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn img { width: 24px; height: 24px; }
+
+/* ---------- 갤러리 (나이키 모바일: 스와이프 스냅 캐러셀) ---------- */
+.m-gallery { position: relative; }
+.m-gallery__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.m-gallery__track::-webkit-scrollbar { display: none; }
+.m-gallery__slide {
+  flex: 0 0 100%;
+  aspect-ratio: 1;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  background: #f6f6f6;
+}
+.m-gallery__slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+/* 이미지 위 위시리스트/공유 (시안: 흰 원형, 이미지 우측 상단 고정) */
+.m-gallery__actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+.circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.circle-btn img { width: 20px; height: 20px; }
+
+/* 다이내믹 도트 — 시안 실측값
+   컨테이너: h12/패딩4/반투명 흰색, 활성 바 11×4 #000, 도트 4px #b3b3b3,
+   축소 도트 3px, 간격 4px */
+.m-gallery__dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 9999px;
+  padding: 4px 2px; /* 도트 양끝 마진 2px와 합쳐 시안과 동일한 4px 여백 */
+  display: flex;
+  align-items: center;
+  z-index: 3;
+}
+.m-gallery__dots .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(17, 17, 17, 0.25);
+  margin: 0 2px;
+  transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease, opacity 0.25s ease, background 0.25s ease;
+}
+.m-gallery__dots .dot.is-active {
+  width: 11px;
+  background: rgb(17, 17, 17);
+}
+.m-gallery__dots .dot.is-small { width: 3px; height: 3px; }
+.m-gallery__dots .dot.is-hidden {
+  width: 0;
+  height: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+/* ---------- 상품 정보 ---------- */
+.m-info { padding: 36px var(--px) 0; }
+.m-info__category { font-size: 14px; line-height: 1.6; color: var(--c-soft); }
+.m-info__name { margin-top: 8px; font-size: 22px; font-weight: 600; line-height: 1.45; }
+.m-info__price {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.m-info__price .now { font-weight: 600; }
+.m-info__price .was { color: #888; text-decoration: line-through; }
+.m-info__desc {
+  margin-top: 30px;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--c-soft);
+}
+
+/* 아코디언 (정적 표시) */
+.m-accordion { margin-top: 40px; border-top: 1px solid var(--line-10); }
+.acc-item { border-bottom: 1px solid var(--line-10); }
+.acc-item__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 21px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+.acc-item__head img { width: 24px; height: 24px; }
+
+/* ---------- 상세 (브랜드 스토리) ---------- */
+.m-detail { margin-top: 48px; }
+.m-detail__clip {
+  position: relative;
+  max-height: 1080px;
+  overflow: hidden;
+}
+.m-detail__clip.is-open { max-height: none; }
+.m-detail__image {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+}
+.m-detail__image > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.m-detail__image--crop > img {
+  width: 201.4%;
+  height: 104.9%;
+  top: -4.9%;
+  left: 0;
+  max-width: none;
+}
+.m-detail__text {
+  font-family: var(--font-detail);
+  padding: 40px var(--px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  line-height: 1.6;
+}
+.m-detail__text strong { font-size: 16px; font-weight: 600; }
+.m-detail__text p { font-size: 14px; }
+.m-detail__more-area {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 260px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #fff 80%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 var(--px);
+  transition: opacity 0.3s;
+}
+.m-detail__clip.is-open .m-detail__more-area { opacity: 0; pointer-events: none; }
+.btn-more {
+  width: 100%;
+  padding: 15px 0;
+  border: 1px solid var(--line-12);
+  border-radius: 9999px;
+  background: #fff;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+/* ---------- 섹션 공통 ---------- */
+.m-section { padding: 48px var(--px) 0; }
+.m-section__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line-10);
+}
+.m-section__title {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.m-section__title .count { font-family: var(--font-en); }
+
+.rating { display: flex; align-items: center; }
+.rating img { width: 16px; height: 16px; }
+.rating-area { display: flex; align-items: center; gap: 6px; }
+.rating-area .score {
+  font-family: var(--font-en);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 15px;
+  border-bottom: 1px solid var(--line-10);
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+}
+.check input { display: none; }
+.check .box {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #d3d3d3;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.check .box img { width: 14px; height: 14px; filter: invert(1); opacity: 0; }
+.check input:checked + .box { background: var(--c-text); border-color: var(--c-text); }
+.check input:checked + .box img { opacity: 1; }
+
+.select-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--line-10);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #fff;
+}
+.select-text img { width: 18px; height: 18px; }
+
+.badge {
+  border: 1px solid #eee;
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.text-btn-group { display: flex; align-items: center; gap: 12px; }
+.text-btn { padding: 6px 0; font-size: 14px; line-height: 1.2; }
+.text-btn--danger { color: var(--c-red); }
+.vdiv { width: 1px; background: var(--line-12); }
+.vdiv--10 { height: 10px; }
+.vdiv--12 { height: 12px; }
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--c-sub);
+}
+
+/* ---------- 리뷰 ---------- */
+.review-item {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line-12);
+}
+.review-item__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.review-item__user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.review-item__user {
+  font-family: var(--font-en);
+  font-size: 14px;
+  font-weight: 500;
+}
+.review-item__meta { display: flex; flex-direction: column; gap: 6px; }
+.review-item__body {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.review-item__photos { display: flex; gap: 8px; }
+.review-item__photos .ph {
+  flex: 0 0 auto;
+  width: calc((100% - 24px) / 4);
+  aspect-ratio: 1;
+  position: relative;
+  overflow: hidden;
+}
+.review-item__photos--3 .ph { width: calc((100% - 16px) / 3); }
+.review-item__photos .ph img { width: 100%; height: 100%; object-fit: cover; }
+.review-item__photos .ph.is-more::after {
+  content: attr(data-more);
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-family: var(--font-en);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.review-item__date {
+  font-family: var(--font-en);
+  font-size: 13px;
+  color: var(--c-sub);
+}
+
+/* ---------- 페이지네이션 (모바일: ‹ 1 / 10 ›) ---------- */
+.m-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 32px 0;
+}
+.m-pagination__arrow {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.m-pagination__arrow img { width: 20px; height: 20px; }
+.m-pagination__arrow:disabled { opacity: 0.3; }
+.m-pagination__label {
+  font-family: var(--font-en);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.m-pagination__label .current { font-weight: 500; color: var(--c-text); }
+.m-pagination__label .sep, .m-pagination__label .total { color: #999; }
+
+/* ---------- 상품 문의 ---------- */
+.btn-pill-dark {
+  background: #000;
+  border-radius: 9999px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.2;
+  padding: 14px 20px;
+}
+.inquiry-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line-12);
+}
+.inquiry-item__info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.inquiry-item__toggle { width: 24px; height: 24px; flex-shrink: 0; }
+.inquiry-item__toggle img { width: 100%; height: 100%; transition: transform 0.3s; }
+.inquiry-item.is-open .inquiry-item__toggle img { transform: rotate(180deg); }
+.inquiry-item__q { font-size: 15px; line-height: 1.6; }
+.inquiry-item__q--clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.inquiry-item .status-done { color: var(--c-text); }
+.inquiry-item__private { display: flex; align-items: center; gap: 4px; }
+.inquiry-item__private img { width: 22px; height: 22px; }
+.inquiry-item__private span {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--c-sub);
+}
+.inquiry-reply {
+  background: var(--bg-gray);
+  padding: 24px 20px;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+}
+.inquiry-item.is-open .inquiry-reply { display: flex; }
+.inquiry-reply__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.inquiry-reply__info strong { font-size: 14px; font-weight: 500; }
+.inquiry-reply__info .date { font-family: var(--font-en); color: var(--c-sub); }
+.inquiry-reply__body { font-size: 15px; line-height: 1.65; white-space: pre-line; }
+
+/* ---------- 주문 정보 ---------- */
+.m-order__body {
+  padding-top: 28px;
+  font-size: 14px;
+  line-height: 1.85;
+  color: #333;
+}
+.m-order__body h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-text);
+  margin-bottom: 18px;
+}
+.m-order__body .block + .block { margin-top: 22px; }
+.m-order__banner { margin-top: 32px; }
+.m-order__banner img { width: 100%; }
+
+/* ---------- 하단 고정 구매 바 ---------- */
+.buy-bar {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, #fff 65%, rgba(255, 255, 255, 0));
+  z-index: 90;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.buy-bar button {
+  width: 100%;
+  height: 54px;
+  border-radius: 9999px;
+  background: #000;
+  color: #fff;
+  font-size: 16px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ==================== 헤더 ==================== -->
+<header class="header">
+  <div class="header__inner">
+    <button class="icon-btn" aria-label="메뉴"><img src="assets/icons/menu.svg" alt=""></button>
+    <a class="header__logo" href="#">BRAND</a>
+    <div class="header__group">
+      <button class="icon-btn" aria-label="검색"><img src="assets/icons/search.svg" alt=""></button>
+      <button class="icon-btn" aria-label="장바구니"><img src="assets/icons/bag.svg" alt=""></button>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== 갤러리 (스와이프 캐러셀) ==================== -->
+<section class="m-gallery">
+  <div class="m-gallery__track js-track"></div>
+  <div class="m-gallery__actions">
+    <button class="circle-btn js-wishlist" aria-label="위시리스트"><img src="assets/icons/wishlist.svg" alt=""></button>
+    <button class="circle-btn js-share" aria-label="공유"><img src="assets/icons/share.svg" alt=""></button>
+  </div>
+  <div class="m-gallery__dots js-dots" role="tablist" aria-label="이미지 인디케이터"></div>
+</section>
+
+<!-- ==================== 상품 정보 ==================== -->
+<section class="m-info">
+  <p class="m-info__category">여성 신발</p>
+  <h1 class="m-info__name">나이키스킴스 리프트 메쉬</h1>
+  <div class="m-info__price">
+    <span class="now">189,000원</span>
+    <span class="was">200,000원</span>
+  </div>
+  <p class="m-info__desc">나이키스킴스 리프트 메쉬는 세련된 실루엣에 메쉬를 더하여 세련되고 통기성이 좋은 신발을 완성합니다. 발밑의 부드러운 폼이 걸음마다 환상적인 느낌을 선사하며, 독특한 스플릿 토 디자인이 캐주얼함과 우아함 사이의 간극을 메웁니다. 절제된 나이키스킴스 브랜딩이 미니멀하고 럭셔리한 룩을 연출합니다.</p>
+
+  <div class="m-accordion">
+    <div class="acc-item"><div class="acc-item__head">배송 및 반품 <img src="assets/icons/chevronDown.svg" alt=""></div></div>
+    <div class="acc-item"><div class="acc-item__head">세탁방법 <img src="assets/icons/chevronDown.svg" alt=""></div></div>
+    <div class="acc-item"><div class="acc-item__head">주의사항 <img src="assets/icons/chevronDown.svg" alt=""></div></div>
+    <div class="acc-item"><div class="acc-item__head">세부정보 <img src="assets/icons/chevronDown.svg" alt=""></div></div>
+  </div>
+</section>
+
+<!-- ==================== 상세 (브랜드 스토리) ==================== -->
+<section class="m-detail">
+  <div class="m-detail__clip">
+    <div>
+      <div class="m-detail__image"><img src="assets/img/detail-1.jpg" alt="나이키스킴스 리프트 메쉬 착용 이미지"></div>
+      <div class="m-detail__text">
+        <strong>간편한 착용</strong>
+        <p>아이코닉한 나이키 리프트 스플릿 토 디자인이 몸의 움직임을 새롭게 만듭니다.</p>
+      </div>
+      <div class="m-detail__image m-detail__image--crop"><img src="assets/img/detail-2.jpg" alt="밑창 디테일"></div>
+    </div>
+    <div class="m-detail__more-area">
+      <button class="btn-more" type="button">더보기</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 리뷰 ==================== -->
+<section class="m-section review">
+  <div class="m-section__title-row">
+    <h2 class="m-section__title">리뷰 <span class="count">(1,423)</span></h2>
+    <div class="rating-area">
+      <div class="rating">
+        <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+      </div>
+      <span class="score">4.2</span>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <label class="check">
+      <input type="checkbox">
+      <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+      포토리뷰만 보기
+    </label>
+    <button class="select-text">최신순 <img src="assets/icons/chevronDown.svg" alt=""></button>
+  </div>
+
+  <div class="review-list">
+    <!-- 리뷰 1 : 사진 3장 -->
+    <article class="review-item">
+      <div class="review-item__meta">
+        <div class="review-item__user-row">
+          <span class="review-item__user">nickname***</span>
+          <div class="rating">
+            <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+          </div>
+        </div>
+        <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+        <p class="review-item__body">처음엔 살짝 투박해 보였는데 신다 보니까 오히려 포인트 되는 느낌이에요. 편해서 아무 때나 신기 좋고, 생각보다 활용도가 높은 신발이에요!</p>
+      </div>
+      <div class="review-item__photos review-item__photos--3">
+        <span class="ph"><img src="assets/img/product-1.jpg" alt=""></span>
+        <span class="ph"><img src="assets/img/product-2.jpg" alt=""></span>
+        <span class="ph"><img src="assets/img/product-3.jpg" alt=""></span>
+      </div>
+      <span class="review-item__date">2026. 6. 12</span>
+    </article>
+
+    <!-- 리뷰 2 : 내 리뷰 + 사진 4장(+3) -->
+    <article class="review-item">
+      <div class="review-item__head">
+        <span class="badge">내 리뷰</span>
+        <div class="text-btn-group">
+          <button class="text-btn">수정</button>
+          <span class="vdiv vdiv--10"></span>
+          <button class="text-btn text-btn--danger">삭제</button>
+        </div>
+      </div>
+      <div class="review-item__meta">
+        <div class="review-item__user-row">
+          <span class="review-item__user">nickname***</span>
+          <div class="rating">
+            <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+          </div>
+        </div>
+        <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+        <p class="review-item__body">디자인 때문에 샀는데 신어보고 나서 진짜 놀랐어요. 발이 신발에 딱 감싸지는 느낌이라 오래 걸어도 피로감이 훨씬 덜하더라고요. 벨크로 스트랩이 장식처럼 보이는데 실제로 고정력이 꽤 좋습니다. 올블랙이라 어디에 코디해도 튀지 않고 자연스럽게 녹아드는 게 마음에 들어요. 재구매 의사 있습니다.</p>
+      </div>
+      <div class="review-item__photos">
+        <span class="ph"><img src="assets/img/product-1.jpg" alt=""></span>
+        <span class="ph"><img src="assets/img/product-2.jpg" alt=""></span>
+        <span class="ph"><img src="assets/img/product-3.jpg" alt=""></span>
+        <span class="ph is-more" data-more="+3"><img src="assets/img/product-6.jpg" alt=""></span>
+      </div>
+      <span class="review-item__date">2026. 6. 12</span>
+    </article>
+
+    <!-- 리뷰 3 : 텍스트만 -->
+    <article class="review-item">
+      <div class="review-item__meta">
+        <div class="review-item__user-row">
+          <span class="review-item__user">nickname***</span>
+          <div class="rating">
+            <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+          </div>
+        </div>
+        <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+        <p class="review-item__body">디자인이 좀 독특해서 처음엔 고민했는데, 막상 신어보니까 생각보다 훨씬 편해요. 스트랩이 있어서 발을 잘 잡아주는 느낌이고, 오래 걸어도 크게 피로하지 않았습니다. 요즘은 거의 매일 신고 다니고 있어요.</p>
+      </div>
+      <span class="review-item__date">2026. 6. 12</span>
+    </article>
+
+    <!-- 리뷰 4 : 사진 1장 -->
+    <article class="review-item">
+      <div class="review-item__meta">
+        <div class="review-item__user-row">
+          <span class="review-item__user">nickname***</span>
+          <div class="rating">
+            <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+          </div>
+        </div>
+        <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+        <p class="review-item__body">밑창이 두툼해서 그런지 쿠션감이 괜찮은 편이에요. 장시간 걸어도 발바닥 부담이 덜하고, 안정감 있게 잡아줘서 만족스럽습니다. 코디도 크게 안 타서 활용도 높은 신발이에요.</p>
+      </div>
+      <div class="review-item__photos">
+        <span class="ph"><img src="assets/img/product-1.jpg" alt=""></span>
+      </div>
+      <span class="review-item__date">2026. 6. 12</span>
+    </article>
+
+    <!-- 리뷰 5 : 텍스트만 -->
+    <article class="review-item">
+      <div class="review-item__meta">
+        <div class="review-item__user-row">
+          <span class="review-item__user">nickname***</span>
+          <div class="rating">
+            <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+          </div>
+        </div>
+        <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+        <p class="review-item__body">밑창 패턴이 독특해서 미끄럼 방지가 잘 될까 걱정했는데, 비 온 날 외출해봤을 때도 확실히 잡아주더라고요. 소재 자체가 방수 계열인지 물이 스며드는 느낌도 거의 없었고요. 활동성이 높은 날 신기에 딱 좋은 것 같습니다.</p>
+      </div>
+      <span class="review-item__date">2026. 6. 12</span>
+    </article>
+  </div>
+
+  <nav class="m-pagination">
+    <button class="m-pagination__arrow m-pagination__arrow--prev" disabled><img src="assets/icons/chevronRight.svg" alt="이전"></button>
+    <span class="m-pagination__label"><span class="current">1</span><span class="sep">/</span><span class="total">10</span></span>
+    <button class="m-pagination__arrow m-pagination__arrow--next"><img src="assets/icons/chevronLeft.svg" alt="다음"></button>
+  </nav>
+</section>
+
+<!-- ==================== 상품 문의 ==================== -->
+<section class="m-section inquiry">
+  <div class="m-section__title-row" style="padding-bottom:16px">
+    <h2 class="m-section__title">상품 문의</h2>
+    <button class="btn-pill-dark">문의하기</button>
+  </div>
+
+  <div class="filter-bar">
+    <label class="check">
+      <input type="checkbox">
+      <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+      내 문의만 보기
+    </label>
+    <button class="select-text">전체 <img src="assets/icons/chevronDown.svg" alt=""></button>
+  </div>
+
+  <div class="inquiry-list">
+    <article class="inquiry-item" data-collapsible>
+      <div>
+        <div class="inquiry-item__info">
+          <div class="option-row">미답변 <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+          <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt="펼치기"></button>
+        </div>
+        <p class="inquiry-item__q inquiry-item__q--clamp" style="margin-top:10px">사이즈 고민 중인데요, 평소 255 신는데 발볼이 좀 있는 편이에요. 255로 주문하면 될까요?<br>아니면 한 사이즈 업해서 260으로 구매해야 될까요?</p>
+      </div>
+    </article>
+
+    <article class="inquiry-item" data-collapsible>
+      <div class="review-item__head">
+        <span class="badge">내 문의</span>
+        <div class="text-btn-group">
+          <button class="text-btn">수정</button>
+          <span class="vdiv vdiv--10"></span>
+          <button class="text-btn text-btn--danger">삭제</button>
+        </div>
+      </div>
+      <div>
+        <div class="inquiry-item__info">
+          <div class="option-row">미답변 <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+          <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt="펼치기"></button>
+        </div>
+        <p class="inquiry-item__q inquiry-item__q--clamp" style="margin-top:10px">이 제품이 쿠션감이 어느 정도인지 궁금합니다. 밑창이 두꺼워 보여서 오래 걸어도 괜찮을 것 같긴 한데,<br>실제로 착용했을 때 발 피로도가 어떤지 알고 싶어요.</p>
+      </div>
+    </article>
+
+    <article class="inquiry-item is-open" data-collapsible>
+      <div>
+        <div class="inquiry-item__info">
+          <div class="option-row"><span class="status-done">답변완료</span> <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+          <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt="접기"></button>
+        </div>
+        <p class="inquiry-item__q" style="margin-top:10px">안녕하세요, 상품 잘 받았는데 상태 확인 후 문의드립니다. 받은 제품에 눈에 띄는 하자가 있어 교환 요청드립니다.<br>착용 전 확인한 상태이며, 제품 마감 부분에 문제가 있는 것 같아 정상 제품으로 교환을 받고 싶습니다.</p>
+      </div>
+      <div class="inquiry-reply">
+        <div class="inquiry-reply__info">
+          <strong>판매자 답변</strong>
+          <span class="vdiv vdiv--10"></span>
+          <span class="date">2026. 6. 13. 09:10</span>
+        </div>
+        <p class="inquiry-reply__body">안녕하세요, 고객님.
+먼저 배송 과정 중 불편을 드리게 된 점 양해 부탁드립니다.
+
+파손 상품은 별도의 비용 없이 회수 예정이며, 정상 상품은 회수 접수 완료 후 순차적으로 발송될 예정입니다.
+교환 배송비는 당사에서 부담합니다.
+
+추가로 궁금하신 사항이 있으시면 언제든지 문의해 주세요.
+불편을 드린 점 다시 한 번 양해 부탁드리며, 빠르게 도움드릴 수 있도록 하겠습니다.
+
+감사합니다.</p>
+      </div>
+    </article>
+
+    <article class="inquiry-item" data-collapsible>
+      <div>
+        <div class="inquiry-item__info">
+          <div class="option-row"><span class="status-done">답변완료</span> <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+          <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt="펼치기"></button>
+        </div>
+        <p class="inquiry-item__q inquiry-item__q--clamp" style="margin-top:10px">벨크로 스트랩 내구성이 궁금해요. 자주 탈부착하다 보면 접착력이 금방 떨어지는 제품들이 있어서요.<br>장기간 사용해도 괜찮은 소재인지 알고 싶습니다.</p>
+      </div>
+    </article>
+
+    <article class="inquiry-item">
+      <div>
+        <div class="inquiry-item__info">
+          <div class="option-row">미답변 <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+          <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt=""></button>
+        </div>
+        <div class="inquiry-item__private" style="margin-top:10px">
+          <img src="assets/icons/lock.svg" alt="">
+          <span>비밀글</span>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <nav class="m-pagination">
+    <button class="m-pagination__arrow m-pagination__arrow--prev" disabled><img src="assets/icons/chevronRight.svg" alt="이전"></button>
+    <span class="m-pagination__label"><span class="current">1</span><span class="sep">/</span><span class="total">10</span></span>
+    <button class="m-pagination__arrow m-pagination__arrow--next"><img src="assets/icons/chevronLeft.svg" alt="다음"></button>
+  </nav>
+</section>
+
+<!-- ==================== 주문 정보 ==================== -->
+<section class="m-section m-order">
+  <div class="m-section__title-row">
+    <h2 class="m-section__title">주문 정보</h2>
+  </div>
+  <div class="m-order__body">
+    <div class="block">
+      <h3>배송 정보</h3>
+      <p>배송 업체&nbsp; ㅣ&nbsp; CJ 대한통운 (1588-1255)<br>
+      배송 지역&nbsp; ㅣ&nbsp; 대한민국 전 지역 배송<br>
+      배송 비용&nbsp; ㅣ&nbsp; 3,500원 / 구매 금액 50,000원 이상 시 무료배송<br>
+      / 제주 및 도서 산간 지역 별도 추가 금액 발생<br>
+      배송 기간&nbsp; ㅣ&nbsp; 주말·공휴일 제외 2일 ~ 5일</p>
+    </div>
+    <div class="block">
+      <p>유의 사항<br>
+      - 주문 폭주 및 공급 사정으로 인하여 지연 및 품절이 발생할 수 있습니다.<br>
+      - 기본 배송기간 이상 소요되는 상품이거나, 품절 상품은 개별 연락을 드립니다.</p>
+    </div>
+  </div>
+  <div class="m-order__banner">
+    <img src="assets/img/order-calendar.jpg" alt="추석 연휴 배송 안내">
+  </div>
+</section>
+
+<!-- ==================== 하단 고정 구매 바 ==================== -->
+<div class="buy-bar">
+  <button class="js-buy">구매하기</button>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var N = 15; // 이미지 15장 (기존 6장 순환)
+
+  /* ---------- 갤러리: 스와이프 스냅 캐러셀 (나이키 모바일 방식) ---------- */
+  var track = document.querySelector('.js-track');
+  var dotsWrap = document.querySelector('.js-dots');
+
+  for (var i = 0; i < N; i++) {
+    var slide = document.createElement('div');
+    slide.className = 'm-gallery__slide';
+    slide.innerHTML = '<img src="assets/img/product-' + (i % 6 + 1) + '.jpg" alt="상품 이미지 ' + (i + 1) + '"' + (i > 1 ? ' loading="lazy"' : '') + '>';
+    track.appendChild(slide);
+    var dot = document.createElement('span');
+    dot.className = 'dot';
+    dotsWrap.appendChild(dot);
+  }
+
+  var dots = dotsWrap.querySelectorAll('.dot');
+  var current = 0;
+  var WINDOW = 4; // 시안: 활성 바 + 도트 2개 + 축소 도트 1개
+  var winStart = 0;
+
+  function renderDots() {
+    /* 나이키식 다이내믹 도트: 진행 방향에 항목이 더 남아 있으면
+       활성 바가 창 경계가 아닌 "끝에서 두 번째"에 위치하도록 창을 미리 이동.
+       창 경계 너머에 항목이 더 있으면 경계 도트를 축소 표시 */
+    var hi = current - (current > 0 ? 1 : 0);                    // 뒤(이전)에 남아 있으면 활성은 두 번째 이상
+    var lo = current - (WINDOW - 1) + (current < N - 1 ? 1 : 0); // 앞(다음)에 남아 있으면 활성은 끝에서 두 번째 이하
+    winStart = Math.max(lo, Math.min(hi, winStart));
+    winStart = Math.max(0, Math.min(N - WINDOW, winStart));
+    var winEnd = winStart + WINDOW - 1;
+    dots.forEach(function (d, k) {
+      d.className = 'dot';
+      if (k < winStart || k > winEnd) { d.classList.add('is-hidden'); return; }
+      if (k === current) { d.classList.add('is-active'); return; }
+      if ((k === winStart && winStart > 0) || (k === winEnd && winEnd < N - 1)) {
+        d.classList.add('is-small');
+      }
+    });
+  }
+
+  function updateCurrent() {
+    var w = track.clientWidth;
+    if (!w) return;
+    var idx = Math.round(track.scrollLeft / w);
+    idx = Math.max(0, Math.min(N - 1, idx));
+    if (idx !== current) {
+      current = idx;
+      renderDots();
+    }
+  }
+
+  track.addEventListener('scroll', updateCurrent, { passive: true });
+  window.addEventListener('resize', updateCurrent);
+  renderDots();
+
+  /* 데스크톱 프리뷰용 마우스 드래그 스와이프 */
+  var dragging = false, startX = 0, startScroll = 0;
+  track.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    dragging = true;
+    startX = e.clientX;
+    startScroll = track.scrollLeft;
+    track.style.scrollSnapType = 'none';
+    track.setPointerCapture(e.pointerId);
+  });
+  track.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    track.scrollLeft = startScroll - (e.clientX - startX);
+  });
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    var w = track.clientWidth;
+    var idx = Math.max(0, Math.min(N - 1, Math.round(track.scrollLeft / w)));
+    track.style.scrollSnapType = '';
+    track.scrollTo({ left: idx * w, behavior: 'smooth' });
+  }
+  track.addEventListener('pointerup', endDrag);
+  track.addEventListener('pointercancel', endDrag);
+
+  /* ---------- 상세 더보기 ---------- */
+  var clip = document.querySelector('.m-detail__clip');
+  document.querySelector('.btn-more').addEventListener('click', function () {
+    clip.style.maxHeight = clip.scrollHeight + 'px';
+    requestAnimationFrame(function () {
+      clip.classList.add('is-open');
+      clip.style.maxHeight = 'none';
+    });
+  });
+
+  /* ---------- 문의 아코디언 ---------- */
+  document.querySelectorAll('.inquiry-item[data-collapsible]').forEach(function (item) {
+    item.querySelector('.inquiry-item__toggle').addEventListener('click', function () {
+      item.classList.toggle('is-open');
+      var q = item.querySelector('.inquiry-item__q');
+      if (q) q.classList.toggle('inquiry-item__q--clamp');
+    });
+  });
+
+  /* ---------- 페이지네이션 (데모: ‹ 1 / 10 ›) ---------- */
+  document.querySelectorAll('.m-pagination').forEach(function (pg) {
+    var cur = pg.querySelector('.current');
+    var total = parseInt(pg.querySelector('.total').textContent, 10);
+    var prev = pg.querySelector('.m-pagination__arrow--prev');
+    var next = pg.querySelector('.m-pagination__arrow--next');
+    function set(n) {
+      n = Math.max(1, Math.min(total, n));
+      cur.textContent = n;
+      prev.disabled = n === 1;
+      next.disabled = n === total;
+    }
+    prev.addEventListener('click', function () { set(parseInt(cur.textContent, 10) - 1); });
+    next.addEventListener('click', function () { set(parseInt(cur.textContent, 10) + 1); });
+  });
+})();
+</script>
+</body>
+</html>
