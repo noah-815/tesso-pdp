@@ -14,16 +14,15 @@
    - 클릭 시 메인 이미지 크로스페이드 (Swiper fade 효과 재현)
    - 세로 섬네일 스트립이 슬라이드되며 활성 섬네일을 중앙 정렬
      (nonfiction.kr: 세로 thumbSwiper + fade mainSwiper 양방향 컨트롤 구조) */
-/* 레일 높이가 행 높이를 결정하지 않도록 섬네일 트랙을 absolute로 분리 */
+/* 레일 높이가 행 높이를 결정하지 않도록 섬네일을 absolute 스크롤 컨테이너로 분리 */
 .gallery--b .gallery__rail { position: relative; overflow: hidden; }
 .gallery--b .gallery__thumbs {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  transition: transform 0.5s cubic-bezier(0.33, 0, 0.2, 1);
-  will-change: transform;
+  inset: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
+.gallery--b .gallery__thumbs::-webkit-scrollbar { display: none; }
 .gallery--b .gallery__thumb { cursor: pointer; }
 .gallery--b .gallery__photo {
   opacity: 0;
@@ -514,45 +513,51 @@
 
 <script src="common.js"></script>
 <script>
-/* 버전 B · 논픽션 방식: 클릭 → 크로스페이드 + 섬네일 스트립 슬라이드 */
+/* 버전 C · 논픽션 방식: 클릭 → 크로스페이드 + 레일 스크롤 (수동 스크롤 가능) */
 (function () {
   var rail = document.querySelector('.gallery--b .gallery__rail');
-  var track = document.querySelector('.gallery--b .js-thumbs');
+  var scroller = document.querySelector('.gallery--b .js-thumbs');
   var thumbs = document.querySelectorAll('.gallery--b .gallery__thumb');
   var photos = document.querySelectorAll('.gallery--b .gallery__photo');
   var GAP = 12;
   var current = 0;
 
-  function slideRail() {
+  /* 클릭 시 활성 섬네일이 레일 중앙에 오도록 부드럽게 스크롤 */
+  function centerRail() {
     var thumbH = thumbs[0].offsetHeight;
     var railH = rail.offsetHeight;
-    var trackH = thumbs.length * thumbH + (thumbs.length - 1) * GAP;
-    if (trackH <= railH) {
-      track.style.transform = 'none';
-      rail.classList.add('at-top', 'at-bottom');
-      return;
-    }
-    var max = trackH - railH;
     var target = current * (thumbH + GAP) - (railH - thumbH) / 2;
-    target = Math.max(0, Math.min(target, max));
-    track.style.transform = 'translateY(' + (-target) + 'px)';
-    /* 트랙 위치 기반 스마트 페이드: 끝에 닿으면 해당 방향 그라디언트 제거 */
-    rail.classList.toggle('at-top', target <= 4);
-    rail.classList.toggle('at-bottom', target >= max - 4);
+    scroller.scrollTo({ top: target, behavior: 'smooth' });
   }
 
   function setActive(i) {
     current = i;
     thumbs.forEach(function (t, k) { t.classList.toggle('is-active', k === current); });
     photos.forEach(function (p, k) { p.classList.toggle('is-visible', k === current); });
-    slideRail();
+    centerRail();
   }
 
   thumbs.forEach(function (t, i) {
     t.addEventListener('click', function () { setActive(i); });
   });
-  window.addEventListener('resize', slideRail);
-  slideRail();
+
+  /* 레일 페이드: 스크롤 위치 기반 (수동 스크롤·자동 센터링 모두 반영) */
+  function updateFades() {
+    var max = scroller.scrollHeight - scroller.clientHeight;
+    if (max <= 0) { rail.classList.add('at-top', 'at-bottom'); return; }
+    rail.classList.toggle('at-top', scroller.scrollTop <= 4);
+    rail.classList.toggle('at-bottom', scroller.scrollTop >= max - 4);
+  }
+  scroller.addEventListener('scroll', updateFades, { passive: true });
+  window.addEventListener('resize', updateFades);
+  var lastTop = -1;
+  (function watch() {
+    if (scroller.scrollTop !== lastTop) {
+      lastTop = scroller.scrollTop;
+      updateFades();
+    }
+    requestAnimationFrame(watch);
+  })();
 })();
 </script>
 </body>
