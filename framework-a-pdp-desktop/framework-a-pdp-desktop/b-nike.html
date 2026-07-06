@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나이키스킴스 리프트 메쉬 — B · 나이키 방식</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ===== 버전 A · 나이키 방식 =====
+   - 섬네일 hover 즉시 전환 (트랜지션 없는 스왑)
+   - 메인 이미지 우측 하단 원형 페이징 버튼 (nike.com PDP 참고) */
+/* 레일 높이가 행 높이를 결정하지 않도록 섬네일을 absolute로 분리 */
+.gallery--a .gallery__rail { position: relative; overflow: hidden; }
+.gallery--a .gallery__thumbs {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.gallery--a .gallery__thumbs::-webkit-scrollbar { display: none; }
+.gallery--a .gallery__photo {
+  opacity: 0;
+  z-index: 0;
+}
+.gallery--a .gallery__photo.is-visible {
+  opacity: 1;
+  z-index: 1;
+}
+.gallery-nav {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+.gallery-nav__btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.gallery-nav__btn:hover { background: #fff; }
+.gallery-nav__btn:active { background: #e5e5e5; }
+.gallery-nav__btn img { width: 20px; height: 20px; }
+@media (max-width: 768px) {
+  .gallery-nav { right: 12px; bottom: 12px; }
+  .gallery-nav__btn { width: 38px; height: 38px; }
+}
+</style>
+</head>
+<body data-version="b">
+
+<!-- ==================== 헤더 ==================== -->
+<header class="header">
+  <div class="header__inner">
+    <button class="icon-btn" aria-label="메뉴"><img src="assets/icons/menu.svg" alt=""></button>
+    <a class="header__logo" href="#">BRAND</a>
+    <div class="header__group">
+      <button class="icon-btn" aria-label="검색"><img src="assets/icons/search.svg" alt=""></button>
+      <button class="icon-btn" aria-label="계정"><img src="assets/icons/account.svg" alt=""></button>
+      <button class="icon-btn" aria-label="장바구니"><img src="assets/icons/bag.svg" alt=""></button>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- ==================== 좌측 콘텐츠 ==================== -->
+  <div class="col-content">
+
+    <!-- 상품 이미지 갤러리 -->
+    <section class="js-gallery-section">
+      <div class="gallery gallery--a">
+        <div class="gallery__rail">
+          <div class="gallery__thumbs js-thumbs">
+            <button class="gallery__thumb is-active" data-index="0" aria-label="상품 이미지 1"><img src="assets/img/product-1.jpg" alt="측면"></button>
+            <button class="gallery__thumb" data-index="1" aria-label="상품 이미지 2"><img src="assets/img/product-2.jpg" alt="밑창"></button>
+            <button class="gallery__thumb" data-index="2" aria-label="상품 이미지 3"><img src="assets/img/product-3.jpg" alt="탑뷰"></button>
+            <button class="gallery__thumb" data-index="3" aria-label="상품 이미지 4"><img src="assets/img/product-4.jpg" alt="사선"></button>
+            <button class="gallery__thumb" data-index="4" aria-label="상품 이미지 5"><img src="assets/img/product-5.jpg" alt="스트랩 디테일"></button>
+            <button class="gallery__thumb" data-index="5" aria-label="상품 이미지 6"><img src="assets/img/product-6.jpg" alt="착용 컷"></button>
+            <button class="gallery__thumb" data-index="6" aria-label="상품 이미지 7"><img src="assets/img/product-1.jpg" alt="측면"></button>
+            <button class="gallery__thumb" data-index="7" aria-label="상품 이미지 8"><img src="assets/img/product-2.jpg" alt="밑창"></button>
+            <button class="gallery__thumb" data-index="8" aria-label="상품 이미지 9"><img src="assets/img/product-3.jpg" alt="탑뷰"></button>
+            <button class="gallery__thumb" data-index="9" aria-label="상품 이미지 10"><img src="assets/img/product-4.jpg" alt="사선"></button>
+            <button class="gallery__thumb" data-index="10" aria-label="상품 이미지 11"><img src="assets/img/product-5.jpg" alt="스트랩 디테일"></button>
+            <button class="gallery__thumb" data-index="11" aria-label="상품 이미지 12"><img src="assets/img/product-6.jpg" alt="착용 컷"></button>
+            <button class="gallery__thumb" data-index="12" aria-label="상품 이미지 13"><img src="assets/img/product-1.jpg" alt="측면"></button>
+            <button class="gallery__thumb" data-index="13" aria-label="상품 이미지 14"><img src="assets/img/product-2.jpg" alt="밑창"></button>
+            <button class="gallery__thumb" data-index="14" aria-label="상품 이미지 15"><img src="assets/img/product-3.jpg" alt="탑뷰"></button>
+          </div>
+          <div class="gallery__rail-fade gallery__rail-fade--top"></div>
+          <div class="gallery__rail-fade gallery__rail-fade--bottom"></div>
+        </div>
+        <div class="gallery__main js-main">
+          <img class="gallery__photo is-visible" data-index="0" src="assets/img/product-1.jpg" alt="나이키스킴스 리프트 메쉬 — 측면">
+          <img class="gallery__photo" data-index="1" src="assets/img/product-2.jpg" alt="나이키스킴스 리프트 메쉬 — 밑창" loading="lazy">
+          <img class="gallery__photo" data-index="2" src="assets/img/product-3.jpg" alt="나이키스킴스 리프트 메쉬 — 탑뷰" loading="lazy">
+          <img class="gallery__photo" data-index="3" src="assets/img/product-4.jpg" alt="나이키스킴스 리프트 메쉬 — 사선" loading="lazy">
+          <img class="gallery__photo" data-index="4" src="assets/img/product-5.jpg" alt="나이키스킴스 리프트 메쉬 — 스트랩 디테일" loading="lazy">
+          <img class="gallery__photo" data-index="5" src="assets/img/product-6.jpg" alt="나이키스킴스 리프트 메쉬 — 착용 컷" loading="lazy">
+          <img class="gallery__photo" data-index="6" src="assets/img/product-1.jpg" alt="나이키스킴스 리프트 메쉬 — 측면" loading="lazy">
+          <img class="gallery__photo" data-index="7" src="assets/img/product-2.jpg" alt="나이키스킴스 리프트 메쉬 — 밑창" loading="lazy">
+          <img class="gallery__photo" data-index="8" src="assets/img/product-3.jpg" alt="나이키스킴스 리프트 메쉬 — 탑뷰" loading="lazy">
+          <img class="gallery__photo" data-index="9" src="assets/img/product-4.jpg" alt="나이키스킴스 리프트 메쉬 — 사선" loading="lazy">
+          <img class="gallery__photo" data-index="10" src="assets/img/product-5.jpg" alt="나이키스킴스 리프트 메쉬 — 스트랩 디테일" loading="lazy">
+          <img class="gallery__photo" data-index="11" src="assets/img/product-6.jpg" alt="나이키스킴스 리프트 메쉬 — 착용 컷" loading="lazy">
+          <img class="gallery__photo" data-index="12" src="assets/img/product-1.jpg" alt="나이키스킴스 리프트 메쉬 — 측면" loading="lazy">
+          <img class="gallery__photo" data-index="13" src="assets/img/product-2.jpg" alt="나이키스킴스 리프트 메쉬 — 밑창" loading="lazy">
+          <img class="gallery__photo" data-index="14" src="assets/img/product-3.jpg" alt="나이키스킴스 리프트 메쉬 — 탑뷰" loading="lazy">
+          <div class="gallery-nav">
+            <!-- FrameworkA 아이콘은 파일명과 시각적 방향이 반대 (chevronRight.svg = ‹ 모양) -->
+            <button class="gallery-nav__btn js-prev" aria-label="이전 이미지"><img src="assets/icons/chevronRight.svg" alt=""></button>
+            <button class="gallery-nav__btn js-next" aria-label="다음 이미지"><img src="assets/icons/chevronLeft.svg" alt=""></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 상품 상세 (브랜드 스토리) -->
+    <section class="detail">
+      <div class="detail__clip">
+        <div class="detail__stack">
+          <div class="detail__image"><img src="assets/img/detail-1.jpg" alt="나이키스킴스 리프트 메쉬 착용 이미지"></div>
+          <div class="detail__text">
+            <strong>간편한 착용</strong>
+            <p>아이코닉한 나이키 리프트 스플릿 토 디자인이 몸의 움직임을 새롭게 만듭니다.</p>
+          </div>
+          <div class="detail__image detail__image--crop"><img src="assets/img/detail-2.jpg" alt="밑창 디테일"></div>
+        </div>
+        <div class="detail__more-area">
+          <button class="btn-more" type="button">더보기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 리뷰 -->
+    <section class="section review">
+      <div class="section__title-row">
+        <h2 class="section__title">리뷰 <span class="count">(1,423)</span></h2>
+        <div class="rating-area">
+          <div class="rating">
+            <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+          </div>
+          <span class="score">4.2</span>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <label class="check">
+          <input type="checkbox">
+          <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+          포토리뷰만 보기
+        </label>
+        <button class="select-text">최신순 <img src="assets/icons/chevronDown.svg" alt=""></button>
+      </div>
+
+      <div class="review-list">
+        <!-- 리뷰 1 : 텍스트 + 사진 8장 -->
+        <article class="review-item">
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <div class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </div>
+            </div>
+            <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+            <p class="review-item__body">처음엔 살짝 투박해 보였는데 신다 보니까 오히려 포인트 되는 느낌이에요.<br>편해서 아무 때나 신기 좋고, 생각보다 활용도가 높은 신발이에요!</p>
+          </div>
+          <div class="review-item__photos">
+            <span class="ph"><img src="assets/img/product-1.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-2.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-3.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-4.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-2.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-3.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-4.jpg" alt=""></span>
+            <span class="ph is-ghost"></span>
+          </div>
+          <span class="review-item__date">2026. 6. 12</span>
+        </article>
+
+        <!-- 리뷰 2 : 내 리뷰 + 사진 9장(+3) -->
+        <article class="review-item">
+          <div class="review-item__head">
+            <span class="badge">내 리뷰</span>
+            <div class="text-btn-group">
+              <button class="text-btn">수정</button>
+              <span class="vdiv vdiv--10"></span>
+              <button class="text-btn text-btn--danger">삭제</button>
+            </div>
+          </div>
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <div class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </div>
+            </div>
+            <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+            <p class="review-item__body">디자인 때문에 샀는데 신어보고 나서 진짜 놀랐어요. 발이 신발에 딱 감싸지는 느낌이라 오래 걸어도 피로감이 훨씬 덜하더라고요. 벨크로 스트랩이 장식처럼 보이는데 실제로 고정력이 꽤 좋습니다. 올블랙이라 어디에 코디해도 튀지 않고 자연스럽게 녹아드는 게 마음에 들어요. 재구매 의사 있습니다.</p>
+          </div>
+          <div class="review-item__photos">
+            <span class="ph"><img src="assets/img/product-1.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-2.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-3.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-4.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-5.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-2.jpg" alt=""></span>
+            <span class="ph"><img src="assets/img/product-3.jpg" alt=""></span>
+            <span class="ph is-more" data-more="+3"><img src="assets/img/product-6.jpg" alt=""></span>
+          </div>
+          <span class="review-item__date">2026. 6. 12</span>
+        </article>
+
+        <!-- 리뷰 3 : 텍스트만 -->
+        <article class="review-item">
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <div class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </div>
+            </div>
+            <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+            <p class="review-item__body">디자인이 좀 독특해서 처음엔 고민했는데, 막상 신어보니까 생각보다 훨씬 편해요.<br>스트랩이 있어서 발을 잘 잡아주는 느낌이고, 오래 걸어도 크게 피로하지 않았습니다. 요즘은 거의 매일 신고 다니고 있어요.</p>
+          </div>
+          <span class="review-item__date">2026. 6. 12</span>
+        </article>
+
+        <!-- 리뷰 4 : 텍스트 + 사진 1장 -->
+        <article class="review-item">
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <div class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </div>
+            </div>
+            <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+            <p class="review-item__body">밑창이 두툼해서 그런지 쿠션감이 괜찮은 편이에요. 장시간 걸어도 발바닥 부담이 덜하고, 안정감 있게 잡아줘서 만족스럽습니다.<br>코디도 크게 안 타서 활용도 높은 신발이에요.</p>
+          </div>
+          <div class="review-item__photos review-item__photos--single">
+            <span class="ph"><img src="assets/img/product-1.jpg" alt=""></span>
+          </div>
+          <span class="review-item__date">2026. 6. 12</span>
+        </article>
+
+        <!-- 리뷰 5 : 텍스트만 -->
+        <article class="review-item">
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <div class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </div>
+            </div>
+            <div class="option-row">240 <span class="vdiv vdiv--12"></span> 블랙 <span class="vdiv vdiv--12"></span> 선물포장</div>
+            <p class="review-item__body">밑창 패턴이 독특해서 미끄럼 방지가 잘 될까 걱정했는데, 비 온 날 외출해봤을 때도 확실히 잡아주더라고요.<br>소재 자체가 방수 계열인지 물이 스며드는 느낌도 거의 없었고요. 활동성이 높은 날 신기에 딱 좋은 것 같습니다.</p>
+          </div>
+          <span class="review-item__date">2026. 6. 12</span>
+        </article>
+      </div>
+
+      <nav class="pagination">
+        <button class="pagination__arrow pagination__arrow--prev" disabled><img src="assets/icons/chevronRight.svg" alt="이전"></button>
+        <div class="pagination__pages">
+          <button class="pagination__page is-active">1</button>
+          <button class="pagination__page">2</button>
+          <button class="pagination__page">3</button>
+          <button class="pagination__page">4</button>
+          <button class="pagination__page">5</button>
+          <button class="pagination__page">6</button>
+          <button class="pagination__page">7</button>
+          <button class="pagination__page">8</button>
+          <button class="pagination__page">9</button>
+          <button class="pagination__page">10</button>
+        </div>
+        <button class="pagination__arrow pagination__arrow--next"><img src="assets/icons/chevronLeft.svg" alt="다음"></button>
+      </nav>
+    </section>
+
+    <!-- 상품 문의 -->
+    <section class="section inquiry">
+      <div class="section__title-row">
+        <h2 class="section__title">상품 문의</h2>
+        <button class="btn-pill-dark">문의하기</button>
+      </div>
+
+      <div class="filter-bar">
+        <label class="check">
+          <input type="checkbox">
+          <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+          내 문의만 보기
+        </label>
+        <button class="select-text">전체 <img src="assets/icons/chevronDown.svg" alt=""></button>
+      </div>
+
+      <div class="inquiry-list">
+        <!-- 문의 1 : 미답변 -->
+        <article class="inquiry-item" data-collapsible>
+          <div>
+            <div class="inquiry-item__info">
+              <div class="option-row">미답변 <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+              <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt="펼치기"></button>
+            </div>
+            <p class="inquiry-item__q inquiry-item__q--clamp" style="margin-top:12px">사이즈 고민 중인데요, 평소 255 신는데 발볼이 좀 있는 편이에요. 255로 주문하면 될까요?<br>아니면 한 사이즈 업해서 260으로 구매해야 될까요?</p>
+          </div>
+        </article>
+
+        <!-- 문의 2 : 내 문의 -->
+        <article class="inquiry-item" data-collapsible>
+          <div class="review-item__head">
+            <span class="badge">내 문의</span>
+            <div class="text-btn-group">
+              <button class="text-btn">수정</button>
+              <span class="vdiv vdiv--10"></span>
+              <button class="text-btn text-btn--danger">삭제</button>
+            </div>
+          </div>
+          <div>
+            <div class="inquiry-item__info">
+              <div class="option-row">미답변 <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+              <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt="펼치기"></button>
+            </div>
+            <p class="inquiry-item__q inquiry-item__q--clamp" style="margin-top:12px">이 제품이 쿠션감이 어느 정도인지 궁금합니다. 밑창이 두꺼워 보여서 오래 걸어도 괜찮을 것 같긴 한데,<br>실제로 착용했을 때 발 피로도가 어떤지 알고 싶어요.</p>
+          </div>
+        </article>
+
+        <!-- 문의 3 : 답변완료 (펼침) -->
+        <article class="inquiry-item is-open" data-collapsible>
+          <div>
+            <div class="inquiry-item__info">
+              <div class="option-row"><span class="status-done">답변완료</span> <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+              <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt="접기"></button>
+            </div>
+            <p class="inquiry-item__q" style="margin-top:12px">안녕하세요, 상품 잘 받았는데 상태 확인 후 문의드립니다. 받은 제품에 눈에 띄는 하자가 있어 교환 요청드립니다.<br>착용 전 확인한 상태이며, 제품 마감 부분에 문제가 있는 것 같아 정상 제품으로 교환을 받고 싶습니다.</p>
+          </div>
+          <div class="inquiry-reply">
+            <div class="inquiry-reply__info">
+              <strong>판매자 답변</strong>
+              <span class="vdiv vdiv--10"></span>
+              <span class="date">2026. 6. 13. 09:10</span>
+            </div>
+            <p class="inquiry-reply__body">안녕하세요, 고객님.
+먼저 배송 과정 중 불편을 드리게 된 점 양해 부탁드립니다.
+
+파손 상품은 별도의 비용 없이 회수 예정이며, 정상 상품은 회수 접수 완료 후 순차적으로 발송될 예정입니다.
+교환 배송비는 당사에서 부담합니다.
+
+추가로 궁금하신 사항이 있으시면 언제든지 문의해 주세요.
+불편을 드린 점 다시 한 번 양해 부탁드리며, 빠르게 도움드릴 수 있도록 하겠습니다.
+
+감사합니다.</p>
+          </div>
+        </article>
+
+        <!-- 문의 4 : 답변완료 (접힘) -->
+        <article class="inquiry-item" data-collapsible>
+          <div>
+            <div class="inquiry-item__info">
+              <div class="option-row"><span class="status-done">답변완료</span> <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+              <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt="펼치기"></button>
+            </div>
+            <p class="inquiry-item__q inquiry-item__q--clamp" style="margin-top:12px">벨크로 스트랩 내구성이 궁금해요. 자주 탈부착하다 보면 접착력이 금방 떨어지는 제품들이 있어서요.<br>장기간 사용해도 괜찮은 소재인지 알고 싶습니다.</p>
+          </div>
+        </article>
+
+        <!-- 문의 5 : 비밀글 -->
+        <article class="inquiry-item">
+          <div>
+            <div class="inquiry-item__info">
+              <div class="option-row">미답변 <span class="vdiv vdiv--12"></span> nickname*** <span class="vdiv vdiv--12"></span> 2026. 6. 12. 14:58</div>
+              <button class="inquiry-item__toggle"><img src="assets/icons/chevronDown.svg" alt=""></button>
+            </div>
+            <div class="inquiry-item__private" style="margin-top:12px">
+              <img src="assets/icons/lock.svg" alt="">
+              <span>비밀글</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <nav class="pagination">
+        <button class="pagination__arrow pagination__arrow--prev" disabled><img src="assets/icons/chevronRight.svg" alt="이전"></button>
+        <div class="pagination__pages">
+          <button class="pagination__page is-active">1</button>
+          <button class="pagination__page">2</button>
+          <button class="pagination__page">3</button>
+          <button class="pagination__page">4</button>
+          <button class="pagination__page">5</button>
+          <button class="pagination__page">6</button>
+          <button class="pagination__page">7</button>
+          <button class="pagination__page">8</button>
+          <button class="pagination__page">9</button>
+          <button class="pagination__page">10</button>
+        </div>
+        <button class="pagination__arrow pagination__arrow--next"><img src="assets/icons/chevronLeft.svg" alt="다음"></button>
+      </nav>
+    </section>
+
+    <!-- 주문 정보 -->
+    <section class="section order-info">
+      <div class="section__title-row">
+        <h2 class="section__title">주문 정보</h2>
+      </div>
+      <div class="order-info__body">
+        <div class="block">
+          <h3>배송 정보</h3>
+          <p>배송 업체&nbsp; ㅣ&nbsp; CJ 대한통운 (1588-1255)<br>
+          배송 지역&nbsp; ㅣ&nbsp; 대한민국 전 지역 배송<br>
+          배송 비용&nbsp; ㅣ&nbsp; 3,500원 / 구매 금액 50,000원 이상 시 무료배송<br>
+          / 제주 및 도서 산간 지역 별도 추가 금액 발생<br>
+          배송 기간&nbsp; ㅣ&nbsp; 주말·공휴일 제외 2일 ~ 5일</p>
+        </div>
+        <div class="block">
+          <p>유의 사항<br>
+          - 주문 폭주 및 공급 사정으로 인하여 지연 및 품절이 발생할 수 있습니다.<br>
+          - 기본 배송기간 이상 소요되는 상품이거나, 품절 상품은 개별 연락을 드립니다.</p>
+        </div>
+      </div>
+      <div class="order-info__banner">
+        <img src="assets/img/order-calendar.jpg" alt="추석 연휴 배송 안내">
+      </div>
+    </section>
+
+    <div class="col-content__bottom-space"></div>
+  </div>
+
+  <!-- ==================== 우측 상품 정보 ==================== -->
+  <aside class="col-info">
+    <div class="info-panel">
+      <div class="info-panel__head">
+        <div>
+          <p class="info-panel__category">여성 신발</p>
+          <h1 class="info-panel__name">나이키스킴스 리프트 메쉬</h1>
+        </div>
+        <div class="info-panel__actions">
+          <button class="circle-btn js-wishlist" aria-label="위시리스트"><img src="assets/icons/wishlist.svg" alt=""></button>
+          <button class="circle-btn js-share" aria-label="공유"><img src="assets/icons/share.svg" alt=""></button>
+        </div>
+      </div>
+
+      <div class="info-panel__price">
+        <span class="now">189,000원</span>
+        <span class="was">200,000원</span>
+      </div>
+
+      <p class="info-panel__desc">나이키스킴스 리프트 메쉬는 세련된 실루엣에 메쉬를 더하여 세련되고 통기성이 좋은 신발을 완성합니다. 발밑의 부드러운 폼이 걸음마다 환상적인 느낌을 선사하며, 독특한 스플릿 토 디자인이 캐주얼함과 우아함 사이의 간극을 메웁니다. 절제된 나이키스킴스 브랜딩이 미니멀하고 럭셔리한 룩을 연출합니다.</p>
+
+      <div class="option-area">
+        <div class="select-field">
+          <div class="select-field__button"><span class="label">사이즈</span><img src="assets/icons/chevronDown.svg" alt=""></div>
+        </div>
+        <div class="select-field is-disabled">
+          <div class="select-field__button"><span class="label">색상</span><img src="assets/icons/chevronDown.svg" alt=""></div>
+        </div>
+        <div class="select-field is-disabled">
+          <div class="select-field__button"><span class="label">추가 옵션</span><img src="assets/icons/chevronDown.svg" alt=""></div>
+        </div>
+
+        <div class="buy-buttons">
+          <button class="btn-cart">장바구니 담기</button>
+          <button class="btn-buy">바로 구매하기</button>
+        </div>
+      </div>
+
+      <div class="info-accordion">
+        <div class="acc-item">
+          <div class="acc-item__head">배송 및 반품 <img src="assets/icons/chevronDown.svg" alt=""></div>
+          <div class="acc-item__body">
+            <div class="acc-item__body-inner">
+              결제 완료 후 평균 2~5일(주말·공휴일 제외) 이내 출고됩니다.<br>
+              단순 변심에 의한 반품은 상품 수령 후 7일 이내 접수 가능하며, 왕복 배송비가 부과됩니다.<br>
+              착용 흔적이나 오염이 있는 경우 반품이 제한될 수 있습니다.
+            </div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-item__head">세탁방법 <img src="assets/icons/chevronDown.svg" alt=""></div>
+          <div class="acc-item__body">
+            <div class="acc-item__body-inner">
+              미온수에 중성세제를 풀어 부드러운 솔로 단독 손세탁해 주세요.<br>
+              세탁기·건조기 사용 시 형태 변형이 발생할 수 있습니다.<br>
+              직사광선을 피해 통풍이 잘되는 그늘에서 자연 건조해 주세요.
+            </div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-item__head">주의사항 <img src="assets/icons/chevronDown.svg" alt=""></div>
+          <div class="acc-item__body">
+            <div class="acc-item__body-inner">
+              열기구 근처 보관 시 접착 부위가 손상될 수 있습니다.<br>
+              밝은 색상의 의류와 마찰 시 이염이 발생할 수 있으니 주의해 주세요.<br>
+              모니터 환경에 따라 실제 색상과 다소 차이가 있을 수 있습니다.
+            </div>
+          </div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-item__head">세부정보 <img src="assets/icons/chevronDown.svg" alt=""></div>
+          <div class="acc-item__body">
+            <div class="acc-item__body-inner">
+              <ul>
+                <li>· 소재: 메쉬, 합성가죽, 고무 아웃솔</li>
+                <li>· 색상: 블랙, 브라운, 다크 브라운</li>
+                <li>· 제조국: 베트남</li>
+                <li>· 품질보증기준: 관련 법 및 소비자 분쟁해결 기준에 따름</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- 스낵바 -->
+<div class="snackbar" role="status">
+  <img class="thumb" src="assets/img/product-1.jpg" alt="" style="display:none">
+  <span class="msg"></span>
+</div>
+
+<!-- 버전 스위처 (데모) -->
+<nav class="version-switcher">
+  <a href="a-click.html">Interaction A</a>
+  <a href="b-nike.html" class="is-active">Interaction B</a>
+  <a href="c-nonfiction.html">Interaction C</a>
+</nav>
+
+<script src="common.js"></script>
+<script>
+/* 버전 A · 나이키 방식: hover 즉시 전환 + 원형 페이징 버튼 */
+(function () {
+  var thumbs = document.querySelectorAll('.gallery--a .gallery__thumb');
+  var photos = document.querySelectorAll('.gallery--a .gallery__photo');
+  var current = 0;
+
+  function setActive(i) {
+    current = (i + thumbs.length) % thumbs.length;
+    thumbs.forEach(function (t, k) { t.classList.toggle('is-active', k === current); });
+    photos.forEach(function (p, k) { p.classList.toggle('is-visible', k === current); });
+    thumbs[current].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  thumbs.forEach(function (t, i) {
+    t.addEventListener('mouseenter', function () { setActive(i); });
+    t.addEventListener('click', function () { setActive(i); });
+  });
+  document.querySelector('.gallery--a .js-prev').addEventListener('click', function () { setActive(current - 1); });
+  document.querySelector('.gallery--a .js-next').addEventListener('click', function () { setActive(current + 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') setActive(current - 1);
+    if (e.key === 'ArrowRight') setActive(current + 1);
+  });
+
+  /* 레일 페이드: 리스트 끝에 닿으면 해당 방향 그라디언트 제거 */
+  var rail = document.querySelector('.gallery--a .gallery__rail');
+  var scroller = document.querySelector('.gallery--a .js-thumbs');
+  function updateFades() {
+    var max = scroller.scrollHeight - scroller.clientHeight;
+    rail.classList.toggle('at-top', scroller.scrollTop <= 4);
+    rail.classList.toggle('at-bottom', scroller.scrollTop >= max - 4);
+  }
+  scroller.addEventListener('scroll', updateFades, { passive: true });
+  window.addEventListener('resize', updateFades);
+  var lastTop = -1;
+  (function watch() {
+    if (scroller.scrollTop !== lastTop) {
+      lastTop = scroller.scrollTop;
+      updateFades();
+    }
+    requestAnimationFrame(watch);
+  })();
+})();
+</script>
+</body>
+</html>
