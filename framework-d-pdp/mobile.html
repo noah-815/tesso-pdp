@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>매일 산책하는 강아지를 위한 샴푸 — Framework D · Mobile</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css">
+<link rel="stylesheet" href="mobile.css?v=1">
+</head>
+<body>
+
+<!-- ==================== 헤더 (mobileT_header) ==================== -->
+<header class="header">
+  <button class="header__icon-btn" aria-label="메뉴"><img src="assets/icons/menu.svg" alt=""></button>
+  <a class="header__logo" href="#">BRAND</a>
+  <div class="header__group">
+    <button class="header__icon-btn" aria-label="검색"><img src="assets/icons/search.svg" alt=""></button>
+    <button class="header__icon-btn" aria-label="장바구니"><img src="assets/icons/bag.svg" alt=""></button>
+  </div>
+</header>
+
+<main>
+  <!-- ==================== 상품 이미지 캐러셀 ==================== -->
+  <section class="m-gallery" aria-label="상품 이미지">
+    <div class="m-gallery__scroller js-scroller"><!-- 슬라이드는 JS가 렌더 --></div>
+    <div class="m-gallery__actions">
+      <button class="icon-btn" aria-label="위시리스트"><img src="assets/icons/wishlist.svg" alt=""></button>
+      <button class="icon-btn" aria-label="공유"><img src="assets/icons/share.svg" alt=""></button>
+    </div>
+    <div class="m-gallery__indicator js-indicator" aria-hidden="true"><!-- 도트는 JS가 렌더 --></div>
+  </section>
+
+  <!-- ==================== 상품 정보 ==================== -->
+  <section class="info">
+    <div class="info__head">
+      <div class="info__title-area">
+        <p class="info__category">Dog Wash</p>
+        <div class="info__name-area">
+          <h1 class="info__name">매일 산책하는 강아지를 위한 샴푸</h1>
+          <div class="info__price-row">
+            <span class="info__price">40,000원</span>
+            <span class="info__price-original">50,000원</span>
+          </div>
+        </div>
+      </div>
+      <p class="info__desc">털을 잘 더럽히는 강아지를 위해 만든 피부 진정·냄새 제거 세정제입니다. 식물성 성분을 사용해 피부의 자연스러운 균형을 해치지 않으면서 부드럽게 세정하고, 털은 한결 부드럽게, 피부는 편안하게 진정시켜 줍니다. 향을 남기지 않는 무향 포뮬러로 마무리되어 부담 없이 사용할 수 있습니다. 산책 후나 뒹군 뒤처럼 오염이 걱정되는 순간은 물론, 일상 속 어떤 상황에서도 매일 사용하기에 적합합니다.</p>
+    </div>
+
+    <div class="detail-info">
+      <div class="acc-item js-acc">
+        <button class="acc-item__head">
+          <span class="title">사용방법</span>
+          <span class="ic"><img class="plus" src="assets/icons/plusSmall.svg" alt=""><img class="minus" src="assets/icons/minusSmall.svg" alt=""></span>
+        </button>
+        <div class="acc-item__body">털을 미온수로 충분히 적신 뒤 적당량을 덜어 부드럽게 마사지하듯 거품을 내주세요.<br>거품이 남지 않도록 꼼꼼히 헹군 후 타월로 물기를 제거하고 완전히 말려주세요.</div>
+      </div>
+      <div class="acc-item js-acc">
+        <button class="acc-item__head">
+          <span class="title">전성분</span>
+          <span class="ic"><img class="plus" src="assets/icons/plusSmall.svg" alt=""><img class="minus" src="assets/icons/minusSmall.svg" alt=""></span>
+        </button>
+        <div class="acc-item__body">정제수, 코코베타인, 데실글루코사이드, 글리세린, 판테놀, 알란토인, 카모마일추출물, 시트르산</div>
+      </div>
+      <div class="acc-item js-acc">
+        <button class="acc-item__head">
+          <span class="title">배송 및 반품</span>
+          <span class="ic"><img class="plus" src="assets/icons/plusSmall.svg" alt=""><img class="minus" src="assets/icons/minusSmall.svg" alt=""></span>
+        </button>
+        <div class="acc-item__body">결제 완료 후 평균 2~5일(주말·공휴일 제외) 이내 출고됩니다.<br>단순 변심에 의한 반품은 상품 수령 후 7일 이내 접수 가능하며, 왕복 배송비가 부과됩니다.</div>
+      </div>
+      <div class="acc-item js-acc">
+        <button class="acc-item__head">
+          <span class="title">주의사항</span>
+          <span class="ic"><img class="plus" src="assets/icons/plusSmall.svg" alt=""><img class="minus" src="assets/icons/minusSmall.svg" alt=""></span>
+        </button>
+        <div class="acc-item__body">반려동물 전용 제품으로 사람에게는 사용하지 마세요.<br>눈에 들어가지 않도록 주의하고, 이상 반응이 있을 경우 사용을 중단한 뒤 수의사와 상담하세요.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 상품 상세 ==================== -->
+  <section class="detail js-detail">
+    <div class="detail__clip">
+      <div class="detail__stack">
+        <div class="detail__image"><img src="assets/img/detail-1.png" alt="매일 산책하는 강아지를 위한 샴푸 무드 이미지"></div>
+        <div class="detail__text">
+          <p class="title">Everyday Wash for Dirty Dogs</p>
+          <p>털을 잘 더럽히는 강아지를 위해 만든 피부 진정·냄새 제거 세정제입니다. 식물성 성분을 사용해 피부의 자연스러운 균형을 해치지 않으면서 부드럽게 세정하고, 털은 한결 부드럽게, 피부는 편안하게 진정시켜 줍니다. 향을 남기지 않는 무향 포뮬러로 마무리되어 부담 없이 사용할 수 있습니다. 산책 후나 뒹군 뒤처럼 오염이 걱정되는 순간은 물론, 일상 속 어떤 상황에서도 매일 사용하기에 적합합니다.</p>
+        </div>
+        <div class="detail__image"><img src="assets/img/detail-2.png" alt="제품 연출 이미지"></div>
+      </div>
+      <div class="detail__more-area">
+        <button class="detail__more-btn js-detail-more" type="button">더보기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 리뷰 ==================== -->
+  <section class="section review">
+    <div class="section__bar">
+      <div class="section__title">리뷰 (1,423)</div>
+      <div class="rating-area">
+        <span class="rating rating--lg">
+          <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+        </span>
+        <span class="rating-score">4.2</span>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <label class="check">
+        <input type="checkbox">
+        <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+        포토리뷰만 보기
+      </label>
+      <button class="select-text">최신순 <img src="assets/icons/chevronDown.svg" alt=""></button>
+    </div>
+
+    <div class="review-list">
+      <!-- 리뷰 1 : 텍스트 + 사진 3장 -->
+      <article class="review-item">
+        <div class="review-item__meta">
+          <div class="review-item__meta-top">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">300ml <span class="vdiv"></span> 무향 <span class="vdiv"></span> 선물포장</div>
+          </div>
+          <p class="review-item__body">산책만 나가면 꼭 풀밭에 몸을 비비는 아이라 냄새 관리가 항상 고민이었는데, 이 샴푸는 씻긴 직후뿐 아니라 다음 날까지도 냄새가 거의 나지 않아서 만족도가 꽤 높았고, 무엇보다 향이 남지 않아 강아지가 더 편안해 보였습니다.</p>
+        </div>
+        <div class="review-item__photos">
+          <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-2.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-3.png" alt=""></span>
+          <span class="ph is-ghost"></span>
+        </div>
+        <span class="review-item__date">2026. 12. 31.</span>
+      </article>
+
+      <!-- 리뷰 2 : 내 리뷰 + 사진 3장 + more -->
+      <article class="review-item">
+        <div class="item-head">
+          <span class="badge">내 리뷰</span>
+          <div class="text-btn-group">
+            <button class="text-btn">수정</button>
+            <span class="vdiv"></span>
+            <button class="text-btn text-btn--danger">삭제</button>
+          </div>
+        </div>
+        <div class="review-item__meta">
+          <div class="review-item__meta-top">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">300ml <span class="vdiv"></span> 무향 <span class="vdiv"></span> 선물포장</div>
+          </div>
+          <p class="review-item__body">산책만 다녀오면 흙이랑 먼지를 잔뜩 묻혀 오는 아이라 거의 매일 씻겨야 하는데, 자주 사용하는 만큼 순한 제품을 찾다가 구매했습니다. 거품도 부드럽게 잘 나고 씻기는 과정에서 피부가 자극받는 느낌이 없어서 만족스러웠어요. 씻고 나면 털이 뻣뻣하지 않고 부드럽게 정돈되는 점도 마음에 들었습니다.</p>
+        </div>
+        <div class="review-item__photos">
+          <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-2.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-3.png" alt=""></span>
+          <span class="ph is-more" data-more="+5"><img src="assets/img/product-4.png" alt=""></span>
+        </div>
+        <span class="review-item__date">2026. 12. 31.</span>
+      </article>
+
+      <!-- 리뷰 3 : 텍스트만 -->
+      <article class="review-item">
+        <div class="review-item__meta">
+          <div class="review-item__meta-top">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">300ml <span class="vdiv"></span> 무향 <span class="vdiv"></span> 선물포장</div>
+          </div>
+          <p class="review-item__body">매일 사용하는 제품인 만큼 성분을 가장 중요하게 생각했는데, 순하게 사용할 수 있다는 점이 구매를 결정한 이유였습니다. 실제로 사용해 보니 세정력도 충분하면서 피부 자극은 적은 느낌이었고, 목욕 후 털이 폭신하고 윤기가 돌아 관리하기 편했습니다.</p>
+        </div>
+        <span class="review-item__date">2026. 12. 31.</span>
+      </article>
+
+      <!-- 리뷰 4 : 텍스트 + 사진 1장 -->
+      <article class="review-item">
+        <div class="review-item__meta">
+          <div class="review-item__meta-top">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">300ml <span class="vdiv"></span> 무향 <span class="vdiv"></span> 선물포장</div>
+          </div>
+          <p class="review-item__body">비 오는 날 산책하거나 흙에서 실컷 뛰어놀고 오면 털에서 냄새가 쉽게 올라왔는데, 이 제품으로 씻기고 나면 깔끔한 상태가 오래 유지되는 편입니다. 강한 향으로 냄새를 가리는 제품이 아니라 자연스럽게 세정되는 느낌이라 더 마음에 들었어요.</p>
+        </div>
+        <div class="review-item__photos">
+          <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+        </div>
+        <span class="review-item__date">2026. 12. 31.</span>
+      </article>
+
+      <!-- 리뷰 5 : 텍스트만 -->
+      <article class="review-item">
+        <div class="review-item__meta">
+          <div class="review-item__meta-top">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">300ml <span class="vdiv"></span> 무향 <span class="vdiv"></span> 선물포장</div>
+          </div>
+          <p class="review-item__body">활동량이 많은 강아지라 잔디밭이나 흙바닥에서 뛰어노는 걸 정말 좋아하는데, 매번 목욕시키는 게 부담이었거든요. 이 제품은 데일리 워시답게 자주 사용해도 부담이 적은 느낌이라 안심하고 사용하고 있습니다.</p>
+        </div>
+        <span class="review-item__date">2026. 12. 31.</span>
+      </article>
+    </div>
+
+    <nav class="pagination">
+      <button class="pagination__arrow" disabled><img src="assets/icons/chevronLeft.svg" alt="이전"></button>
+      <div class="pagination__pages">
+        <button class="pagination__page is-active">1</button>
+        <button class="pagination__page">2</button>
+        <button class="pagination__page">3</button>
+        <button class="pagination__page">4</button>
+        <button class="pagination__page">5</button>
+      </div>
+      <button class="pagination__arrow"><img src="assets/icons/chevronRight.svg" alt="다음"></button>
+    </nav>
+  </section>
+
+  <!-- ==================== 상품 문의 ==================== -->
+  <section class="section inquiry">
+    <div class="section__bar">
+      <div class="section__title">상품 문의</div>
+      <button class="btn-dark">문의하기</button>
+    </div>
+
+    <div class="filter-bar">
+      <label class="check">
+        <input type="checkbox">
+        <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+        내 문의만 보기
+      </label>
+      <button class="select-text">전체 <img src="assets/icons/chevronDown.svg" alt=""></button>
+    </div>
+
+    <div class="inquiry-list">
+      <article class="inquiry-item js-inquiry">
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> 2026. 12. 31. 08:30</div>
+            <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <p class="inquiry-item__q">이 샴푸를 전신 샴푸가 아닌 부분 세정용으로 매일 사용해도 괜찮은지, 혹시 잦은 사용 시 주의해야 할 점이 있는지 문의드립니다. 물로만 헹구는 것보다 나은 선택인지도 궁금합니다.</p>
+        </div>
+      </article>
+
+      <article class="inquiry-item js-inquiry">
+        <div class="item-head">
+          <span class="badge">내 문의</span>
+          <div class="text-btn-group">
+            <button class="text-btn">수정</button>
+            <span class="vdiv"></span>
+            <button class="text-btn text-btn--danger">삭제</button>
+          </div>
+        </div>
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> 2026. 12. 31. 08:30</div>
+            <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <p class="inquiry-item__q">장모종 강아지를 키우고 있는데, 샴푸 후 털이 많이 뻣뻣해지거나 엉키지는 않는지 궁금합니다. 컨디셔너나 린스를 따로 사용하지 않아도 될 정도의 보습감이 있는지도 알고 싶습니다.</p>
+          <div class="inquiry-item__private"><img src="assets/icons/lock.svg" alt=""><span>비밀글</span></div>
+        </div>
+      </article>
+
+      <article class="inquiry-item is-open js-inquiry">
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status status--done">답변완료</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> 2026. 12. 31. 08:30</div>
+            <button class="inquiry-item__toggle" aria-label="접기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <p class="inquiry-item__q">안녕하세요. 배송받은 상품을 확인하는 과정에서 외관에 이상이 있어 교환을 요청드립니다. 제품 자체의 기능에는 문제가 없을 수 있으나, 새 상품으로 교환받고 싶습니다. 사진 첨부가 필요하다면 안내 부탁드립니다.</p>
+        </div>
+        <div class="inquiry-reply">
+          <div class="inquiry-reply__info">판매자 답변 <span class="vdiv"></span> <span class="date">YYYY. MM. DD. HH:MM</span></div>
+          <p class="inquiry-reply__body">안녕하세요, 고객님.<br>먼저 배송 과정 중 불편을 드리게 된 점 양해 부탁드립니다.<br><br>상품은 별도의 비용 없이 회수 예정이며, 정상 상품은 회수 접수 완료 후 순차적으로 발송될 예정입니다.<br>교환 배송비는 당사에서 부담합니다.<br><br>감사합니다.</p>
+        </div>
+      </article>
+
+      <article class="inquiry-item js-inquiry">
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status status--done">답변완료</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> 2026. 12. 31. 08:30</div>
+            <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <p class="inquiry-item__q">피부 트러블이 있는 강아지에게 사용해도 되는 성분인지, 사용 시 주의사항이 있다면 안내 부탁드립니다.</p>
+        </div>
+        <div class="inquiry-reply">
+          <div class="inquiry-reply__info">판매자 답변 <span class="vdiv"></span> <span class="date">YYYY. MM. DD. HH:MM</span></div>
+          <p class="inquiry-reply__body">안녕하세요, 고객님.<br>저자극 식물성 세정 성분으로 만들어져 민감한 피부에도 사용하실 수 있습니다.<br>다만 트러블이 심한 경우 수의사와 상담 후 사용을 권장드립니다.<br><br>감사합니다.</p>
+        </div>
+      </article>
+
+      <article class="inquiry-item">
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> 2026. 12. 31. 08:30</div>
+            <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <div class="inquiry-item__private"><img src="assets/icons/lock.svg" alt=""><span>비밀글</span></div>
+        </div>
+      </article>
+    </div>
+
+    <nav class="pagination">
+      <button class="pagination__arrow" disabled><img src="assets/icons/chevronLeft.svg" alt="이전"></button>
+      <div class="pagination__pages">
+        <button class="pagination__page is-active">1</button>
+        <button class="pagination__page">2</button>
+        <button class="pagination__page">3</button>
+        <button class="pagination__page">4</button>
+        <button class="pagination__page">5</button>
+      </div>
+      <button class="pagination__arrow"><img src="assets/icons/chevronRight.svg" alt="다음"></button>
+    </nav>
+  </section>
+
+  <!-- ==================== 주문 정보 ==================== -->
+  <section class="section order-info">
+    <div class="section__bar">
+      <div class="section__title">주문 정보</div>
+    </div>
+    <div class="order-info__content">
+      <div class="order-info__text">
+        <p class="title">배송정보</p>
+        <p>배송 업체&nbsp; ㅣ&nbsp; CJ 대한통운 (1588-1255)<br>
+        배송 지역&nbsp; ㅣ&nbsp; 대한민국 전 지역 배송<br>
+        배송 비용&nbsp; ㅣ&nbsp; 3,500원 / 구매 금액 50,000원 이상 시 무료배송 / 제주 및 도서 산간 지역 별도 추가 금액 발생<br>
+        배송 기간&nbsp; ㅣ&nbsp; 주말·공휴일 제외 2일 ~ 5일<br><br>
+        유의 사항<br>
+        - 주문 폭주 및 공급 사정으로 인하여 지연 및 품절이 발생할 수 있습니다.<br>
+        - 기본 배송기간 이상 소요되는 상품이거나, 품절 상품은 개별 연락을 드립니다.</p>
+      </div>
+      <div class="order-info__image"><img src="assets/img/order-calendar.png" alt="추석 연휴 배송 안내"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ==================== 고정 하단 구매 바 ==================== -->
+<div class="buy-bar">
+  <button class="buy-bar__btn">구매하기</button>
+</div>
+
+<script src="mobile.js?v=1"></script>
+</body>
+</html>
