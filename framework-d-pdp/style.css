@@ -178,19 +178,15 @@ img { display: block; }
 .gallery__rail.at-top::before { opacity: 0; }
 .gallery__rail.at-bottom::after { opacity: 0; }
 
-/* --- 메인 이미지 --- */
+/* --- 메인 이미지 (드래그 페이징 미제공) --- */
 .gallery__main {
   position: relative;
   margin-left: calc(var(--thumb-size) + 20px);
   aspect-ratio: 1 / 1;
   border-radius: var(--radius-xl);
   overflow: hidden;
-  cursor: grab;
-  touch-action: pan-y;
   background: #f5f5f5;
 }
-
-.gallery__main.is-dragging { cursor: grabbing; }
 
 /* 전환 효과 없는 즉시 교체: 선택된 이미지만 표시 */
 .gallery__photo {

@@ -129,28 +129,7 @@
     setScroll(clamp(scroll + e.deltaY), false);
   }, { passive: false });
 
-  /* ---------- 메인 이미지: 가로 스와이프 → 이전/다음 ---------- */
-  var swipe = null;
-
-  main.addEventListener('pointerdown', function (e) {
-    swipe = { x: e.clientX };
-    main.classList.add('is-dragging');
-    main.setPointerCapture(e.pointerId);
-  });
-
-  main.addEventListener('pointerup', function (e) {
-    if (!swipe) return;
-    var dx = e.clientX - swipe.x;
-    if (dx <= -50) select(current + 1);
-    else if (dx >= 50) select(current - 1);
-    main.classList.remove('is-dragging');
-    swipe = null;
-  });
-
-  main.addEventListener('pointercancel', function () {
-    main.classList.remove('is-dragging');
-    swipe = null;
-  });
+  /* 메인 이미지 가로 스와이프 페이징은 미제공 — 이미지 전환은 섬네일 클릭으로만 */
 
   /* ---------- 초기화 ---------- */
   window.addEventListener('resize', function () {
