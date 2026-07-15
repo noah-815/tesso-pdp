@@ -33,27 +33,46 @@
     return d;
   });
 
-  /* ---------- 페이지 ↔ 도트 동기화 ---------- */
+  /* ---------- 페이지 ↔ 도트 동기화 (다이내믹 도트) ---------- */
+  var N = IMAGES.length;
+  var WINDOW = 4;            // 도트는 4개까지만 표시
   var current = 0;
+  var winStart = 0;
 
-  function updateDots(idx) {
-    if (idx === current) return;
-    current = idx;
+  function renderDots() {
+    /* 진행 방향에 이미지가 더 남아 있으면 활성 바가 창 경계가 아닌
+       "끝에서 두 번째"에 머물도록 창을 한 칸 먼저 민다.
+       창 경계 너머에 항목이 더 있으면 경계 도트는 축소 표시 */
+    var hi = current - (current > 0 ? 1 : 0);                    // 뒤(이전)에 남아 있으면 활성은 두 번째 이상
+    var lo = current - (WINDOW - 1) + (current < N - 1 ? 1 : 0); // 앞(다음)에 남아 있으면 활성은 끝에서 두 번째 이하
+    winStart = Math.max(lo, Math.min(hi, winStart));
+    winStart = Math.max(0, Math.min(N - WINDOW, winStart));
+    var winEnd = winStart + WINDOW - 1;
     dots.forEach(function (d, k) {
-      d.classList.toggle('is-active', k === idx);
+      d.className = 'm-gallery__dot';
+      if (k < winStart || k > winEnd) { d.classList.add('is-hidden'); return; }
+      if (k === current) { d.classList.add('is-active'); return; }
+      if ((k === winStart && winStart > 0) || (k === winEnd && winEnd < N - 1)) {
+        d.classList.add('is-small');
+      }
     });
   }
 
-  var ticking = false;
-  scroller.addEventListener('scroll', function () {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(function () {
-      ticking = false;
-      var idx = Math.round(scroller.scrollLeft / scroller.clientWidth);
-      updateDots(Math.min(IMAGES.length - 1, Math.max(0, idx)));
-    });
-  }, { passive: true });
+  function updateCurrent() {
+    var w = scroller.clientWidth;
+    if (!w) return;
+    var idx = Math.round(scroller.scrollLeft / w);
+    idx = Math.min(N - 1, Math.max(0, idx));
+    if (idx !== current) {
+      current = idx;
+      renderDots();
+    }
+  }
+
+  scroller.addEventListener('scroll', updateCurrent, { passive: true });
+  window.addEventListener('resize', updateCurrent);
+
+  renderDots();
 
   /* 데스크탑 브라우저 확인용: 마우스 드래그로도 스와이프 가능
      (터치는 네이티브 스크롤+스냅 사용, 마우스는 드래그 동안 스냅을 끄고

@@ -131,24 +131,38 @@ img { display: block; }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   z-index: 2;
   pointer-events: none;
 }
 
+/* 다이내믹 도트: 최대 4개 노출, 창 밖 도트는 접힘(is-hidden),
+   창 경계 너머에 항목이 더 있으면 경계 도트 축소(is-small) */
 .m-gallery__dot {
   width: 6px;
   height: 6px;
   border-radius: 3px;
+  margin: 0 2px;
   background: #fff;
   mix-blend-mode: difference;
   opacity: 0.5;
-  transition: width 0.25s ease, opacity 0.25s ease;
+  transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease, opacity 0.25s ease;
 }
 
 .m-gallery__dot.is-active {
   width: 14px;
   opacity: 1;
+}
+
+.m-gallery__dot.is-small {
+  width: 4px;
+  height: 4px;
+}
+
+.m-gallery__dot.is-hidden {
+  width: 0;
+  height: 0;
+  margin: 0;
+  opacity: 0;
 }
 
 /* ==================== 상품 정보 ==================== */
