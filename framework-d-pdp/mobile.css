@@ -131,7 +131,9 @@ img { display: block; }
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  /* 주의: z-index/opacity 등을 주면 독립 스태킹 컨텍스트가 생겨
+     자식 도트의 mix-blend-mode가 아래 이미지와 블렌드되지 않는다.
+     DOM 순서상 스크롤러 뒤에 오므로 z-index 없이도 위에 그려짐 */
   pointer-events: none;
 }
 
