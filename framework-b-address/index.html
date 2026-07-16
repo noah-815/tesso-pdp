@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>배송지 정보를 입력하세요 — Framework B · Mobile</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ==========================================================================
+   Framework B · dialog/address (Figma 3130:88399, 393 기준)
+   언더라인 필드 무드 · KR: Pretendard · 버튼 라운드 없음
+   ========================================================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --c-text: #111;
+  --c-placeholder: rgba(17, 17, 17, 0.3);
+  --c-line: rgba(0, 0, 0, 0.12);
+}
+
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  background: #fff;
+  color: var(--c-text);
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+img { display: block; }
+
+/* ==================== 헤더 ==================== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 56px;
+}
+
+.header__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header__close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.header__close img { width: 24px; height: 24px; }
+
+/* ==================== 폼 ==================== */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 24px 16px 32px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.field-group--tight {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-line {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.single-line .label {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.text-field {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--c-line);
+  padding: 13px 0 14px;
+}
+
+.text-field--icon { padding: 8px 4px 9px 0; }
+
+.text-field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--c-text);
+  padding: 0;
+  border-radius: 0;
+}
+
+.text-field input::placeholder { color: var(--c-placeholder); }
+
+.text-field .icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.text-field .icon-btn img { width: 24px; height: 24px; }
+
+/* ==================== 체크박스 ==================== */
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.check input { display: none; }
+
+.check .box {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #d3d3d3;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.check input:checked + .box { background: #111; border-color: #111; }
+
+.check input:checked + .box::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+/* ==================== 저장 버튼 ==================== */
+.button-area {
+  padding: 16px 16px calc(56px + env(safe-area-inset-bottom));
+}
+
+.btn-save {
+  width: 100%;
+  padding: 14px 22px;
+  background: #111;
+  border: 1px solid rgba(17, 17, 17, 0);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== 헤더 ==================== -->
+<header class="header">
+  <h1 class="header__title">배송지 정보를 입력하세요</h1>
+  <button class="header__close" aria-label="닫기"><img src="assets/icons/close.svg" alt=""></button>
+</header>
+
+<!-- ==================== 배송지 폼 ==================== -->
+<main class="content">
+  <div class="field-group">
+    <div class="field-group--tight">
+      <div class="single-line">
+        <label class="label" for="addr">주소</label>
+        <div class="text-field text-field--icon">
+          <input id="addr" type="text" value="[12345] 서울 마포구 양화로 147">
+          <button class="icon-btn" aria-label="주소 검색"><img src="assets/icons/search.svg" alt=""></button>
+        </div>
+      </div>
+      <div class="single-line">
+        <div class="text-field">
+          <input type="text" placeholder="상세주소 입력 (예: 건물명, 동/호수)">
+        </div>
+      </div>
+    </div>
+
+    <div class="single-line">
+      <label class="label" for="name">이름</label>
+      <div class="text-field">
+        <input id="name" type="text" value="이강인">
+      </div>
+    </div>
+
+    <div class="single-line">
+      <label class="label" for="phone">휴대폰 번호</label>
+      <div class="text-field">
+        <input id="phone" type="tel" value="010-1234-1234">
+      </div>
+    </div>
+
+    <div class="single-line">
+      <label class="label" for="memo">배송 요청사항</label>
+      <div class="text-field">
+        <input id="memo" type="text" placeholder="배달 기사님께 전달할 메시지 입력">
+      </div>
+    </div>
+  </div>
+
+  <label class="check">
+    <input type="checkbox">
+    <span class="box"></span>
+    기본 배송지로 설정
+  </label>
+</main>
+
+<!-- ==================== 저장 ==================== -->
+<div class="button-area">
+  <button class="btn-save">저장</button>
+</div>
+
+</body>
+</html>
