@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>브와 드 일랑 오 드 퍼퓸 — Framework C · Mobile</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<style>
+/* ==========================================================================
+   Framework C · PDP Mobile (Figma: productDetail/mobile 3897:93955)
+   히어로 인터랙션: 스와이프 → dip 없는 크로스페이드 (루프 없음)
+   ========================================================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --c-text: #111;
+  --c-text-80: rgba(17, 17, 17, 0.8);
+  --c-text-50: rgba(17, 17, 17, 0.5);
+  --c-border: rgba(0, 0, 0, 0.12);
+  --c-line: rgba(0, 0, 0, 0.1);
+  --font-kr: "Pretendard Variable", Pretendard, sans-serif;
+  --font-en: "Montserrat", "Pretendard Variable", sans-serif;
+  --header-h: 64px;
+  --px: 16px;
+}
+
+html { -webkit-font-smoothing: antialiased; }
+body {
+  background: #fff;
+  color: var(--c-text);
+  font-family: var(--font-kr);
+  font-size: 14px;
+  line-height: 1.6;
+  padding-bottom: 72px;   /* 하단 고정 구매 바 */
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+img { display: block; }
+p { margin: 0; }
+.en { font-family: var(--font-en); }
+
+/* ---------- 헤더 ---------- */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--header-h);
+  background: #fff;
+  border-bottom: 1px solid var(--c-line);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--px);
+}
+.header a { color: var(--c-text); text-decoration: none; }
+.header__nav { font-size: 13px; letter-spacing: 0.01em; text-transform: uppercase; }
+.header__logo {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-family: var(--font-en); font-size: 20px; font-weight: 600; letter-spacing: 0.04em;
+}
+main { margin-top: var(--header-h); }
+
+/* ---------- 히어로: 크로스페이드 스택 ---------- */
+.hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f2ece4;
+  touch-action: pan-y;              /* 세로 스크롤은 브라우저에 양보 */
+  user-select: none; -webkit-user-select: none;
+}
+/* dip 없는 크로스페이드: 나가는 이미지는 opacity 1로 아래(z1)에 깔리고,
+   들어오는 이미지만 위(z2)에서 0→1 페이드인 */
+.hero__photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0; z-index: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.hero__photo.is-leaving { opacity: 1; z-index: 1; transition: none; }
+.hero__photo.is-visible { opacity: 1; z-index: 2; }
+
+.hero__counter {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  display: flex; justify-content: center; gap: 4px;
+  padding: 20px 24px;
+  color: #fff; mix-blend-mode: difference;
+  font-family: var(--font-en); font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.hero__counter .num { display: inline-block; min-width: 1ch; }
+.hero__counter .num--cur { text-align: right; }
+.hero__counter .num--total { text-align: left; }
+
+/* ---------- 상품 정보 ---------- */
+.info {
+  display: flex; flex-direction: column; gap: 32px;
+  padding: 20px 12px 40px var(--px);
+  border-bottom: 1px solid var(--c-line);
+}
+.info__title-area { display: flex; gap: 12px; align-items: flex-start; }
+.info__text-area { flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+.info__category { font-family: var(--font-en); font-size: 12px; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.02em; }
+.info__name-area { display: flex; flex-direction: column; gap: 2px; }
+.info__name { font-size: 14px; font-weight: 500; line-height: 1.6; }
+.info__price-row { display: flex; gap: 6px; align-items: baseline; }
+.info__price { font-size: 14px; font-weight: 500; }
+.info__price .num { font-family: var(--font-en); }
+.info__price-original { position: relative; font-size: 14px; opacity: 0.5; }
+.info__price-original .num { font-family: var(--font-en); }
+.info__price-original::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px;
+  background: #111; transform: translateY(-50%);
+}
+.icon-btn {
+  flex: none; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-btn img { width: 24px; height: 24px; }
+.info__desc { font-size: 13px; color: var(--c-text-80); }
+
+/* ---------- 아코디언 (productDetailInfo) ---------- */
+.acc-item {
+  width: 100%;
+  display: flex; align-items: center; gap: 16px;
+  padding: 6px 0;
+  text-align: left;
+}
+.acc-item p { flex: 1 0 0; min-width: 0; font-size: 13px; }
+.acc-item img { width: 24px; height: 24px; transition: transform 0.3s ease; }
+.acc.is-open .acc-item img { transform: rotate(180deg); }
+.acc-panel { max-height: 0; overflow: hidden; transition: max-height 0.32s ease; }
+.acc-panel__inner { padding: 12px 0 32px; font-size: 13px; color: var(--c-text-80); }
+.acc-panel__inner p + p { margin-top: 12px; }
+
+/* ---------- 상세 (더보기 클립) ---------- */
+.detail { padding: 40px 12px 0; }
+.detail__clip { position: relative; max-height: 1000px; overflow: hidden; }
+.detail.is-expanded .detail__clip { max-height: none; }
+.detail__stack { display: flex; flex-direction: column; gap: 32px; }
+.detail__image img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+.detail__text { display: flex; flex-direction: column; gap: 24px; padding: 0 4px; }
+.detail__text p:first-child { font-size: 16px; font-weight: 500; }
+.detail__more-area {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 360px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 80%);
+  display: flex; align-items: flex-end;
+  pointer-events: none;
+}
+.detail.is-expanded .detail__more-area { display: none; }
+.detail__more-btn {
+  pointer-events: auto; width: 100%;
+  border-top: 1px solid var(--c-border); border-bottom: 1px solid var(--c-border);
+  padding: 14px 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500;
+  background: #fff;
+}
+
+/* ---------- 공통 섹션 ---------- */
+.section { padding-top: 40px; }
+.section__bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding: 16px var(--px) 17px;
+  border-bottom: 1px solid var(--c-line);
+}
+.section__title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.section__title .count { font-family: var(--font-en); }
+.rating-area { display: flex; align-items: center; gap: 6px; }
+.rating { display: inline-flex; height: 16px; }
+.rating img { width: 16px; height: 16px; }
+.rating--lg img { width: 18px; height: 18px; }
+.rating-score { font-family: var(--font-en); font-weight: 600; font-size: 18px; }
+.btn-dark { background: #111; color: #fff; font-size: 13px; font-weight: 500; padding: 10px 16px; }
+
+.filter-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px var(--px) 17px;
+  border-bottom: 1px solid var(--c-line);
+  font-size: 13px;
+}
+.check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.check input { display: none; }
+.check .box {
+  width: 16px; height: 16px; border: 1px solid #d3d3d3;
+  display: flex; align-items: center; justify-content: center;
+}
+.check .box img { width: 12px; height: 12px; opacity: 0; }
+.check input:checked + .box { background: #111; border-color: #111; }
+.check input:checked + .box img { opacity: 1; filter: invert(1); }
+.select-text { display: flex; align-items: center; gap: 4px; font-size: 13px; }
+.select-text img { width: 20px; height: 20px; }
+
+.vdiv { display: inline-block; width: 1px; height: 10px; background: var(--c-line); vertical-align: middle; margin: 0 6px; }
+.option-row { font-size: 13px; color: var(--c-text-50); display: flex; align-items: center; }
+.badge { background: #eee; font-size: 12px; padding: 6px 8px; }
+.text-btn-group { display: flex; align-items: center; }
+.text-btn { font-size: 12px; padding: 9px 0; }
+.text-btn--danger { color: #ef0000; }
+.item-head { display: flex; align-items: center; justify-content: space-between; }
+
+/* ---------- 리뷰 ---------- */
+.review-item {
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 24px var(--px) 25px;
+  border-bottom: 1px solid var(--c-border);
+}
+.review-item__meta { display: flex; flex-direction: column; gap: 4px; }
+.review-item__user-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.review-item__user { font-size: 13px; }
+.review-item__body { font-size: 14px; }
+.review-item__date { font-family: var(--font-en); font-size: 13px; color: var(--c-text-50); }
+/* 모바일: 사진 한 줄 4칸, 초과분은 마지막 칸 +N */
+.review-item__photos { display: flex; gap: 8px; }
+.review-item__photos .ph {
+  position: relative; flex: 1 0 0; min-width: 0; aspect-ratio: 1 / 1;
+  background: #eee; overflow: hidden;
+}
+.review-item__photos .ph img { width: 100%; height: 100%; object-fit: cover; }
+.review-item__photos--single .ph { flex: 0 0 calc(25% - 6px); }
+.ph__more {
+  position: absolute; inset: 0; background: rgba(0, 0, 0, 0.8);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-family: var(--font-en); font-weight: 600; font-size: 18px;
+}
+
+/* ---------- 페이지네이션 ---------- */
+.pagination { display: flex; align-items: center; justify-content: center; padding: 32px 8px; gap: 4px; }
+.pagination__arrow { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+.pagination__arrow img { width: 20px; height: 20px; }
+.pagination__arrow:disabled { opacity: 0.3; cursor: default; }
+.pagination__pages { display: flex; gap: 8px; padding: 4px 8px; font-family: var(--font-en); font-size: 14px; }
+.pagination__pages .total, .pagination__pages .sep { color: var(--c-text-50); }
+
+/* ---------- 문의 ---------- */
+.inquiry-item {
+  display: flex; flex-direction: column; gap: 24px;
+  padding: 24px var(--px) 25px;
+  border-bottom: 1px solid var(--c-border);
+}
+.inquiry-item__q-area { display: flex; flex-direction: column; gap: 16px; }
+.inquiry-item__info { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.inquiry-item__info .status--done { color: var(--c-text); }
+.inquiry-item__toggle img { width: 24px; height: 24px; transition: transform 0.3s ease; }
+.inquiry-item.is-open .inquiry-item__toggle img { transform: rotate(180deg); }
+.inquiry-item__q {
+  font-size: 14px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.inquiry-item.is-open .inquiry-item__q { display: block; }
+.inquiry-item__private { display: flex; align-items: center; gap: 4px; }
+.inquiry-item__private img { width: 20px; height: 20px; }
+.inquiry-item__private span { font-size: 13px; color: var(--c-text-50); }
+.inquiry-reply { display: none; background: #f9f9f9; padding: 24px 20px; flex-direction: column; gap: 16px; }
+.inquiry-item.is-open .inquiry-reply { display: flex; }
+.inquiry-reply__info { font-size: 13px; }
+.inquiry-reply__info .date { color: var(--c-text-50); font-family: var(--font-en); }
+.inquiry-reply__body { font-size: 14px; }
+
+/* ---------- 주문 정보 ---------- */
+.order-info__content { display: flex; flex-direction: column; gap: 40px; padding: 40px var(--px); }
+.order-info__text { display: flex; flex-direction: column; gap: 24px; }
+.order-info__text p:first-child { font-size: 16px; font-weight: 500; }
+.order-info__image img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+
+/* ---------- 하단 고정 구매 바 ---------- */
+.buybar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+  background: #fff;
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+}
+.buybar__btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 14px 22px;
+  background: #111; color: #fff;
+  font-size: 13px; font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== 헤더 ==================== -->
+<header class="header">
+  <a class="header__nav" href="#">Menu</a>
+  <a class="header__logo" href="#">BRAND</a>
+  <a class="header__nav" href="#">Bag [0]</a>
+</header>
+
+<main>
+  <!-- ==================== 히어로: 스와이프 크로스페이드 ==================== -->
+  <section class="hero js-hero" aria-label="상품 이미지">
+    <!-- 사진은 JS가 렌더 -->
+    <div class="hero__counter" aria-hidden="true"><span class="num num--cur js-cur">1</span><span>/</span><span class="num num--total js-total">5</span></div>
+  </section>
+
+  <!-- ==================== 상품 정보 ==================== -->
+  <section class="info">
+    <div class="info__title-area">
+      <div class="info__text-area">
+        <p class="info__category">Perfume</p>
+        <div class="info__name-area">
+          <h1 class="info__name">브와 드 일랑 오 드 퍼퓸</h1>
+          <div class="info__price-row">
+            <span class="info__price"><span class="num">40,000</span>원</span>
+            <span class="info__price-original"><span class="num">50,000</span>원</span>
+          </div>
+        </div>
+      </div>
+      <button class="icon-btn" aria-label="위시리스트"><img src="assets/icons/bookmark.svg" alt=""></button>
+    </div>
+    <p class="info__desc">로즈와 와일드 플라워의 향기에 모리스 루셀이 엮어낸 기억과 감정, 아이리스와 일랑일랑의 향기에 도미니크 로피옹이 조각한 꽃의 본질적인 미학. 두 마스터 퍼퓨머의 풍부한 상상력과 정교한 탐구를 넘나들며 완성한 독창적인 꽃향기로 새로운 영감을 발견하고 감각을 환기해보세요.</p>
+
+    <div class="accordion">
+      <div class="acc">
+        <button class="acc-item js-acc" aria-expanded="false"><p>배송 및 반품</p><img src="assets/icons/chevronDown.svg" alt=""></button>
+        <div class="acc-panel"><div class="acc-panel__inner">
+          <p>[배송 안내]<br>주문하신 상품은 결제 완료 후 순차적으로 출고되며, 배송은 영업일 기준으로 진행됩니다.<br>배송 기간은 지역 및 택배사 사정에 따라 차이가 있을 수 있습니다.</p>
+          <p>[반품 안내]<br>상품 수령 후 일정 기간 내에 반품 신청이 가능하며, 상품은 미사용 상태로 포장되어야 합니다.<br>단순 변심에 의한 반품의 경우 배송비는 고객 부담이며, 상품 하자 또는 오배송의 경우 배송비는 당사에서 부담합니다.</p>
+        </div></div>
+      </div>
+      <div class="acc">
+        <button class="acc-item js-acc" aria-expanded="false"><p>사용방법</p><img src="assets/icons/chevronDown.svg" alt=""></button>
+        <div class="acc-panel"><div class="acc-panel__inner">
+          <p>손목, 귀 뒤, 목선 등 맥박이 느껴지는 부위에 가볍게 분사해 주세요.<br>향이 머무는 동안 문지르지 않아야 잔향이 오래 유지됩니다.</p>
+        </div></div>
+      </div>
+      <div class="acc">
+        <button class="acc-item js-acc" aria-expanded="false"><p>주의사항</p><img src="assets/icons/chevronDown.svg" alt=""></button>
+        <div class="acc-panel"><div class="acc-panel__inner">
+          <p>화기 및 직사광선을 피해 서늘한 곳에 보관해 주세요.<br>눈에 닿았을 경우 즉시 물로 씻어내고, 이상이 있을 경우 사용을 중단해 주세요.</p>
+        </div></div>
+      </div>
+      <div class="acc">
+        <button class="acc-item js-acc" aria-expanded="false"><p>세부정보</p><img src="assets/icons/chevronDown.svg" alt=""></button>
+        <div class="acc-panel"><div class="acc-panel__inner">
+          <p>용량: 50mL / 1.69FL.OZ<br>제조국: 프랑스<br>사용기한: 제조일로부터 36개월</p>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 상세 ==================== -->
+  <section class="detail js-detail">
+    <div class="detail__clip">
+      <div class="detail__stack">
+        <div class="detail__image"><img src="assets/img/detail-1.png" alt="브와 드 일랑 오 드 퍼퓸 무드 이미지"></div>
+        <div class="detail__text">
+          <p>브와 드 일랑 오 드 퍼퓸</p>
+          <p>일랑일랑과 튜베로즈의 관능적인 바탕에 샌달우드를 가미해 모던한 감각을 입힌 매혹적인 향.</p>
+        </div>
+        <div class="detail__image"><img src="assets/img/detail-2.png" alt="제품 연출 이미지"></div>
+      </div>
+      <div class="detail__more-area">
+        <button class="detail__more-btn js-detail-more" type="button">더보기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 리뷰 ==================== -->
+  <section class="section review">
+    <div class="section__bar">
+      <div class="section__title">리뷰 <span class="count">(1,423)</span></div>
+      <div class="rating-area">
+        <span class="rating rating--lg">
+          <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+        </span>
+        <span class="rating-score">4.2</span>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <label class="check">
+        <input type="checkbox">
+        <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+        포토리뷰만 보기
+      </label>
+      <button class="select-text">최신순 <img src="assets/icons/chevronDown.svg" alt=""></button>
+    </div>
+
+    <div class="review-list">
+      <article class="review-item">
+        <div class="review-item__meta">
+          <div class="review-item__user-row">
+            <span class="review-item__user">nickname***</span>
+            <span class="rating">
+              <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+            </span>
+          </div>
+          <div class="option-row">50mL <span class="vdiv"></span> 선물 포장</div>
+        </div>
+        <p class="review-item__body">아침에 사용하면 기분이 확실히 달라져요. 상쾌한데 너무 쨍하지 않고, 햇살 같은 느낌이 있어서 하루 시작할 때 쓰기 좋아요. 향 설명 그대로의 분위기라 만족합니다.</p>
+        <div class="review-item__photos">
+          <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-2.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-3.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-1.png" alt=""><span class="ph__more">+4</span></span>
+        </div>
+        <span class="review-item__date">2026. 6. 17.</span>
+      </article>
+
+      <article class="review-item">
+        <div class="item-head">
+          <span class="badge">내 리뷰</span>
+          <div class="text-btn-group">
+            <button class="text-btn">수정</button>
+            <span class="vdiv"></span>
+            <button class="text-btn text-btn--danger">삭제</button>
+          </div>
+        </div>
+        <div class="review-item__meta">
+          <div class="review-item__user-row">
+            <span class="review-item__user">nickname***</span>
+            <span class="rating">
+              <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+            </span>
+          </div>
+          <div class="option-row">50mL <span class="vdiv"></span> 선물 포장</div>
+        </div>
+        <p class="review-item__body">향 설명 보고 궁금해서 구매했는데, 실제로 써보니 설명이 과장이 아니더라고요. 꽃 향이 달거나 무겁지 않아서 좋았어요.<br>잔향이 은은하게 남아서 하루 마무리까지 기분 좋게 이어집니다.</p>
+        <div class="review-item__photos">
+          <span class="ph"><img src="assets/img/product-2.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-3.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+          <span class="ph"><img src="assets/img/product-2.png" alt=""><span class="ph__more">+7</span></span>
+        </div>
+        <span class="review-item__date">2026. 6. 17.</span>
+      </article>
+
+      <article class="review-item">
+        <div class="review-item__meta">
+          <div class="review-item__user-row">
+            <span class="review-item__user">nickname***</span>
+            <span class="rating">
+              <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+            </span>
+          </div>
+          <div class="option-row">50mL <span class="vdiv"></span> 선물 포장</div>
+        </div>
+        <p class="review-item__body">꽃 향이 튀지 않고 맑게 느껴져서 마음에 들었어요. 인위적인 향 싫어하는 편인데 이건 괜찮네요. 향이 몸에서 은은하게 나서 기분이 좋아요!</p>
+        <span class="review-item__date">2026. 6. 17.</span>
+      </article>
+
+      <article class="review-item">
+        <div class="review-item__meta">
+          <div class="review-item__user-row">
+            <span class="review-item__user">nickname***</span>
+            <span class="rating">
+              <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+            </span>
+          </div>
+          <div class="option-row">50mL <span class="vdiv"></span> 선물 포장</div>
+        </div>
+        <p class="review-item__body">한 달 사용해 봤는데 향이 좋고 지속력도 기대 이상이에요. 가볍게 뿌려도 은은하게 하루 종일 이어져서 데일리로 쓰기 좋습니다.</p>
+        <div class="review-item__photos review-item__photos--single">
+          <span class="ph"><img src="assets/img/product-3.png" alt=""></span>
+        </div>
+        <span class="review-item__date">2026. 6. 17.</span>
+      </article>
+
+      <article class="review-item">
+        <div class="review-item__meta">
+          <div class="review-item__user-row">
+            <span class="review-item__user">nickname***</span>
+            <span class="rating">
+              <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+            </span>
+          </div>
+          <div class="option-row">50mL <span class="vdiv"></span> 선물 포장</div>
+        </div>
+        <p class="review-item__body">피부가 예민한 편이라 향 제품 고를 때 항상 조심하는데, 이 제품은 자극 없이 잘 맞았어요. 향이 오래 잔향으로 남기보다는 은은하게 사라져서, 다른 향수 쓰는 날에도 부담 없이 사용할 수 있었어요.</p>
+        <span class="review-item__date">2026. 6. 17.</span>
+      </article>
+    </div>
+
+    <nav class="pagination">
+      <button class="pagination__arrow" disabled><img src="assets/icons/chevronLeft.svg" alt="이전"></button>
+      <div class="pagination__pages"><span class="cur">1</span><span class="sep">/</span><span class="total">10</span></div>
+      <button class="pagination__arrow"><img src="assets/icons/chevronRight.svg" alt="다음"></button>
+    </nav>
+  </section>
+
+  <!-- ==================== 상품 문의 ==================== -->
+  <section class="section inquiry">
+    <div class="section__bar">
+      <div class="section__title">상품 문의</div>
+      <button class="btn-dark">문의하기</button>
+    </div>
+
+    <div class="filter-bar">
+      <label class="check">
+        <input type="checkbox">
+        <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+        내 문의만 보기
+      </label>
+      <button class="select-text">전체 <img src="assets/icons/chevronDown.svg" alt=""></button>
+    </div>
+
+    <div class="inquiry-list">
+      <article class="inquiry-item js-inquiry">
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date en">2026. 6. 17.</span></div>
+            <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <p class="inquiry-item__q">상세 설명을 보았을 때 향과 사용감이 궁금한데, 실제로는 향이 강한 편인지 아니면 은은하게 남는 타입인지 알고 싶습니다. 또한 여름철에도 부담 없이 사용할 수 있는지, 잔향이 오래 지속되는지도 궁금합니다.</p>
+        </div>
+      </article>
+
+      <article class="inquiry-item js-inquiry">
+        <div class="item-head">
+          <span class="badge">내 문의</span>
+          <div class="text-btn-group">
+            <button class="text-btn">수정</button>
+            <span class="vdiv"></span>
+            <button class="text-btn text-btn--danger">삭제</button>
+          </div>
+        </div>
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date en">2026. 6. 17.</span></div>
+            <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <p class="inquiry-item__q">여름철에 사용하기에도 무겁지 않은지 궁금합니다. 사용 후 잔향이 부담스럽지는 않은지 알고 싶어요.</p>
+          <div class="inquiry-item__private"><img src="assets/icons/lock.svg" alt=""><span>비밀글</span></div>
+        </div>
+      </article>
+
+      <article class="inquiry-item is-open js-inquiry">
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status status--done">답변완료</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date en">2026. 6. 17.</span></div>
+            <button class="inquiry-item__toggle" aria-label="접기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <p class="inquiry-item__q">주문한 상품을 수령하여 확인하던 중 배송 과정에서 발생한 것으로 보이는 파손이 있어 교환을 요청드리고자 문의드립니다.<br><br>외부 박스는 크게 훼손되지 않았으나, 개봉 후 확인해보니 상품 자체에 파손 흔적이 발견되었습니다. 수령 직후 확인한 상태이며, 현재 상품은 사용하지 않고 그대로 보관 중입니다.</p>
+        </div>
+        <div class="inquiry-reply">
+          <div class="inquiry-reply__info">판매자 답변 <span class="vdiv"></span> <span class="date">YYYY. MM. DD.</span></div>
+          <p class="inquiry-reply__body">안녕하세요, 고객님.<br>먼저 배송 과정 중 불편을 드리게 된 점 양해 부탁드립니다.<br><br>파손 상품은 별도의 비용 없이 회수 예정이며, 정상 상품은 회수 접수 완료 후 순차적으로 발송될 예정입니다.<br>교환 배송비는 당사에서 부담합니다.<br><br>감사합니다.</p>
+        </div>
+      </article>
+
+      <article class="inquiry-item js-inquiry">
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status status--done">답변완료</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date en">2026. 6. 17.</span></div>
+            <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <p class="inquiry-item__q">상세 페이지에 적힌 향 설명은 확인했는데, 실제로는 향 지속력이 어느 정도 되는지 궁금합니다.</p>
+        </div>
+        <div class="inquiry-reply">
+          <div class="inquiry-reply__info">판매자 답변 <span class="vdiv"></span> <span class="date">YYYY. MM. DD.</span></div>
+          <p class="inquiry-reply__body">안녕하세요, 고객님.<br>은은하게 남는 타입으로, 보통 4~5시간 정도 부드럽게 지속됩니다.<br>진하게 남는 향이 부담스러우신 분들께도 무리 없이 권해드리고 있습니다.<br><br>감사합니다.</p>
+        </div>
+      </article>
+
+      <article class="inquiry-item">
+        <div class="inquiry-item__q-area">
+          <div class="inquiry-item__info">
+            <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date en">2026. 6. 17.</span></div>
+            <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+          </div>
+          <div class="inquiry-item__private"><img src="assets/icons/lock.svg" alt=""><span>비밀글</span></div>
+        </div>
+      </article>
+    </div>
+
+    <nav class="pagination">
+      <button class="pagination__arrow" disabled><img src="assets/icons/chevronLeft.svg" alt="이전"></button>
+      <div class="pagination__pages"><span class="cur">1</span><span class="sep">/</span><span class="total">10</span></div>
+      <button class="pagination__arrow"><img src="assets/icons/chevronRight.svg" alt="다음"></button>
+    </nav>
+  </section>
+
+  <!-- ==================== 주문 정보 ==================== -->
+  <section class="section order-info">
+    <div class="section__bar">
+      <div class="section__title">주문 정보</div>
+    </div>
+    <div class="order-info__content">
+      <div class="order-info__text">
+        <p>배송 정보</p>
+        <p>배송 업체&nbsp; ㅣ&nbsp; CJ 대한통운 (1588-1255)<br>
+        배송 지역&nbsp; ㅣ&nbsp; 대한민국 전 지역 배송<br>
+        배송 비용&nbsp; ㅣ&nbsp; 3,500원 / 구매 금액 50,000원 이상 시 무료배송<br>
+        / 제주 및 도서 산간 지역 별도 추가 금액 발생<br>
+        배송 기간&nbsp; ㅣ&nbsp; 주말·공휴일 제외 2일 ~ 5일<br><br>
+        유의 사항<br>
+        - 주문 폭주 및 공급 사정으로 인하여 지연 및 품절이 발생할 수 있습니다.<br>
+        - 기본 배송기간 이상 소요되는 상품이거나, 품절 상품은 개별 연락을 드립니다.</p>
+      </div>
+      <div class="order-info__image"><img src="assets/img/order-calendar.png" alt="배송 안내"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ==================== 하단 고정 구매 바 ==================== -->
+<div class="buybar">
+  <button class="buybar__btn">구매하기</button>
+</div>
+
+<script>
+/* ==========================================================================
+   히어로: 스와이프 → dip 없는 크로스페이드 (Framework C 모바일 인터랙션)
+   · 루프 없음 (1↔5), 카운터 동기화
+   · 커밋: 거리 50px OR 플릭 0.5px/ms — 크로스페이드라 드래그 추종은 없음
+   · 나가는 이미지는 opacity 1로 아래에 깔리고 들어오는 것만 페이드인 (dip 제거)
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var hero = document.querySelector('.js-hero');
+  var curEl = hero.querySelector('.js-cur');
+  var totalEl = hero.querySelector('.js-total');
+
+  var IMAGES = [];
+  for (var i = 0; i < 5; i++) {
+    IMAGES.push('assets/img/product-' + (i % 3 + 1) + '.png');
+  }
+  var N = IMAGES.length;
+
+  var photos = IMAGES.map(function (src, k) {
+    var el = document.createElement('img');
+    el.className = 'hero__photo' + (k === 0 ? ' is-visible' : '');
+    el.src = src;
+    el.alt = '브와 드 일랑 오 드 퍼퓸 — 상품 이미지 ' + (k + 1);
+    if (k > 0) el.loading = 'lazy';
+    hero.insertBefore(el, hero.firstChild);
+    return el;
+  });
+  totalEl.textContent = N;
+
+  var current = 0;
+  var leaveTimer = null;
+
+  /* dip 없는 크로스페이드 — is-leaving은 항상 최대 1개, 연타 시 이전 타이머 취소 */
+  function crossfade(next) {
+    var incoming = photos[next];
+    if (incoming.classList.contains('is-visible')) return;
+    clearTimeout(leaveTimer);
+    photos.forEach(function (p) { p.classList.remove('is-leaving'); });
+    photos.forEach(function (p) {
+      if (p !== incoming && p.classList.contains('is-visible')) {
+        p.classList.remove('is-visible');
+        p.classList.add('is-leaving');
+      }
+    });
+    incoming.classList.add('is-visible');
+    leaveTimer = setTimeout(function () {
+      photos.forEach(function (p) { p.classList.remove('is-leaving'); });
+    }, 320);
+  }
+
+  function select(i) {
+    var next = Math.min(N - 1, Math.max(0, i));   // 루프 없음
+    if (next === current) return;
+    current = next;
+    crossfade(current);
+    curEl.textContent = current + 1;
+  }
+
+  /* 스와이프: 수평 우세 제스처만, 거리 50px OR 플릭 0.5px/ms 커밋 */
+  var DIST = 50;      // px
+  var VEL  = 0.5;     // px/ms
+  var swipe = null;
+
+  hero.addEventListener('pointerdown', function (e) {
+    swipe = { x: e.clientX, y: e.clientY, t: performance.now(), locked: false };
+  });
+  hero.addEventListener('pointermove', function (e) {
+    if (!swipe || swipe.locked) return;
+    var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+    if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      swipe.locked = true;                        // 수평 확정 후에만 캡처
+      try { hero.setPointerCapture(e.pointerId); } catch (_) {}
+    } else if (Math.abs(dy) > 8 && Math.abs(dy) >= Math.abs(dx)) {
+      swipe = null;                               // 세로 스크롤에 양보
+    }
+  });
+  hero.addEventListener('pointerup', function (e) {
+    if (!swipe) return;
+    var dx = e.clientX - swipe.x;
+    var dt = Math.max(performance.now() - swipe.t, 1);
+    var commit = Math.abs(dx) >= DIST || Math.abs(dx) / dt >= VEL;
+    if (swipe.locked && commit) {
+      if (dx < 0) select(current + 1);
+      else select(current - 1);
+    }
+    swipe = null;
+  });
+  hero.addEventListener('pointercancel', function () { swipe = null; });
+})();
+
+/* ==================== 아코디언 (단일 열림) ==================== */
+document.querySelectorAll('.js-acc').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var item = btn.parentElement;
+    var willOpen = !item.classList.contains('is-open');
+    document.querySelectorAll('.accordion .acc').forEach(function (a) {
+      a.classList.remove('is-open');
+      a.querySelector('.acc-panel').style.maxHeight = null;
+      a.querySelector('.js-acc').setAttribute('aria-expanded', 'false');
+    });
+    if (willOpen) {
+      item.classList.add('is-open');
+      var pnl = item.querySelector('.acc-panel');
+      pnl.style.maxHeight = pnl.scrollHeight + 'px';
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+
+/* ==================== 상세 더보기 ==================== */
+(function () {
+  var detail = document.querySelector('.js-detail');
+  var btn = document.querySelector('.js-detail-more');
+  if (btn) btn.addEventListener('click', function () {
+    detail.classList.add('is-expanded');
+  });
+})();
+
+/* ==================== 문의 아코디언 ==================== */
+document.querySelectorAll('.js-inquiry').forEach(function (item) {
+  item.querySelector('.inquiry-item__info').addEventListener('click', function () {
+    item.classList.toggle('is-open');
+  });
+});
+</script>
+</body>
+</html>
