@@ -923,11 +923,24 @@ button { font-family: inherit; color: inherit; background: none; border: 0; curs
   });
   track.addEventListener('pointermove', function (e) {
     if (!dragging) return;
-    track.scrollLeft = startScroll - (e.clientX - startX);
+    var target = startScroll - (e.clientX - startX);
+    var max = maxScroll();
+    var cap = track.clientWidth * RUBBER_MAX_RATIO;
+    if (target < 0) {                       /* 첫 장 너머 */
+      track.scrollLeft = 0;
+      setRubber(rubber(-target, cap));
+    } else if (target > max) {              /* 마지막 장 너머 */
+      track.scrollLeft = max;
+      setRubber(-rubber(target - max, cap));
+    } else {
+      if (rubberOffset) setRubber(0);
+      track.scrollLeft = target;
+    }
   });
   function endDrag() {
     if (!dragging) return;
     dragging = false;
+    releaseRubber();
     var w = track.clientWidth;
     var idx = Math.max(0, Math.min(N - 1, Math.round(track.scrollLeft / w)));
     track.style.scrollSnapType = '';
@@ -935,6 +948,58 @@ button { font-family: inherit; color: inherit; background: none; border: 0; curs
   }
   track.addEventListener('pointerup', endDrag);
   track.addEventListener('pointercancel', endDrag);
+
+  /* ---------- 엣지 러버밴딩 (나이키 모바일 수준: 끝단에서 살짝 밀렸다 복귀) ----------
+     중간 스크롤은 네이티브 스냅 그대로 두고, 끝단을 넘어서는 제스처만
+     지수 감쇠(최대 폭의 12%) transform으로 반응시킨다. */
+  var RUBBER_MAX_RATIO = 0.12;
+  var rubberOffset = 0;
+  function rubber(d, max) { return max * (1 - Math.exp(-d / max)); }
+  function maxScroll() { return track.scrollWidth - track.clientWidth; }
+  function setRubber(px) {
+    rubberOffset = px;
+    track.style.transition = '';
+    track.style.transform = px ? 'translate3d(' + px.toFixed(2) + 'px,0,0)' : '';
+  }
+  function releaseRubber() {
+    if (!rubberOffset) return;
+    rubberOffset = 0;
+    track.style.transition = 'transform 320ms cubic-bezier(0.22, 1, 0.36, 1)';
+    track.style.transform = 'translate3d(0,0,0)';
+    track.addEventListener('transitionend', function h() {
+      track.removeEventListener('transitionend', h);
+      track.style.transition = '';
+      track.style.transform = '';
+    });
+  }
+
+  /* 터치: 끝단에서 시작한 수평 제스처만 가로챈다 (Android 등 네이티브 바운스 없는 환경 대응) */
+  var tStartX = 0, tStartY = 0, tActive = false, tLocked = false;
+  track.addEventListener('touchstart', function (e) {
+    tStartX = e.touches[0].clientX;
+    tStartY = e.touches[0].clientY;
+    tActive = true; tLocked = false;
+  }, { passive: true });
+  track.addEventListener('touchmove', function (e) {
+    if (!tActive) return;
+    var dx = e.touches[0].clientX - tStartX;
+    var dy = e.touches[0].clientY - tStartY;
+    if (!tLocked && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy) * 1.2) tLocked = true;
+    if (!tLocked) return;
+    var cap = track.clientWidth * RUBBER_MAX_RATIO;
+    if (track.scrollLeft <= 0 && dx > 0) {
+      if (e.cancelable) e.preventDefault();
+      setRubber(rubber(dx, cap));
+    } else if (track.scrollLeft >= maxScroll() - 1 && dx < 0) {
+      if (e.cancelable) e.preventDefault();
+      setRubber(-rubber(-dx, cap));
+    } else if (rubberOffset) {
+      setRubber(0);
+    }
+  }, { passive: false });
+  function touchEnd() { tActive = false; releaseRubber(); }
+  track.addEventListener('touchend', touchEnd);
+  track.addEventListener('touchcancel', touchEnd);
 
   /* ---------- 상세 더보기 ---------- */
   var clip = document.querySelector('.m-detail__clip');
