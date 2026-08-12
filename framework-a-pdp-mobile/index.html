@@ -105,25 +105,28 @@ button { font-family: inherit; color: inherit; background: none; border: 0; curs
   object-fit: cover;
   pointer-events: none;
 }
-/* 이미지 위 위시리스트/공유 (시안: 흰 원형, 이미지 우측 상단 고정) */
-.m-gallery__actions {
-  position: absolute;
-  top: 16px;
-  right: 16px;
+/* 타이틀 행: 상품명 + 찜 (Figma: title gap18, iconButton 24, 아이콘 20) */
+.m-info__titlerow {
+  margin-top: 8px;
   display: flex;
-  gap: 8px;
-  z-index: 3;
+  gap: 18px;
+  align-items: flex-start;
 }
-.circle-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #fff;
+.m-info__titlerow .m-info__name { margin-top: 0; flex: 1 0 0; min-width: 0; }
+.m-info__wish {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 4px;   /* 22px/1.45 첫 줄에 광학 정렬 */
   display: flex;
   align-items: center;
   justify-content: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 }
-.circle-btn img { width: 20px; height: 20px; }
+.m-info__wish img { width: 20px; height: 20px; }
 
 /* 다이내믹 도트 — 시안 실측값
    컨테이너: h12/패딩4/반투명 흰색, 활성 바 11×4 #000, 도트 4px #b3b3b3,
@@ -550,17 +553,16 @@ button { font-family: inherit; color: inherit; background: none; border: 0; curs
 <!-- ==================== 갤러리 (스와이프 캐러셀) ==================== -->
 <section class="m-gallery">
   <div class="m-gallery__track js-track"></div>
-  <div class="m-gallery__actions">
-    <button class="circle-btn js-wishlist" aria-label="위시리스트"><img src="assets/icons/wishlist.svg" alt=""></button>
-    <button class="circle-btn js-share" aria-label="공유"><img src="assets/icons/share.svg" alt=""></button>
-  </div>
   <div class="m-gallery__dots js-dots" role="tablist" aria-label="이미지 인디케이터"></div>
 </section>
 
 <!-- ==================== 상품 정보 ==================== -->
 <section class="m-info">
   <p class="m-info__category">여성 신발</p>
-  <h1 class="m-info__name">나이키스킴스 리프트 메쉬</h1>
+  <div class="m-info__titlerow">
+    <h1 class="m-info__name">나이키스킴스 리프트 메쉬</h1>
+    <button class="m-info__wish js-wishlist" aria-label="위시리스트"><img src="assets/icons/wishlist.svg" alt=""></button>
+  </div>
   <div class="m-info__price">
     <span class="now">189,000원</span>
     <span class="was">200,000원</span>
