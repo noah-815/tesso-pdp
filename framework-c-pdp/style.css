@@ -908,3 +908,22 @@ img { display: block; }
   background: #111;
   color: #fff;
 }
+
+/* ==================== a-center-v2 전용 오버라이드 ====================
+   (body[data-fade="stack"][data-main-swipe="off"] 에서만 적용 — 기존 페이지 영향 없음) */
+
+/* 크로스페이드 dip 제거: 나가는 이미지는 opacity:1 유지한 채 아래에 깔리고,
+   들어오는 이미지만 위(z2)에서 0→1 페이드인. 300ms ease 그대로 */
+[data-fade="stack"] .gallery__photo            { opacity: 0; z-index: 0; transition: opacity 0.3s ease; }
+[data-fade="stack"] .gallery__photo.is-leaving { opacity: 1; z-index: 1; transition: none; }
+[data-fade="stack"] .gallery__photo.is-visible { opacity: 1; z-index: 2; }
+
+/* 드래그 페이징 제거: 기본 커서로, 드래그용 속성 정리 */
+[data-main-swipe="off"] .gallery__main {
+  cursor: default;
+  touch-action: auto;   /* 세로 스크롤 포함 기본 제스처 복원 */
+}
+[data-main-swipe="off"] .gallery__photo {
+  user-select: auto;
+  pointer-events: auto; /* 이미지 우클릭·선택 등 기본 동작 복원 */
+}

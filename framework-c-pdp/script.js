@@ -50,14 +50,37 @@
     photos.push(el);
   });
 
+  /* data-fade="stack": 나가는 이미지를 is-leaving(z1, opacity1)으로 유지하고
+     들어오는 이미지만 위에서 페이드인 → 중간 지점 dip 제거.
+     연타 시 이전 is-leaving 타이머를 취소하고 is-leaving은 항상 최대 1개 유지 */
+  var FADE_STACK = document.body.dataset.fade === 'stack';
+  var leaveTimer = null;
   function crossfade(current) {
-    photos.forEach(function (p, k) {
-      p.classList.toggle('is-visible', k === current);
+    if (!FADE_STACK) {
+      photos.forEach(function (p, k) {
+        p.classList.toggle('is-visible', k === current);
+      });
+      return;
+    }
+    var incoming = photos[current];
+    if (incoming.classList.contains('is-visible')) return;
+    clearTimeout(leaveTimer);
+    photos.forEach(function (p) { p.classList.remove('is-leaving'); });
+    photos.forEach(function (p) {
+      if (p !== incoming && p.classList.contains('is-visible')) {
+        p.classList.remove('is-visible');
+        p.classList.add('is-leaving');
+      }
     });
+    incoming.classList.add('is-visible');
+    leaveTimer = setTimeout(function () {
+      photos.forEach(function (p) { p.classList.remove('is-leaving'); });
+    }, 320);   // 300ms 전환 완료 후 정리
   }
 
   /* 메인 이미지 가로 스와이프 공통 바인딩 */
   function bindMainSwipe(onPrev, onNext) {
+    if (document.body.dataset.mainSwipe === 'off') return;   // 드래그 페이징 미사용 페이지
     var swipe = null;
     main.addEventListener('pointerdown', function (e) {
       swipe = { x: e.clientX };

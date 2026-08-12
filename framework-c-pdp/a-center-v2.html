@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>브와 드 일랑 오 드 퍼퓸 — Framework C · A 루프 없음+중앙 정렬 v2 (dip 제거·드래그 제거)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-gallery-mode="center" data-fade="stack" data-main-swipe="off">
+
+<!-- ==================== 헤더 (set06_header) ==================== -->
+<header class="header">
+  <div class="header__inner">
+    <nav class="header__nav">
+      <a href="#">Shop</a>
+      <a href="#">About</a>
+      <a href="#">Journal</a>
+      <a href="#">Info</a>
+      <a href="#">The Story</a>
+    </nav>
+    <a class="header__logo" href="#">BRAND</a>
+    <nav class="header__nav">
+      <a href="#">Search</a>
+      <a href="#">Sign in</a>
+      <a href="#">Bag [0]</a>
+    </nav>
+  </div>
+</header>
+
+<main class="content-area">
+  <!-- ==================== 좌측 · 상품 이미지 캐러셀 ==================== -->
+  <div class="col-content">
+    <section class="gallery" aria-label="상품 이미지">
+      <div class="gallery__rail js-rail">
+        <div class="gallery__track js-track"><!-- 섬네일은 JS가 렌더 --></div>
+      </div>
+      <div class="gallery__main js-main"><!-- 메인 이미지는 JS가 렌더 --></div>
+    </section>
+
+    <!-- ==================== 상품 상세 (productDetail) ==================== -->
+    <section class="detail js-detail">
+      <div class="detail__clip">
+        <div class="detail__stack">
+          <div class="detail__image"><img src="assets/img/detail-1.png" alt="브와 드 일랑 오 드 퍼퓸 무드 이미지"></div>
+          <div class="detail__text">
+            <p>브와 드 일랑 오 드 퍼퓸</p>
+            <p>일랑일랑과 튜베로즈의 관능적인 바탕에 샌달우드를 가미해 모던한 감각을 입힌 매혹적인 향.</p>
+          </div>
+          <div class="detail__image"><img src="assets/img/detail-2.png" alt="제품 연출 이미지"></div>
+        </div>
+        <div class="detail__more-area">
+          <button class="detail__more-btn js-detail-more" type="button">더보기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 리뷰 (review) ==================== -->
+    <section class="section review">
+      <div class="section__bar">
+        <div class="section__title">리뷰 <span class="count">(1,423)</span></div>
+        <div class="rating-area">
+          <span class="rating rating--lg">
+            <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+          </span>
+          <span class="rating-score">4.2</span>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <label class="check">
+          <input type="checkbox">
+          <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+          포토리뷰만 보기
+        </label>
+        <button class="select-text">최신순 <img src="assets/icons/chevronDown.svg" alt=""></button>
+      </div>
+
+      <div class="review-list">
+        <!-- 리뷰 1 : 텍스트 + 사진 8장 -->
+        <article class="review-item">
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">400ml <span class="vdiv"></span> Thank you <span class="vdiv"></span> 펌프</div>
+          </div>
+          <p class="review-item__body">아침에 사용하면 기분이 확실히 달라져요. 상쾌한데 너무 쨍하지 않고, 햇살 같은 느낌이 있어서 하루 시작할 때 쓰기 좋아요. 향 설명 그대로의 분위기라 만족합니다.</p>
+          <div class="review-item__photos">
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph is-ghost"></span>
+          </div>
+          <span class="review-item__date">2026. 6. 17.</span>
+        </article>
+
+        <!-- 리뷰 2 : 내 리뷰 + 사진 8장 + more -->
+        <article class="review-item">
+          <div class="item-head">
+            <span class="badge">내 리뷰</span>
+            <div class="text-btn-group">
+              <button class="text-btn">수정</button>
+              <span class="vdiv"></span>
+              <button class="text-btn text-btn--danger">삭제</button>
+            </div>
+          </div>
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">400ml <span class="vdiv"></span> Thank you <span class="vdiv"></span> 펌프</div>
+          </div>
+          <p class="review-item__body">향 설명 보고 궁금해서 구매했는데, 실제로 써보니 설명이 과장이 아니더라고요. 오렌지 꽃 향이 달거나 무겁지 않아서 좋았어요.<br>그리고 요즘 날씨가 더워지면서 샤워를 자주 하는데, 이 바디워시는 사용감이 가벼워서 자주 사용하기에도 부담 없더라고요.<br>거품이 풍성한 편은 아니지만 피부에 문질렀을 때 부드럽게 퍼지고, 씻고 나서 미끌거리거나 당기는 느낌이 거의 없어요.<br>향도 인위적이지 않아서 하루 마무리용으로도 잘 쓰고 있습니다.</p>
+          <div class="review-item__photos">
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+            <span class="ph is-more" data-more="+3"><img src="assets/img/product-1.png" alt=""></span>
+          </div>
+          <span class="review-item__date">2026. 6. 17.</span>
+        </article>
+
+        <!-- 리뷰 3 : 텍스트만 -->
+        <article class="review-item">
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">400ml <span class="vdiv"></span> Thank you <span class="vdiv"></span> 펌프</div>
+          </div>
+          <p class="review-item__body">오렌지 꽃 향이 튀지 않고 맑게 느껴져서 마음에 들었어요. 인위적인 향 싫어하는 편인데 이건 괜찮네요. 향이 몸에서 은은하게 나서 기분이 좋아요!</p>
+          <span class="review-item__date">2026. 6. 17.</span>
+        </article>
+
+        <!-- 리뷰 4 : 텍스트 + 사진 1장 -->
+        <article class="review-item">
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">400ml <span class="vdiv"></span> Thank you <span class="vdiv"></span> 펌프</div>
+          </div>
+          <p class="review-item__body">한 달 사용해 봤는데 향도 좋고 무엇보다 건조함이 많이 사라졌어요. 전에 사용하던 다른 바디워시는 사용하고 나서 꼭 바디로션을 발라줘야 했었는데 이건 따로 로션을 바르지 않아도 돼요. 무엇보다 향이 오래 지속되어서 마음에 듭니다.</p>
+          <div class="review-item__photos review-item__photos--single">
+            <span class="ph"><img src="assets/img/product-1.png" alt=""></span>
+          </div>
+          <span class="review-item__date">2026. 6. 17.</span>
+        </article>
+
+        <!-- 리뷰 5 : 텍스트만 -->
+        <article class="review-item">
+          <div class="review-item__meta">
+            <div class="review-item__user-row">
+              <span class="review-item__user">nickname***</span>
+              <span class="rating">
+                <img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOn.svg" alt=""><img src="assets/icons/starOff.svg" alt="">
+              </span>
+            </div>
+            <div class="option-row">400ml <span class="vdiv"></span> Thank you <span class="vdiv"></span> 펌프</div>
+          </div>
+          <p class="review-item__body">피부가 예민한 편이라 바디워시 고를 때 항상 조심하는데, 이 제품은 자극 없이 잘 맞았어요. 거품이 가볍고 세정 후에 피부가 편안한 느낌이에요. 향도 오래 잔향으로 남기보다는 은은하게 사라져서, 향수 쓰는 날에도 부담 없이 사용할 수 있었어요. 계절 바뀔 때마다 찾게 될 것 같아요.</p>
+          <span class="review-item__date">2026. 6. 17.</span>
+        </article>
+      </div>
+
+      <nav class="pagination">
+        <button class="pagination__arrow" disabled><img src="assets/icons/chevronLeft.svg" alt="이전"></button>
+        <div class="pagination__pages"><span class="cur">1</span><span class="sep">/</span><span class="total">10</span></div>
+        <button class="pagination__arrow"><img src="assets/icons/chevronRight.svg" alt="다음"></button>
+      </nav>
+    </section>
+
+    <!-- ==================== 상품 문의 (inquiry) ==================== -->
+    <section class="section inquiry">
+      <div class="section__bar">
+        <div class="section__title">상품 문의</div>
+        <button class="btn-dark">문의하기</button>
+      </div>
+
+      <div class="filter-bar">
+        <label class="check">
+          <input type="checkbox">
+          <span class="box"><img src="assets/icons/checkSmall.svg" alt=""></span>
+          내 문의만 보기
+        </label>
+        <button class="select-text">전체 <img src="assets/icons/chevronDown.svg" alt=""></button>
+      </div>
+
+      <div class="inquiry-list">
+        <!-- 문의 1 : 미답변, 접힘 -->
+        <article class="inquiry-item js-inquiry">
+          <div class="inquiry-item__q-area">
+            <div class="inquiry-item__info">
+              <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date">2026. 6. 17. 20:35</span></div>
+              <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+            </div>
+            <p class="inquiry-item__q">상세 설명을 보았을 때 향과 사용감이 궁금한데, 실제로는 향이 강한 편인지 아니면 은은하게 남는 타입인지 알고 싶습니다. 또한 여름철에도 부담 없이 사용할 수 있는지, 잔향이 오래 지속되는지도 궁금합니다.</p>
+          </div>
+        </article>
+
+        <!-- 문의 2 : 내 문의 + 비밀글 -->
+        <article class="inquiry-item js-inquiry">
+          <div class="item-head">
+            <span class="badge">내 문의</span>
+            <div class="text-btn-group">
+              <button class="text-btn">수정</button>
+              <span class="vdiv"></span>
+              <button class="text-btn text-btn--danger">삭제</button>
+            </div>
+          </div>
+          <div class="inquiry-item__q-area">
+            <div class="inquiry-item__info">
+              <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date">2026. 6. 17. 20:35</span></div>
+              <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+            </div>
+            <p class="inquiry-item__q">여름철에 사용하기에도 무겁지 않은지 궁금합니다. 사용 후 잔향이나 사용감이 끈적이지는 않는지 알고 싶어요.</p>
+            <div class="inquiry-item__private"><img src="assets/icons/lock.svg" alt=""><span>비밀글</span></div>
+          </div>
+        </article>
+
+        <!-- 문의 3 : 답변완료, 펼침 -->
+        <article class="inquiry-item is-open js-inquiry">
+          <div class="inquiry-item__q-area">
+            <div class="inquiry-item__info">
+              <div class="option-row"><span class="status status--done">답변완료</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date">2026. 6. 17. 20:35</span></div>
+              <button class="inquiry-item__toggle" aria-label="접기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+            </div>
+            <p class="inquiry-item__q">주문한 상품을 수령하여 확인하던 중 배송 과정에서 발생한 것으로 보이는 파손이 있어 교환을 요청드리고자 문의드립니다.<br><br>외부 박스는 크게 훼손되지 않았으나, 개봉 후 확인해보니 상품 자체에 파손 흔적이 발견되었습니다. 수령 직후 확인한 상태이며, 현재 상품은 사용하지 않고 그대로 보관 중입니다. 배송 중 충격으로 인해 발생한 문제로 판단되어 정상 제품으로의 교환이 가능한지 확인 부탁드립니다.</p>
+          </div>
+          <div class="inquiry-reply">
+            <div class="inquiry-reply__info">판매자 답변 <span class="vdiv"></span> <span class="date">YYYY. MM. DD. HH:MM</span></div>
+            <p class="inquiry-reply__body">안녕하세요, 고객님.<br>먼저 배송 과정 중 불편을 드리게 된 점 양해 부탁드립니다.<br><br>파손 상품은 별도의 비용 없이 회수 예정이며, 정상 상품은 회수 접수 완료 후 순차적으로 발송될 예정입니다.<br>교환 배송비는 당사에서 부담합니다.<br><br>추가로 궁금하신 사항이 있으시면 언제든지 문의해 주세요.<br>불편을 드린 점 다시 한 번 양해 부탁드리며, 빠르게 도움드릴 수 있도록 하겠습니다.<br><br>감사합니다.</p>
+          </div>
+        </article>
+
+        <!-- 문의 4 : 답변완료, 접힘 -->
+        <article class="inquiry-item js-inquiry">
+          <div class="inquiry-item__q-area">
+            <div class="inquiry-item__info">
+              <div class="option-row"><span class="status status--done">답변완료</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date">2026. 6. 17. 20:35</span></div>
+              <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+            </div>
+            <p class="inquiry-item__q">상세 페이지에 적힌 향 설명은 확인했는데, 실제로는 향 지속력이<br>어느 정도 되는지 궁금합니다. 샤워 후 바로 사라지는 편인가요?</p>
+          </div>
+          <div class="inquiry-reply">
+            <div class="inquiry-reply__info">판매자 답변 <span class="vdiv"></span> <span class="date">YYYY. MM. DD. HH:MM</span></div>
+            <p class="inquiry-reply__body">안녕하세요, 고객님.<br>은은하게 남는 타입으로, 보통 2~3시간 정도 부드럽게 지속됩니다.<br>진하게 남는 향이 부담스러우신 분들께도 무리 없이 권해드리고 있습니다.<br><br>감사합니다.</p>
+          </div>
+        </article>
+
+        <!-- 문의 5 : 미답변 + 비밀글만 -->
+        <article class="inquiry-item">
+          <div class="inquiry-item__q-area">
+            <div class="inquiry-item__info">
+              <div class="option-row"><span class="status">미답변</span> <span class="vdiv"></span> nickname*** <span class="vdiv"></span> <span class="date">2026. 6. 17. 20:35</span></div>
+              <button class="inquiry-item__toggle" aria-label="펼치기"><img src="assets/icons/chevronDown.svg" alt=""></button>
+            </div>
+            <div class="inquiry-item__private"><img src="assets/icons/lock.svg" alt=""><span>비밀글</span></div>
+          </div>
+        </article>
+      </div>
+
+      <nav class="pagination">
+        <button class="pagination__arrow" disabled><img src="assets/icons/chevronLeft.svg" alt="이전"></button>
+        <div class="pagination__pages"><span class="cur">1</span><span class="sep">/</span><span class="total">10</span></div>
+        <button class="pagination__arrow"><img src="assets/icons/chevronRight.svg" alt="다음"></button>
+      </nav>
+    </section>
+
+    <!-- ==================== 주문 정보 (orderInfo) ==================== -->
+    <section class="section order-info">
+      <div class="section__bar">
+        <div class="section__title">주문 정보</div>
+      </div>
+      <div class="order-info__content">
+        <div class="order-info__text">
+          <p>배송 정보</p>
+          <p>배송 업체&nbsp; ㅣ&nbsp; CJ 대한통운 (1588-1255)<br>
+          배송 지역&nbsp; ㅣ&nbsp; 대한민국 전 지역 배송<br>
+          배송 비용&nbsp; ㅣ&nbsp; 3,500원 / 구매 금액 50,000원 이상 시 무료배송<br>
+          / 제주 및 도서 산간 지역 별도 추가 금액 발생<br>
+          배송 기간&nbsp; ㅣ&nbsp; 주말·공휴일 제외 2일 ~ 5일<br><br>
+          유의 사항<br>
+          - 주문 폭주 및 공급 사정으로 인하여 지연 및 품절이 발생할 수 있습니다.<br>
+          - 기본 배송기간 이상 소요되는 상품이거나, 품절 상품은 개별 연락을 드립니다.</p>
+        </div>
+        <div class="order-info__image"><img src="assets/img/order-calendar.png" alt="추석 연휴 배송 안내"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== 우측 · 상품 정보 (productInfo) ==================== -->
+  <aside class="col-info">
+    <div class="info">
+      <div class="info__top">
+        <div class="info__head">
+          <div class="info__title-area">
+            <div class="info__text-area">
+              <p class="info__category">Perfume</p>
+              <div class="info__name-area">
+                <h1 class="info__name">브와 드 일랑 오 드 퍼퓸</h1>
+                <div class="info__price-row">
+                  <span class="info__price"><span class="num">40,000</span>원</span>
+                  <span class="info__price-original"><span class="num">50,000</span>원</span>
+                </div>
+              </div>
+            </div>
+            <div class="info__actions">
+              <button class="icon-btn" aria-label="위시리스트"><img src="assets/icons/bookmark.svg" alt=""></button>
+              <button class="icon-btn" aria-label="공유"><img src="assets/icons/share.svg" alt=""></button>
+            </div>
+          </div>
+          <div class="info__desc">
+            <p>로즈와 와일드 플라워의 향기에 모리스 루셀이 엮어낸 기억과 감정, 아이리스와 일랑일랑의 향기에 도미니크 로피옹이 조각한 꽃의 본질적인 미학. 두 마스터 퍼퓨머의 풍부한 상상력과 정교한 탐구를 넘나들며 완성한 독창적인 꽃향기로 새로운 영감을 발견하고 감각을 환기해보세요.</p>
+            <p>‘브와 드 일랑’은 일랑일랑의 관능적인 매력을 모던한 감각으로 풀어낸 매혹적인 플로럴 향기입니다. 일랑일랑의 짙고 이국적인 노트가 튜베로즈 앱솔루트의 풍부하고 크리미한 깊이와 어우러져 본능적인 아름다움과 우아함을 모두 담은 복합적인 향기를 완성합니다. 샌달우드와 블론드우드의 부드럽고 따뜻한 잔향은 현대적이면서도 세련된 플로럴 터치로 향기를 감싸며, 고귀하고 매혹적인 향기를 선사합니다.</p>
+          </div>
+        </div>
+
+        <div class="option-group">
+          <button class="select-field">
+            <span class="label">용량</span>
+            <img class="chevron" src="assets/icons/chevronDown.svg" alt="">
+          </button>
+          <button class="select-field is-disabled" disabled>
+            <span class="label">메시지 카드</span>
+            <img class="chevron" src="assets/icons/chevronDown.svg" alt="">
+          </button>
+          <button class="select-field is-disabled" disabled>
+            <span class="label">추가 옵션</span>
+            <img class="chevron" src="assets/icons/chevronDown.svg" alt="">
+          </button>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn--cart">장바구니 담기</button>
+          <button class="btn btn--buy">바로 구매하기</button>
+        </div>
+      </div>
+
+      <div class="detail-info">
+        <div class="detail-info__tabs js-tabs">
+          <button class="detail-info__tab is-active" data-tab="0">배송 및 반품</button>
+          <button class="detail-info__tab" data-tab="1">사용방법</button>
+          <button class="detail-info__tab" data-tab="2">주의사항</button>
+          <button class="detail-info__tab" data-tab="3">세부정보</button>
+        </div>
+        <div class="detail-info__body js-tab-body">
+          <p>[배송 안내]<br>주문하신 상품은 결제 완료 후 순차적으로 출고되며, 배송은 영업일 기준으로 진행됩니다.<br>배송 기간은 지역 및 택배사 사정에 따라 차이가 있을 수 있습니다.</p>
+          <p>[반품 안내]<br>상품 수령 후 일정 기간 내에 반품 신청이 가능하며, 상품은 미사용 상태로 포장되어야 합니다.<br>단순 변심에 의한 반품의 경우 배송비는 고객 부담이며, 상품 하자 또는 오배송의 경우 배송비는 당사에서 부담합니다.</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- 버전 스위처 (데모) -->
+<nav class="version-switcher">
+  <a href="a-center.html" class="js-ver-a is-active">A · 루프 없음 + 중앙 정렬</a>
+  <a href="b-nonfiction.html" class="js-ver-b">B · 루프 + 상단 정렬</a>
+</nav>
+
+<script src="script.js"></script>
+</body>
+</html>
