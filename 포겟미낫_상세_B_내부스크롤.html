@@ -109,20 +109,7 @@
     padding:24px;
     color:#fff; font-family:var(--en); font-size:13px;
     mix-blend-mode:difference; z-index:3;
-    /* 숫자 슬롯 폭 계산의 전제: 모든 숫자 글리프가 동일 폭(1ch) */
-    font-variant-numeric:tabular-nums;
-    font-feature-settings:"tnum" 1;
   }
-  /* 숫자 슬롯 = ch (폰트 종속).
-     --slots = total 자릿수(1~9장이면 1ch, 10장 이상이면 2ch)를 JS가 주입.
-     cur/total 두 슬롯 모두 같은 min-width를 가지므로 1→15로 넘어가도 '/' 위치가 고정된다. */
-  .hero__indicator .num{
-    display:inline-block;
-    min-width:var(--slots, 1ch);
-    font-variant-numeric:tabular-nums;
-  }
-  .hero__indicator .num--cur{ text-align:right; }
-  .hero__indicator .num--total{ text-align:left; }
 
   /* ============ DETAIL INTRO ============ */
   .intro{ padding-top:40px; }
@@ -342,7 +329,7 @@
       </div>
       <button class="hero__arrow hero__arrow--prev is-hidden" aria-label="이전 이미지"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0LjgzIDcuNzUzNDJMMTAuNTgzOSAxMS45OTk1TDE0LjgzIDE2LjI0NjZMMTQuMTIyOSAxNi45NTM2TDkuMTY5ODYgMTIuMDAwNUw5LjUyMzM3IDExLjY0NkwxNC4xMjI5IDcuMDQ2MzlMMTQuODMgNy43NTM0MloiIGZpbGw9ImJsYWNrIi8+Cjwvc3ZnPgo=" alt=""></button>
       <button class="hero__arrow hero__arrow--next" aria-label="다음 이미지"><img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0LjgzMDYgMTIuMDAwNUwxNC40NzYxIDEyLjM1NEw5Ljg3NjQ5IDE2Ljk1MzZMOS4xNjk0MyAxNi4yNDY2TDEzLjQxNDYgMTEuOTk5NUw5LjE2OTQzIDcuNzUzNDJMOS44NzY0OSA3LjA0NjM5TDE0LjgzMDYgMTIuMDAwNVoiIGZpbGw9ImJsYWNrIi8+Cjwvc3ZnPgo=" alt=""></button>
-      <div class="hero__indicator en" id="heroIndicator"><span class="num num--cur" id="heroCur">1</span><span>/</span><span class="num num--total" id="heroTotal">15</span></div>
+      <div class="hero__indicator en"><span id="heroCur">1</span><span>/</span><span id="heroTotal">5</span></div>
     </section>
 
     <!-- DETAIL INTRO -->
@@ -717,26 +704,12 @@
   // ---- hero image slider: arrows (hover, first/last hidden) + drag / swipe ----
   (function () {
     var hero = document.getElementById('hero'); if (!hero) return;
-    var TOTAL = 15;                                   // 기존 이미지를 반복해서 15장 구성
     var track = hero.querySelector('.hero__track');
+    var slides = hero.querySelectorAll('.hero__slide');
     var prev = hero.querySelector('.hero__arrow--prev');
     var next = hero.querySelector('.hero__arrow--next');
     var cur = document.getElementById('heroCur');
-    var total = document.getElementById('heroTotal');
-    var indicator = document.getElementById('heroIndicator');
-
-    // 원본 슬라이드를 순환 복제해 TOTAL 장까지 채운다 (base64 중복 없이 노드만 복제)
-    var base = Array.prototype.slice.call(hero.querySelectorAll('.hero__slide'));
-    for (var k = base.length; k < TOTAL; k++) {
-      track.appendChild(base[k % base.length].cloneNode(true));
-    }
-    var slides = hero.querySelectorAll('.hero__slide');
     var i = 0, n = slides.length;
-
-    // 숫자 슬롯 폭 = total 자릿수(ch). 1~9장이면 1ch, 10장 이상이면 2ch.
-    total.textContent = n;
-    indicator.style.setProperty('--slots', String(n).length + 'ch');
-
     function render() {
       track.style.transform = 'translateX(-' + (i * 100) + '%)';
       cur.textContent = (i + 1);
