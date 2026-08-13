@@ -11,7 +11,7 @@
 <style>
 /* ==========================================================================
    Framework C · PDP Mobile (Figma: productDetail/mobile 3897:93955)
-   히어로 인터랙션: 스와이프 → dip 없는 크로스페이드 (루프 없음)
+   히어로 인터랙션: 가로 슬라이드 캐러셀 (루프 없음)
    ========================================================================== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -58,7 +58,7 @@ p { margin: 0; }
 }
 main { margin-top: var(--header-h); }
 
-/* ---------- 히어로: 크로스페이드 스택 ---------- */
+/* ---------- 히어로: 가로 슬라이드 캐러셀 ---------- */
 .hero {
   position: relative;
   width: 100%;
@@ -67,19 +67,23 @@ main { margin-top: var(--header-h); }
   background: #f2ece4;
   touch-action: pan-y;              /* 세로 스크롤은 브라우저에 양보 */
   user-select: none; -webkit-user-select: none;
+  cursor: grab;
 }
-/* dip 없는 크로스페이드: 나가는 이미지는 opacity 1로 아래(z1)에 깔리고,
-   들어오는 이미지만 위(z2)에서 0→1 페이드인 */
-.hero__photo {
-  position: absolute; inset: 0;
+/* 가로 슬라이드 트랙: 드래그 1:1 추종, 릴리즈 시 300ms ease 스냅 */
+.hero__track {
+  display: flex; height: 100%;
+  transition: transform 0.3s ease;
+}
+.hero.is-dragging { cursor: grabbing; }
+.hero.is-dragging .hero__track { transition: none; }
+.hero__slide {
+  flex: 0 0 100%; height: 100%;
+}
+.hero__slide img {
   width: 100%; height: 100%;
   object-fit: cover;
-  opacity: 0; z-index: 0;
-  transition: opacity 0.3s ease;
   pointer-events: none;
 }
-.hero__photo.is-leaving { opacity: 1; z-index: 1; transition: none; }
-.hero__photo.is-visible { opacity: 1; z-index: 2; }
 
 .hero__counter {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
@@ -604,10 +608,11 @@ main { margin-top: var(--header-h); }
 
 <script>
 /* ==========================================================================
-   히어로: 스와이프 → dip 없는 크로스페이드 (Framework C 모바일 인터랙션)
-   · 루프 없음 (1↔5), 카운터 동기화
-   · 커밋: 거리 50px OR 플릭 0.5px/ms — 크로스페이드라 드래그 추종은 없음
-   · 나가는 이미지는 opacity 1로 아래에 깔리고 들어오는 것만 페이드인 (dip 제거)
+   히어로: 가로 슬라이드 캐러셀 (Framework C 모바일 인터랙션)
+   · 루프 없음 (1↔5), 카운터 동기화, 드래그 1:1 추종
+   · 커밋: 거리 폭의 35% OR 플릭 0.5px/ms
+   · 끝단 러버밴딩: 비선형 감쇠 MAX·over/(over+K) — 최대 폭의 15%
+   · 전환: 300ms ease
    ========================================================================== */
 (function () {
   'use strict';
@@ -622,76 +627,82 @@ main { margin-top: var(--header-h); }
   }
   var N = IMAGES.length;
 
-  var photos = IMAGES.map(function (src, k) {
-    var el = document.createElement('img');
-    el.className = 'hero__photo' + (k === 0 ? ' is-visible' : '');
-    el.src = src;
-    el.alt = '브와 드 일랑 오 드 퍼퓸 — 상품 이미지 ' + (k + 1);
-    if (k > 0) el.loading = 'lazy';
-    hero.insertBefore(el, hero.firstChild);
-    return el;
+  var track = document.createElement('div');
+  track.className = 'hero__track';
+  IMAGES.forEach(function (src, k) {
+    var slide = document.createElement('div');
+    slide.className = 'hero__slide';
+    var img = document.createElement('img');
+    img.src = src;
+    img.alt = '브와 드 일랑 오 드 퍼퓸 — 상품 이미지 ' + (k + 1);
+    if (k > 0) img.loading = 'lazy';
+    slide.appendChild(img);
+    track.appendChild(slide);
   });
+  hero.insertBefore(track, hero.firstChild);
   totalEl.textContent = N;
 
   var current = 0;
-  var leaveTimer = null;
 
-  /* dip 없는 크로스페이드 — is-leaving은 항상 최대 1개, 연타 시 이전 타이머 취소 */
-  function crossfade(next) {
-    var incoming = photos[next];
-    if (incoming.classList.contains('is-visible')) return;
-    clearTimeout(leaveTimer);
-    photos.forEach(function (p) { p.classList.remove('is-leaving'); });
-    photos.forEach(function (p) {
-      if (p !== incoming && p.classList.contains('is-visible')) {
-        p.classList.remove('is-visible');
-        p.classList.add('is-leaving');
-      }
-    });
-    incoming.classList.add('is-visible');
-    leaveTimer = setTimeout(function () {
-      photos.forEach(function (p) { p.classList.remove('is-leaving'); });
-    }, 320);
-  }
-
-  function select(i) {
-    var next = Math.min(N - 1, Math.max(0, i));   // 루프 없음
-    if (next === current) return;
-    current = next;
-    crossfade(current);
+  function render() {
+    track.style.transform = 'translateX(calc(-' + (current * 100) + '%))';
     curEl.textContent = current + 1;
   }
 
-  /* 스와이프: 수평 우세 제스처만, 거리 50px OR 플릭 0.5px/ms 커밋 */
-  var DIST = 50;      // px
-  var VEL  = 0.5;     // px/ms
+  /* 드래그: 수평 방향락 후 1:1 추종, 끝단은 비선형 러버밴딩 */
+  var DIST = 0.35;    // 커밋 거리 임계 (폭 대비)
+  var VEL  = 0.5;     // 커밋 속도 임계 (px/ms)
   var swipe = null;
 
   hero.addEventListener('pointerdown', function (e) {
-    swipe = { x: e.clientX, y: e.clientY, t: performance.now(), locked: false };
+    swipe = { x: e.clientX, y: e.clientY, t: performance.now(), locked: false, w: hero.clientWidth || 1 };
   });
   hero.addEventListener('pointermove', function (e) {
-    if (!swipe || swipe.locked) return;
-    var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
-    if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-      swipe.locked = true;                        // 수평 확정 후에만 캡처
-      try { hero.setPointerCapture(e.pointerId); } catch (_) {}
-    } else if (Math.abs(dy) > 8 && Math.abs(dy) >= Math.abs(dx)) {
-      swipe = null;                               // 세로 스크롤에 양보
-    }
-  });
-  hero.addEventListener('pointerup', function (e) {
     if (!swipe) return;
+    var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+    if (!swipe.locked) {
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        swipe.locked = true;                      // 수평 확정 후에만 캡처
+        hero.classList.add('is-dragging');
+        try { hero.setPointerCapture(e.pointerId); } catch (_) {}
+      } else if (Math.abs(dy) > 8 && Math.abs(dy) >= Math.abs(dx)) {
+        swipe = null;                             // 세로 스크롤에 양보
+        return;
+      } else return;
+    }
+    var px = dx;
+    if ((current === 0 && dx > 0) || (current === N - 1 && dx < 0)) {
+      // 끝단 러버밴딩 — 처음엔 약 50% 따라오다 점점 뻑뻑, 최대 폭의 15%
+      var MAX = swipe.w * 0.15;
+      var K   = swipe.w * 0.30;
+      var over = Math.abs(dx);
+      px = Math.sign(dx) * (MAX * over / (over + K));
+    }
+    track.style.transform = 'translateX(calc(-' + (current * 100) + '% + ' + px + 'px))';
+  });
+  function release(e) {
+    if (!swipe) return;
+    var wasLocked = swipe.locked;
     var dx = e.clientX - swipe.x;
     var dt = Math.max(performance.now() - swipe.t, 1);
-    var commit = Math.abs(dx) >= DIST || Math.abs(dx) / dt >= VEL;
-    if (swipe.locked && commit) {
-      if (dx < 0) select(current + 1);
-      else select(current - 1);
+    hero.classList.remove('is-dragging');
+    if (wasLocked) {
+      var commit = Math.abs(dx) > swipe.w * DIST || Math.abs(dx) / dt >= VEL;
+      if (commit) {
+        if (dx < 0 && current < N - 1) current++;
+        else if (dx > 0 && current > 0) current--;
+      }
+      render();                                   // 미달·끝단은 제자리 스냅백
     }
     swipe = null;
+  }
+  hero.addEventListener('pointerup', release);
+  hero.addEventListener('pointercancel', function () {
+    if (swipe && swipe.locked) { hero.classList.remove('is-dragging'); render(); }
+    swipe = null;
   });
-  hero.addEventListener('pointercancel', function () { swipe = null; });
+
+  render();
 })();
 
 /* ==================== 아코디언 (단일 열림) ==================== */
