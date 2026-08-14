@@ -24,11 +24,9 @@
   <!-- ==================== 상품 이미지 캐러셀 ==================== -->
   <section class="m-gallery" aria-label="상품 이미지">
     <div class="m-gallery__scroller js-scroller"><!-- 슬라이드는 JS가 렌더 --></div>
-    <div class="m-gallery__actions">
-      <button class="icon-btn" aria-label="위시리스트"><img src="assets/icons/wishlist.svg" alt=""></button>
-      <button class="icon-btn" aria-label="공유"><img src="assets/icons/share.svg" alt=""></button>
+    <div class="m-gallery__indicator" aria-hidden="true">
+      <div class="m-gallery__dots js-indicator"><!-- 도트는 JS가 렌더 --></div>
     </div>
-    <div class="m-gallery__indicator js-indicator" aria-hidden="true"><!-- 도트는 JS가 렌더 --></div>
   </section>
 
   <!-- ==================== 상품 정보 ==================== -->
@@ -37,7 +35,10 @@
       <div class="info__title-area">
         <p class="info__category">Dog Wash</p>
         <div class="info__name-area">
-          <h1 class="info__name">매일 산책하는 강아지를 위한 샴푸</h1>
+          <div class="info__name-row">
+            <h1 class="info__name">매일 산책하는 강아지를 위한 샴푸</h1>
+            <button class="info__wish" aria-label="위시리스트"><img src="assets/icons/wishlist.svg" alt=""></button>
+          </div>
           <div class="info__price-row">
             <span class="info__price">40,000원</span>
             <span class="info__price-original">50,000원</span>

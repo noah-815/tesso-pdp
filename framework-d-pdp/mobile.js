@@ -1,21 +1,24 @@
 /* ==========================================================================
    Framework D · PDP Mobile 인터랙션
+   인터랙션 값은 framework-a-pdp-mobile과 동일하게 맞춤:
    - 상품 이미지: 가로 스와이프 페이징 (scroll-snap, 루프 없음)
-   - 도트 인디케이터: #ffffff + mix-blend-mode: difference,
-     현재 페이지에 맞춰 실시간 갱신 (활성 도트는 14px 필 형태)
-   - 이미지 15장: 데스크탑과 동일한 에셋 사용
+   - 끝단 러버밴딩: 지수 감쇠, 최대 폭의 12%, 복귀 320ms
+   - 도트 인디케이터: 최대 4개 노출 + 진행 방향 선반영(끝에서 두 번째 유지)
+   - 이미지: 기존 10장 + 추가 무드컷 9장 = 19장
    ========================================================================== */
 (function () {
-  /* 1번(제품 정면) → 흑백 패션(10) → 패브릭(9) → 램프/안경/자동차(6~8) → 기존 이미지 순서 */
-  var ORDER = [1, 10, 9, 6, 7, 8, 2, 3, 4, 5];
-  var IMAGES = [];
-  for (var i = 0; i < 15; i++) {
-    var n = ORDER[i % ORDER.length];
-    IMAGES.push({
-      src: 'assets/img/product-' + n + '.png',
+  /* 기존 10장(제품 정면 → 흑백 패션 → 패브릭 → 램프/안경/자동차 → 나머지)
+     뒤에 추가 무드컷 9장을 이어붙여 총 19장 */
+  var FILES = ['product-1.png', 'product-10.png', 'product-9.png', 'product-6.png', 'product-7.png',
+               'product-8.png', 'product-2.png', 'product-3.png', 'product-4.png', 'product-5.png',
+               'extra-5.webp', 'extra-6.webp', 'extra-7.webp', 'extra-8.webp', 'extra-9.webp',
+               'extra-10.webp', 'extra-11.webp', 'extra-12.webp', 'extra-13.webp'];
+  var IMAGES = FILES.map(function (f, i) {
+    return {
+      src: 'assets/img/' + f,
       alt: '매일 산책하는 강아지를 위한 샴푸 — 상품 이미지 ' + (i + 1)
-    });
-  }
+    };
+  });
 
   var scroller = document.querySelector('.js-scroller');
   var indicator = document.querySelector('.js-indicator');
@@ -76,34 +79,95 @@
 
   renderDots();
 
-  /* 데스크탑 브라우저 확인용: 마우스 드래그로도 스와이프 가능
-     (터치는 네이티브 스크롤+스냅 사용, 마우스는 드래그 동안 스냅을 끄고
-     놓는 순간 드래그 방향 기준으로 페이지 스냅) */
-  var drag = null;
+  /* 데스크탑 프리뷰용 마우스 드래그 스와이프 (framework-a-pdp-mobile과 동일) */
+  var dragging = false, startX = 0, startScroll = 0;
   scroller.addEventListener('pointerdown', function (e) {
-    if (e.pointerType === 'touch') return;
-    drag = { x: e.clientX, startLeft: scroller.scrollLeft, startPage: Math.round(scroller.scrollLeft / scroller.clientWidth) };
+    if (e.pointerType !== 'mouse') return;
+    dragging = true;
+    startX = e.clientX;
+    startScroll = scroller.scrollLeft;
     scroller.style.scrollSnapType = 'none';
     scroller.setPointerCapture(e.pointerId);
   });
   scroller.addEventListener('pointermove', function (e) {
-    if (!drag) return;
-    scroller.scrollLeft = drag.startLeft - (e.clientX - drag.x);
+    if (!dragging) return;
+    var target = startScroll - (e.clientX - startX);
+    var max = maxScroll();
+    var cap = scroller.clientWidth * RUBBER_MAX_RATIO;
+    if (target < 0) {                       /* 첫 장 너머 */
+      scroller.scrollLeft = 0;
+      setRubber(rubber(-target, cap));
+    } else if (target > max) {              /* 마지막 장 너머 */
+      scroller.scrollLeft = max;
+      setRubber(-rubber(target - max, cap));
+    } else {
+      if (rubberOffset) setRubber(0);
+      scroller.scrollLeft = target;
+    }
   });
-  function endDrag(e) {
-    if (!drag) return;
-    var dx = e.clientX - drag.x;
-    var target = drag.startPage;
-    if (dx <= -40) target += 1;
-    else if (dx >= 40) target -= 1;
-    target = Math.min(IMAGES.length - 1, Math.max(0, target));
-    scroller.scrollTo({ left: target * scroller.clientWidth, behavior: 'smooth' });
-    /* 스무스 스크롤이 끝난 뒤 스냅 복원 */
-    setTimeout(function () { scroller.style.scrollSnapType = ''; }, 400);
-    drag = null;
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    releaseRubber();
+    var w = scroller.clientWidth;
+    var idx = Math.max(0, Math.min(N - 1, Math.round(scroller.scrollLeft / w)));
+    scroller.style.scrollSnapType = '';
+    scroller.scrollTo({ left: idx * w, behavior: 'smooth' });
   }
   scroller.addEventListener('pointerup', endDrag);
   scroller.addEventListener('pointercancel', endDrag);
+
+  /* ---------- 엣지 러버밴딩 (framework-a-pdp-mobile과 동일 값) ----------
+     중간 스크롤은 네이티브 스냅 그대로 두고, 끝단을 넘어서는 제스처만
+     지수 감쇠(최대 폭의 12%) transform으로 반응시킨다. */
+  var RUBBER_MAX_RATIO = 0.12;
+  var rubberOffset = 0;
+  function rubber(d, max) { return max * (1 - Math.exp(-d / max)); }
+  function maxScroll() { return scroller.scrollWidth - scroller.clientWidth; }
+  function setRubber(px) {
+    rubberOffset = px;
+    scroller.style.transition = '';
+    scroller.style.transform = px ? 'translate3d(' + px.toFixed(2) + 'px,0,0)' : '';
+  }
+  function releaseRubber() {
+    if (!rubberOffset) return;
+    rubberOffset = 0;
+    scroller.style.transition = 'transform 320ms cubic-bezier(0.22, 1, 0.36, 1)';
+    scroller.style.transform = 'translate3d(0,0,0)';
+    scroller.addEventListener('transitionend', function h() {
+      scroller.removeEventListener('transitionend', h);
+      scroller.style.transition = '';
+      scroller.style.transform = '';
+    });
+  }
+
+  /* 터치: 끝단에서 시작한 수평 제스처만 가로챈다 (Android 등 네이티브 바운스 없는 환경 대응) */
+  var tStartX = 0, tStartY = 0, tActive = false, tLocked = false;
+  scroller.addEventListener('touchstart', function (e) {
+    tStartX = e.touches[0].clientX;
+    tStartY = e.touches[0].clientY;
+    tActive = true; tLocked = false;
+  }, { passive: true });
+  scroller.addEventListener('touchmove', function (e) {
+    if (!tActive) return;
+    var dx = e.touches[0].clientX - tStartX;
+    var dy = e.touches[0].clientY - tStartY;
+    if (!tLocked && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy) * 1.2) tLocked = true;
+    if (!tLocked) return;
+    var cap = scroller.clientWidth * RUBBER_MAX_RATIO;
+    if (scroller.scrollLeft <= 0 && dx > 0) {
+      if (e.cancelable) e.preventDefault();
+      setRubber(rubber(dx, cap));
+    } else if (scroller.scrollLeft >= maxScroll() - 1 && dx < 0) {
+      if (e.cancelable) e.preventDefault();
+      setRubber(-rubber(-dx, cap));
+    } else if (rubberOffset) {
+      setRubber(0);
+    }
+  }, { passive: false });
+  function touchEnd() { tActive = false; releaseRubber(); }
+  scroller.addEventListener('touchend', touchEnd);
+  scroller.addEventListener('touchcancel', touchEnd);
 })();
 
 /* ==================== 상품 상세 · 더보기 ==================== */
