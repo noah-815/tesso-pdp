@@ -5,7 +5,8 @@
                    다음 이미지가 오른쪽에서 밀려들어옴
    · 루프        : 없음 (첫/마지막은 이어지지 않음)
    · 도트        : 최대 4개만 노출. 진행 방향에 이미지가 더 남아 있으면
-                   활성 도트가 창의 끝이 아니라 끝에서 두 번째에 머문다
+                   활성 도트가 창의 끝이 아니라 끝에서 두 번째에 머문다.
+                   창 너머에 더 있으면 그쪽 경계 도트를 4px로 축소 (시안 5px/4px)
    · 러버밴딩    : iOS UIScrollView와 동일한 곡선
                    f(x) = (1 − 1 / (x·c/W + 1)) · W ,  c = 0.55
                    → 처음엔 55% 따라오다 점점 뻑뻑해지고 컨테이너 폭(W)에 점근
@@ -75,8 +76,7 @@
   function renderDots() {
     if (N <= WINDOW) {                                  /* 4장 이하면 전부 노출 */
       for (var j = 0; j < dots.length; j++) {
-        dots[j].classList.remove('is-hidden');
-        dots[j].classList.toggle('is-active', j === index);
+        dots[j].className = 'dot' + (j === index ? ' is-active' : '');
       }
       return;
     }
@@ -86,9 +86,12 @@
     winStart = Math.max(0, Math.min(N - WINDOW, winStart));
     var winEnd = winStart + WINDOW - 1;
     for (var k = 0; k < dots.length; k++) {
-      var inWin = k >= winStart && k <= winEnd;
-      dots[k].classList.toggle('is-hidden', !inWin);
-      dots[k].classList.toggle('is-active', inWin && k === index);
+      var d = dots[k];
+      if (k < winStart || k > winEnd) { d.className = 'dot is-hidden'; continue; }
+      if (k === index) { d.className = 'dot is-active'; continue; }
+      /* 창 경계 너머에 더 있으면 그 경계 도트를 축소 표시 */
+      var isEdge = (k === winStart && winStart > 0) || (k === winEnd && winEnd < N - 1);
+      d.className = 'dot' + (isEdge ? ' is-small' : '');
     }
   }
 

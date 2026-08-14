@@ -99,12 +99,14 @@ main { padding-top: var(--header-h); }
 }
 .hero__dots .dot {
   width: 5px; height: 5px;
-  border-radius: 50%;
+  border-radius: 9999px;
   background: #ffffff;
-  opacity: 0.4;
-  transition: opacity 0.3s ease;
+  opacity: 0.3;                         /* 시안: 비활성 0.3 */
+  transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
 }
-.hero__dots .dot.is-active { opacity: 1; }
+.hero__dots .dot.is-active { opacity: 0.8; }   /* 시안: 활성 0.8 */
+/* 창 너머에 이미지가 더 있음을 알리는 경계 도트 — 시안: 4px */
+.hero__dots .dot.is-small { width: 4px; height: 4px; }
 .hero__dots .dot.is-hidden { display: none; }
 
 /* ============ 상품 정보 ============ */
