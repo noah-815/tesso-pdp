@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Framework E — Product Detail · Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="mobile.css">
+</head>
+<body>
+
+<!-- ============ Header ============ -->
+<header class="m-header">
+  <a class="nav" href="#">Menu</a>
+  <a class="logo" href="#">BRAND</a>
+  <a class="nav" href="#">Bag [0]</a>
+</header>
+
+<main>
+
+  <!-- ============ 상품 이미지 캐러셀 ============ -->
+  <section class="hero js-hero" aria-label="상품 이미지">
+    <div class="hero__track js-track"><!-- 슬라이드는 JS가 렌더 --></div>
+    <div class="hero__dots js-dots" aria-hidden="true"><!-- 도트는 JS가 렌더 --></div>
+  </section>
+
+  <!-- ============ 상품 정보 ============ -->
+  <section class="pinfo">
+    <div class="pinfo__head">
+      <div class="pinfo__text">
+        <p class="pinfo__category">Drink</p>
+        <h1 class="pinfo__name">전해질 보충 음료 블러드 오렌지</h1>
+        <div class="pinfo__price-row">
+          <span class="pinfo__price"><span class="en">40,000</span>원</span>
+          <span class="pinfo__sale"><span class="en">50,000</span>원</span>
+        </div>
+      </div>
+      <button class="icon-btn" aria-label="위시리스트"><img src="assets/wishlist.svg" alt=""></button>
+    </div>
+    <p class="pinfo__desc">설탕이 전혀 들어가지 않은 탄산 전해질 음료로, 300mg의 나트륨, 75mg의 칼륨, 25mg의 마그네슘을 함유하여 수분 보충을 돕도록 제조되었습니다.</p>
+  </section>
+
+  <!-- ============ 상세정보 탭 ============ -->
+  <div class="pi-tabs">
+    <div class="pi-tab is-open">배송 및 반품 <span class="ic"><img src="assets/minus-small.svg" alt="접기"></span></div>
+    <div class="pi-tab">사용 방법 <span class="ic"><img src="assets/plus-small.svg" alt="펼치기"></span></div>
+    <div class="pi-tab">주의사항 <span class="ic"><img src="assets/plus-small.svg" alt="펼치기"></span></div>
+    <div class="pi-tab">세부정보 <span class="ic"><img src="assets/plus-small.svg" alt="펼치기"></span></div>
+  </div>
+  <div class="pi-tab-content">
+    100,000원 이상 구매 시 무료 배송<br>
+    도서산간 지역 및 부피가 큰 상품은 추가 배송비가 발생할 수 있습니다.<br>
+    공휴일 택배사 휴무 및 파업으로 인해 출고 또는 배송이 지연될 수 있습니다.
+  </div>
+
+  <!-- ============ 상품 상세 ============ -->
+  <section class="detail">
+    <div class="detail__clip js-detail-clip">
+      <div class="detail__stack">
+        <img src="assets/detail-1.jpg" alt="상품 상세 이미지 1">
+        <div class="detail__text">
+          <p class="title">Zero Sugar</p>
+          <p>설탕이 전혀 들어가지 않은 탄산 전해질 음료로, 300mg의 나트륨, 75mg의 칼륨, 25mg의 마그네슘을 함유하여 수분 보충을 돕도록 제조되었습니다.</p>
+        </div>
+        <img src="assets/detail-2.jpg" alt="상품 상세 이미지 2">
+      </div>
+      <div class="detail__more">
+        <button class="js-detail-more" type="button">더보기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 리뷰 ============ -->
+  <section class="section review">
+    <div class="section__bar">
+      <div class="section__title">리뷰 <span class="en">(1,423)</span></div>
+      <div class="rating-area">
+        <span class="rating">
+          <img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-empty.svg" alt="">
+        </span>
+        <span class="score">4.2</span>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <label class="checkbox-label"><span class="box"></span><span>포토리뷰만 보기</span></label>
+      <button class="select-text">최신순 <img src="assets/chevron-down-sm.svg" alt=""></button>
+    </div>
+
+    <div class="review-list">
+      <!-- review 1 : 사진 8장 → 4칸 + 4 -->
+      <article class="review-item">
+        <div class="meta">
+          <div class="name-row">
+            <span class="name">nickname***</span>
+            <span class="rating rating--sm">
+              <img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-empty.svg" alt="별점 4점">
+            </span>
+          </div>
+          <div class="option-row">250ml <span class="v-divider"></span> 오렌지 <span class="v-divider"></span> 텀블러</div>
+        </div>
+        <p class="body">운동 전후에 마시면 확실히 갈증이 빨리 해소되는 느낌이라 만족스럽습니다. 블러드 오렌지 향이 상큼하면서도 너무 달지 않아 부담 없이 마실 수 있었고, 인공적인 맛이 강하지 않아 데일리 음료처럼 즐기기 좋았습니다. 운동할 때뿐만 아니라 더운 날 외출 후에도 자주 찾게 되는 제품입니다.</p>
+        <div class="images">
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"></div>
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"></div>
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"></div>
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"><span class="images__more">+4</span></div>
+        </div>
+        <span class="date">2026. 12. 31.</span>
+      </article>
+
+      <!-- review 2 : 내 리뷰 -->
+      <article class="review-item">
+        <div class="item-head">
+          <span class="badge">내 리뷰</span>
+          <div class="btn-group">
+            <button class="text-btn">수정</button>
+            <span class="v-divider"></span>
+            <button class="text-btn text-btn--danger">삭제</button>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="name-row">
+            <span class="name">nickname***</span>
+            <span class="rating rating--sm">
+              <img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-empty.svg" alt="별점 4점">
+            </span>
+          </div>
+          <div class="option-row">250ml <span class="v-divider"></span> 오렌지 <span class="v-divider"></span> 텀블러</div>
+        </div>
+        <p class="body">평소 운동을 자주 하는 편이라 전해질 음료를 여러 브랜드 제품으로 번갈아 마셔봤는데, 이번에 구매한 ARISE 제품은 기대 이상으로 만족스러웠습니다. 가장 마음에 들었던 점은 과하게 달지 않은 깔끔한 맛이었습니다. 블러드 오렌지 특유의 상큼함이 은은하게 느껴져 마시는 내내 부담이 없었고, 끝맛도 텁텁하지 않아 좋았습니다. 운동 후뿐만 아니라 더운 날 외출하고 돌아왔을 때나 평소 갈증이 날 때도 자연스럽게 손이 가는 제품입니다. 앞으로도 꾸준히 구매해서 마실 생각입니다.</p>
+        <div class="images">
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"></div>
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"></div>
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"></div>
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"><span class="images__more">+3</span></div>
+        </div>
+        <span class="date">2026. 12. 31.</span>
+      </article>
+
+      <!-- review 3 : 텍스트만 -->
+      <article class="review-item">
+        <div class="meta">
+          <div class="name-row">
+            <span class="name">nickname***</span>
+            <span class="rating rating--sm">
+              <img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-empty.svg" alt="별점 4점">
+            </span>
+          </div>
+          <div class="option-row">250ml <span class="v-divider"></span> 오렌지 <span class="v-divider"></span> 텀블러</div>
+        </div>
+        <p class="body">장시간 야외 활동을 할 때 수분 보충용으로 마셔봤는데 맛도 좋고 부담이 없어 계속 손이 갔습니다. 너무 달거나 끈적한 느낌이 없어서 시원하게 마시기 좋았고, 상큼한 블러드 오렌지 향 덕분에 일반 생수보다 훨씬 만족스러웠습니다. 앞으로도 꾸준히 구매해서 마실 것 같습니다.</p>
+        <span class="date">2026. 12. 31.</span>
+      </article>
+
+      <!-- review 4 : 사진 1장 -->
+      <article class="review-item">
+        <div class="meta">
+          <div class="name-row">
+            <span class="name">nickname***</span>
+            <span class="rating rating--sm">
+              <img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-empty.svg" alt="별점 4점">
+            </span>
+          </div>
+          <div class="option-row">250ml <span class="v-divider"></span> 오렌지 <span class="v-divider"></span> 텀블러</div>
+        </div>
+        <p class="body">운동을 시작하면서 전해질 음료를 이것저것 비교해 봤는데 개인적으로는 이 제품이 가장 취향에 맞았습니다. 상큼한 블러드 오렌지 맛 덕분에 끝까지 질리지 않고 마실 수 있었고, 과하게 단맛이 남지 않아 깔끔했습니다. 운동 후 수분 보충용으로도 좋고 평소 갈증이 날 때 마시기에도 만족스러운 제품이라 주변에도 추천하고 싶습니다.</p>
+        <div class="images images--single">
+          <div><img src="assets/thumb-product.png" alt="리뷰 이미지"></div>
+        </div>
+        <span class="date">2026. 12. 31.</span>
+      </article>
+
+      <!-- review 5 : 텍스트만 -->
+      <article class="review-item">
+        <div class="meta">
+          <div class="name-row">
+            <span class="name">nickname***</span>
+            <span class="rating rating--sm">
+              <img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-filled.svg" alt=""><img src="assets/star-empty.svg" alt="별점 4점">
+            </span>
+          </div>
+          <div class="option-row">250ml <span class="v-divider"></span> 오렌지 <span class="v-divider"></span> 텀블러</div>
+        </div>
+        <p class="body">평소 물만 마시면 금방 질려서 수분 섭취가 부족한 편이었는데, 이 제품을 구매한 이후에는 훨씬 자주 물을 마시게 되었습니다. 블러드 오렌지의 상큼한 향이 은은하게 느껴지고 단맛은 과하지 않아 매일 마셔도 부담이 없습니다. 전체적으로 맛의 밸런스가 잘 잡혀 있고 깔끔한 마무리 덕분에 만족도가 높았습니다.</p>
+        <span class="date">2026. 12. 31.</span>
+      </article>
+    </div>
+
+    <nav class="pagination">
+      <button class="arrow" disabled><img src="assets/chevron-left.svg" alt="이전"></button>
+      <div class="pages"><span class="cur">1</span><span class="sep">/</span><span class="total">10</span></div>
+      <button class="arrow"><img src="assets/chevron-right.svg" alt="다음"></button>
+    </nav>
+  </section>
+
+  <!-- ============ 상품 문의 ============ -->
+  <section class="section inquiry">
+    <div class="section__bar">
+      <div class="section__title">상품 문의</div>
+      <button class="btn-dark">문의하기</button>
+    </div>
+
+    <div class="filter-bar">
+      <label class="checkbox-label"><span class="box"></span><span>내 문의만 보기</span></label>
+      <button class="select-text">전체 <img src="assets/chevron-down-sm.svg" alt=""></button>
+    </div>
+
+    <div class="inquiry-list">
+      <!-- 문의 1 : 미답변 -->
+      <article class="inquiry-item js-inquiry">
+        <div class="info">
+          <div class="option-row"><span class="status">미답변</span> <span class="v-divider"></span> nickname*** <span class="v-divider"></span> <span class="en">2026. 12. 31.</span></div>
+          <button class="toggle" aria-label="펼치기"><img src="assets/chevron-down.svg" alt=""></button>
+        </div>
+        <p class="question">안녕하세요. 제품을 받아 확인해 보니 전반적으로 만족스러웠는데, 몇 가지 궁금한 점이 있어 문의드립니다. 제품 상세페이지에는 전해질 음료로 소개되어 있는데 운동 전과 운동 후 중 어느 시점에 마시는 것이 가장 효과적인지 궁금합니다. 또한 평소 일상에서 수분 보충용으로 마셔도 괜찮은지, 하루 권장 섭취량이나 보관 시 주의해야 할 사항이 있다면 함께 안내 부탁드립니다.</p>
+      </article>
+
+      <!-- 문의 2 : 내 문의 + 비밀글 -->
+      <article class="inquiry-item js-inquiry">
+        <div class="item-head">
+          <span class="badge">내 문의</span>
+          <div class="btn-group">
+            <button class="text-btn">수정</button>
+            <span class="v-divider"></span>
+            <button class="text-btn text-btn--danger">삭제</button>
+          </div>
+        </div>
+        <div class="info">
+          <div class="option-row"><span class="status">미답변</span> <span class="v-divider"></span> nickname*** <span class="v-divider"></span> <span class="en">2026. 12. 31.</span></div>
+          <button class="toggle" aria-label="펼치기"><img src="assets/chevron-down.svg" alt=""></button>
+        </div>
+        <p class="question">안녕하세요. 이번에 처음 구매해서 마셔보고 있는데 맛도 깔끔하고 만족스러워 재구매를 고민하고 있습니다. 블러드 오렌지 맛 외에도 다른 맛이 출시될 예정인지 궁금하고, 대용량이나 묶음 구성 상품도 판매 계획이 있는지 알고 싶습니다.</p>
+        <div class="private"><img src="assets/lock.svg" alt=""><span>비밀글</span></div>
+      </article>
+
+      <!-- 문의 3 : 답변완료 (펼침) -->
+      <article class="inquiry-item is-open js-inquiry">
+        <div class="info">
+          <div class="option-row"><span class="status status--done">답변완료</span> <span class="v-divider"></span> nickname*** <span class="v-divider"></span> <span class="en">2026. 12. 31.</span></div>
+          <button class="toggle" aria-label="접기"><img src="assets/chevron-down.svg" alt=""></button>
+        </div>
+        <p class="question">안녕하세요. 오늘 제품을 받아 개봉했는데 주문한 상품과 다른 제품이 배송된 것 같아 문의드립니다. 포장 상태는 이상이 없었지만 제가 주문한 옵션과 실제로 받은 상품이 달라 확인을 부탁드립니다. 교환을 진행하려면 어떤 절차로 접수하면 되는지, 회수는 택배 기사님이 방문하시는 방식인지도 함께 안내해 주시면 감사하겠습니다.</p>
+        <div class="inquiry-reply">
+          <div class="info-row">판매자 답변 <span class="v-divider"></span> <span class="date">YYYY. MM. DD.</span></div>
+          <p class="body">안녕하세요, 고객님.<br>먼저 잘못된 상품이 배송되어 불편을 드린 점 사과드립니다.<br><br>교환 접수는 마이페이지 &gt; 주문 내역에서 신청하실 수 있으며, 회수는 택배 기사님이 방문하여 진행합니다. 교환 배송비는 전액 당사에서 부담하며, 회수 접수 완료 후 정상 상품이 순차적으로 발송됩니다.<br><br>감사합니다.</p>
+        </div>
+      </article>
+
+      <!-- 문의 4 : 답변완료 (접힘) -->
+      <article class="inquiry-item js-inquiry">
+        <div class="info">
+          <div class="option-row"><span class="status status--done">답변완료</span> <span class="v-divider"></span> nickname*** <span class="v-divider"></span> <span class="en">2026. 12. 31.</span></div>
+          <button class="toggle" aria-label="펼치기"><img src="assets/chevron-down.svg" alt=""></button>
+        </div>
+        <p class="question">안녕하세요. 제품을 구매한 뒤 만족스럽게 이용하고 있어 추가 구매를 고려하고 있습니다. 혹시 정기적으로 할인 행사나 프로모션이 진행되는지, 또는 여러 개를 한 번에 구매할 경우 추가 혜택이 있는지도 궁금합니다.</p>
+        <div class="inquiry-reply">
+          <div class="info-row">판매자 답변 <span class="v-divider"></span> <span class="date">YYYY. MM. DD.</span></div>
+          <p class="body">안녕하세요, 고객님.<br>정기 프로모션은 뉴스레터와 공식 계정을 통해 사전 안내드리고 있습니다.<br>묶음 구성은 상시 판매 중이며, 수량에 따라 추가 할인이 적용됩니다.<br><br>감사합니다.</p>
+        </div>
+      </article>
+
+      <!-- 문의 5 : 미답변 + 비밀글만 -->
+      <article class="inquiry-item">
+        <div class="info">
+          <div class="option-row"><span class="status">미답변</span> <span class="v-divider"></span> nickname*** <span class="v-divider"></span> <span class="en">2026. 12. 31.</span></div>
+          <button class="toggle" aria-label="펼치기"><img src="assets/chevron-down.svg" alt=""></button>
+        </div>
+        <div class="private"><img src="assets/lock.svg" alt=""><span>비밀글</span></div>
+      </article>
+    </div>
+
+    <nav class="pagination">
+      <button class="arrow" disabled><img src="assets/chevron-left.svg" alt="이전"></button>
+      <div class="pages"><span class="cur">1</span><span class="sep">/</span><span class="total">10</span></div>
+      <button class="arrow"><img src="assets/chevron-right.svg" alt="다음"></button>
+    </nav>
+  </section>
+
+  <!-- ============ 주문 정보 ============ -->
+  <section class="section order-info">
+    <div class="section__bar">
+      <div class="section__title">주문 정보</div>
+    </div>
+    <div class="order__content">
+      <div class="order__text">
+        <p class="title">배송 정보</p>
+        <p>배송 업체&nbsp; ㅣ&nbsp; CJ 대한통운 (1588-1255)<br>
+        배송 지역&nbsp; ㅣ&nbsp; 대한민국 전 지역 배송<br>
+        배송 비용&nbsp; ㅣ&nbsp; 3,500원 / 구매 금액 50,000원 이상 시 무료배송<br>
+        / 제주 및 도서 산간 지역 별도 추가 금액 발생<br>
+        배송 기간&nbsp; ㅣ&nbsp; 주말·공휴일 제외 2일 ~ 5일</p>
+        <p>유의 사항<br>
+        - 주문 폭주 및 공급 사정으로 인하여 지연 및 품절이 발생할 수 있습니다.<br>
+        - 기본 배송기간 이상 소요되는 상품이거나, 품절 상품은 개별 연락을 드립니다.</p>
+      </div>
+      <div class="order__img"><img src="assets/order-info.jpg" alt="추석 연휴 배송 안내"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ 하단 고정 구매 바 ============ -->
+<div class="buybar">
+  <button class="buybar__btn">구매하기</button>
+</div>
+
+<script src="mobile.js"></script>
+</body>
+</html>
