@@ -775,7 +775,7 @@
       if (!dragging) return;
       dx = e.clientX - startX;
       if (Math.abs(dx) > 3) moved = true;
-      if ((i === 0 && dx > 0) || (i === n - 1 && dx < 0)) dx *= 0.35; // edge resistance
+      if ((i === 0 && dx > 0) || (i === n - 1 && dx < 0)) dx = 0;   // 끝단에서는 더 끌리지 않음 (러버밴딩 없음)
       track.style.transform = 'translateX(calc(-' + (i * 100) + '% + ' + dx + 'px))';
     }
     function up() {

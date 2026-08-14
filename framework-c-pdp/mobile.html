@@ -611,7 +611,7 @@ main { margin-top: var(--header-h); }
    히어로: 가로 슬라이드 캐러셀 (Framework C 모바일 — b.html 인터랙션 값)
    · 루프 없음 (1↔5), 카운터 동기화, 드래그 1:1 추종
    · 커밋: 거리 폭의 15% (최소 40px) — 속도 판정 없음
-   · 끝단 러버밴딩: 선형 0.35 저항
+   · 끝단: 러버밴딩 없음 — 더 끌어도 움직이지 않음
    · 전환: 450ms ease
    ========================================================================== */
 (function () {
@@ -649,7 +649,7 @@ main { margin-top: var(--header-h); }
     curEl.textContent = current + 1;
   }
 
-  /* 드래그 — b.html과 동일한 로직·값 (0.35 선형 저항, 15% 임계, 속도 판정 없음) */
+  /* 드래그 — b.html과 동일한 값 (15% 임계, 속도 판정 없음). 끝단 러버밴딩 없음 */
   var dragging = false, startX = 0, dx = 0, w = 0;
   hero.addEventListener('pointerdown', function (e) {
     dragging = true;
@@ -660,7 +660,7 @@ main { margin-top: var(--header-h); }
   hero.addEventListener('pointermove', function (e) {
     if (!dragging) return;
     dx = e.clientX - startX;
-    if ((current === 0 && dx > 0) || (current === N - 1 && dx < 0)) dx *= 0.35; // edge resistance
+    if ((current === 0 && dx > 0) || (current === N - 1 && dx < 0)) dx = 0;   // 끝단에서는 더 끌리지 않음
     track.style.transform = 'translateX(calc(-' + (current * 100) + '% + ' + dx + 'px))';
   });
   function release() {

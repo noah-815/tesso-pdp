@@ -2,7 +2,7 @@
    Framework D · PDP Mobile 인터랙션
    인터랙션 값은 framework-a-pdp-mobile과 동일하게 맞춤:
    - 상품 이미지: 가로 스와이프 페이징 (scroll-snap, 루프 없음)
-   - 끝단 러버밴딩: 지수 감쇠, 최대 폭의 12%, 복귀 320ms
+   - 끝단: 러버밴딩 없음 — 이전/다음 이미지가 없으면 더 끌어도 움직이지 않음
    - 도트 인디케이터: 최대 4개 노출 + 진행 방향 선반영(끝에서 두 번째 유지)
    - 이미지: 기존 10장 + 추가 무드컷 9장 = 19장
    ========================================================================== */
@@ -91,24 +91,12 @@
   });
   scroller.addEventListener('pointermove', function (e) {
     if (!dragging) return;
-    var target = startScroll - (e.clientX - startX);
-    var max = maxScroll();
-    var cap = scroller.clientWidth * RUBBER_MAX_RATIO;
-    if (target < 0) {                       /* 첫 장 너머 */
-      scroller.scrollLeft = 0;
-      setRubber(rubber(-target, cap));
-    } else if (target > max) {              /* 마지막 장 너머 */
-      scroller.scrollLeft = max;
-      setRubber(-rubber(target - max, cap));
-    } else {
-      if (rubberOffset) setRubber(0);
-      scroller.scrollLeft = target;
-    }
+    /* 끝단을 넘어서는 이동은 브라우저가 그대로 잘라낸다 — 러버밴딩 없음 */
+    scroller.scrollLeft = startScroll - (e.clientX - startX);
   });
   function endDrag() {
     if (!dragging) return;
     dragging = false;
-    releaseRubber();
     var w = scroller.clientWidth;
     var idx = Math.max(0, Math.min(N - 1, Math.round(scroller.scrollLeft / w)));
     scroller.style.scrollSnapType = '';
@@ -116,58 +104,6 @@
   }
   scroller.addEventListener('pointerup', endDrag);
   scroller.addEventListener('pointercancel', endDrag);
-
-  /* ---------- 엣지 러버밴딩 (framework-a-pdp-mobile과 동일 값) ----------
-     중간 스크롤은 네이티브 스냅 그대로 두고, 끝단을 넘어서는 제스처만
-     지수 감쇠(최대 폭의 12%) transform으로 반응시킨다. */
-  var RUBBER_MAX_RATIO = 0.12;
-  var rubberOffset = 0;
-  function rubber(d, max) { return max * (1 - Math.exp(-d / max)); }
-  function maxScroll() { return scroller.scrollWidth - scroller.clientWidth; }
-  function setRubber(px) {
-    rubberOffset = px;
-    scroller.style.transition = '';
-    scroller.style.transform = px ? 'translate3d(' + px.toFixed(2) + 'px,0,0)' : '';
-  }
-  function releaseRubber() {
-    if (!rubberOffset) return;
-    rubberOffset = 0;
-    scroller.style.transition = 'transform 320ms cubic-bezier(0.22, 1, 0.36, 1)';
-    scroller.style.transform = 'translate3d(0,0,0)';
-    scroller.addEventListener('transitionend', function h() {
-      scroller.removeEventListener('transitionend', h);
-      scroller.style.transition = '';
-      scroller.style.transform = '';
-    });
-  }
-
-  /* 터치: 끝단에서 시작한 수평 제스처만 가로챈다 (Android 등 네이티브 바운스 없는 환경 대응) */
-  var tStartX = 0, tStartY = 0, tActive = false, tLocked = false;
-  scroller.addEventListener('touchstart', function (e) {
-    tStartX = e.touches[0].clientX;
-    tStartY = e.touches[0].clientY;
-    tActive = true; tLocked = false;
-  }, { passive: true });
-  scroller.addEventListener('touchmove', function (e) {
-    if (!tActive) return;
-    var dx = e.touches[0].clientX - tStartX;
-    var dy = e.touches[0].clientY - tStartY;
-    if (!tLocked && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy) * 1.2) tLocked = true;
-    if (!tLocked) return;
-    var cap = scroller.clientWidth * RUBBER_MAX_RATIO;
-    if (scroller.scrollLeft <= 0 && dx > 0) {
-      if (e.cancelable) e.preventDefault();
-      setRubber(rubber(dx, cap));
-    } else if (scroller.scrollLeft >= maxScroll() - 1 && dx < 0) {
-      if (e.cancelable) e.preventDefault();
-      setRubber(-rubber(-dx, cap));
-    } else if (rubberOffset) {
-      setRubber(0);
-    }
-  }, { passive: false });
-  function touchEnd() { tActive = false; releaseRubber(); }
-  scroller.addEventListener('touchend', touchEnd);
-  scroller.addEventListener('touchcancel', touchEnd);
 })();
 
 /* ==================== 상품 상세 · 더보기 ==================== */

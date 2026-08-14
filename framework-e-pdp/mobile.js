@@ -9,10 +9,7 @@
                    진행 방향에 이미지가 더 남아 있으면 활성 도트가 창의 끝이 아니라
                    끝에서 두 번째에 머물고, 창 경계 도트는 4px로 축소(시안 5px/4px),
                    창 밖으로 나가는 도트는 더 작아지며 사라진다 (튀지 않는 연속 모션)
-   · 러버밴딩    : iOS UIScrollView와 동일한 곡선
-                   f(x) = (1 − 1 / (x·c/W + 1)) · W ,  c = 0.55
-                   → 처음엔 55% 따라오다 점점 뻑뻑해지고 컨테이너 폭(W)에 점근
-                   (rarify.co 모바일 갤러리 = 네이티브 오버스크롤 바운스와 동일)
+   · 끝단        : 러버밴딩 없음 — 이전/다음 이미지가 없으면 더 끌어도 움직이지 않음
    ========================================================================== */
 (function () {
   'use strict';
@@ -63,11 +60,6 @@
   var FLICK_VEL = 0.5;       // px/ms — 짧고 빠른 스와이프도 전환
   var DIR_LOCK = 8;          // 수평 제스처로 인정하는 최소 이동(px)
   var DIR_RATIO = 1.2;       // |dx| > |dy| × 1.2 이면 수평 우세
-
-  /* iOS 러버밴딩 곡선 — 초기 추종률 0.55, 폭(dim)에 점근 */
-  function rubber(over, dim) {
-    return (1 - 1 / (over * 0.55 / dim + 1)) * dim;
-  }
 
   function setX(px, animate) {
     track.classList.toggle('is-animating', !!animate);
@@ -147,15 +139,10 @@
       }
     }
 
+    /* 이전/다음 이미지가 없으면 더 끌어도 움직이지 않는다 (러버밴딩 없음) */
+    if ((index === 0 && dx > 0) || (index === N - 1 && dx < 0)) dx = 0;
     drag.dx = dx;
-    var px = -index * W + dx;
-    /* 양 끝을 넘어서면 러버밴딩 (이동은 막되 입력은 받아 반응) */
-    if (index === 0 && dx > 0) {
-      px = -index * W + rubber(dx, W);
-    } else if (index === N - 1 && dx < 0) {
-      px = -index * W - rubber(-dx, W);
-    }
-    setX(px, false);
+    setX(-index * W + dx, false);
   });
 
   function release() {
