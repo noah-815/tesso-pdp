@@ -5,8 +5,12 @@
    - 메인: 전환 효과 없는 즉시 교체 — 선택된 이미지만 표시
    ========================================================================== */
 (function () {
-  /* 시안 순서: 제품 정면 → 라벨 → 멀티팩 → 제품 정면 → 무드 */
-  var ORDER = ['thumb-product.png', 'thumb-2.jpg', 'thumb-3.png', 'thumb-product.png', 'thumb-4.jpg'];
+  /* 시안 5장(제품 정면·라벨·멀티팩·정면·무드) + 추가 무드컷 9장 = 14종을 순환해 15장 구성 */
+  var ORDER = [
+    'thumb-product.png', 'thumb-2.jpg', 'thumb-3.png', 'thumb-product.png', 'thumb-4.jpg',
+    'thumb-5.webp', 'thumb-6.webp', 'thumb-7.webp', 'thumb-8.webp', 'thumb-9.webp',
+    'thumb-10.webp', 'thumb-11.webp', 'thumb-12.webp', 'thumb-13.webp'
+  ];
   var IMAGES = [];
   for (var i = 0; i < 15; i++) {
     IMAGES.push({

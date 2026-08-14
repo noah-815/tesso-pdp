@@ -15,8 +15,12 @@
 (function () {
   'use strict';
 
-  /* 데스크톱(carousel.js)과 동일하게 원본 순서를 순환해 15장 구성 */
-  var ORDER = ['thumb-product.png', 'thumb-2.jpg', 'thumb-3.png', 'thumb-product.png', 'thumb-4.jpg'];
+  /* 데스크톱(carousel.js)과 동일한 14종을 순환해 15장 구성 */
+  var ORDER = [
+    'thumb-product.png', 'thumb-2.jpg', 'thumb-3.png', 'thumb-product.png', 'thumb-4.jpg',
+    'thumb-5.webp', 'thumb-6.webp', 'thumb-7.webp', 'thumb-8.webp', 'thumb-9.webp',
+    'thumb-10.webp', 'thumb-11.webp', 'thumb-12.webp', 'thumb-13.webp'
+  ];
   var TOTAL = 15;
   var FILES = [];
   for (var i = 0; i < TOTAL; i++) FILES.push(ORDER[i % ORDER.length]);
