@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Framework E — Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <nav>
+      <a href="#">Shop</a>
+      <a href="#">About</a>
+      <a href="#">Journal</a>
+      <a href="#">Info</a>
+      <a href="#">The Story</a>
+    </nav>
+    <a class="logo" href="index.html">BRAND</a>
+    <nav>
+      <a href="#">Search</a>
+      <a href="login.html">Sign in</a>
+      <a href="cart.html">Bag [0]</a>
+    </nav>
+  </div>
+</header>
+
+<main class="mypage-grid">
+  <h1 class="mp-title">마이페이지</h1>
+  <div class="mp-body">
+    <nav class="mp-nav">
+      <a href="mypage.html">홈</a>
+      <a href="mypage-orders.html">주문내역</a>
+      <a href="mypage-wishlist.html">위시리스트</a>
+      <a href="mypage-coupon.html">쿠폰</a>
+      <a href="mypage-review.html">리뷰</a>
+      <a href="mypage-profile.html" class="active">프로필</a>
+    </nav>
+    <div class="mp-content">
+      <section class="profile-section">
+        <div class="mp-section-title">
+          <p class="sec-title">계정 정보</p>
+          <button class="btn-underline" data-open-dialog="dlgAccount">변경</button>
+        </div>
+        <div class="profile-rows">
+          <div class="profile-row"><span class="lbl">아이디</span><span class="val en">example@gmail.com</span></div>
+          <div class="profile-row"><span class="lbl">비밀번호</span><span class="val en">●●●●●●●●●</span></div>
+        </div>
+      </section>
+
+      <section class="profile-section">
+        <div class="mp-section-title">
+          <p class="sec-title">회원 정보</p>
+          <button class="btn-underline" data-open-dialog="dlgMember">수정</button>
+        </div>
+        <div class="profile-rows">
+          <div class="profile-row"><span class="lbl">이름</span><span class="val">홍길동</span></div>
+          <div class="profile-row"><span class="lbl">휴대폰 번호</span><span class="val en">010-1234-1234</span></div>
+        </div>
+      </section>
+
+      <section class="profile-section">
+        <div class="mp-section-title">
+          <p class="sec-title">배송지 정보</p>
+          <button class="btn-underline">추가</button>
+        </div>
+        <div class="profile-addresses">
+          <div class="profile-address">
+            <div class="texts">
+              <span class="badge">기본 배송지</span>
+              <p class="addr">[12345] 서울 마포구 양화로 147 아일렉스 빌딩 413호</p>
+              <div class="info"><span>이강인</span><span class="v-divider"></span><span class="en">010-1234-1234</span></div>
+              <div class="request"><span class="lbl">배송 요청사항</span><span>경비실에 맡겨주세요</span></div>
+            </div>
+            <div class="text-btn-group">
+              <button class="text-btn">수정</button>
+              <span class="v-divider"></span>
+              <button class="text-btn danger">삭제</button>
+            </div>
+          </div>
+          <div class="profile-address">
+            <div class="texts">
+              <p class="addr">[06236] 서울 강남구 테헤란로 427 위워크타워 10층</p>
+              <div class="info"><span>이강인</span><span class="v-divider"></span><span class="en">010-1234-1234</span></div>
+              <div class="request"><span class="lbl">배송 요청사항</span><span>문 앞에 놓아주세요</span></div>
+            </div>
+            <div class="text-btn-group">
+              <button class="text-btn">수정</button>
+              <span class="v-divider"></span>
+              <button class="text-btn danger">삭제</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="profile-section">
+        <div class="marketing-row">
+          <div class="texts">
+            <p class="sec-title">마케팅 정보 수신 설정</p>
+            <p class="sub">신제품 소식과 혜택 정보를 받아보세요</p>
+          </div>
+          <button class="toggle" aria-label="마케팅 정보 수신 설정"></button>
+        </div>
+      </section>
+
+      <div class="profile-footer">
+        <button onclick="location.href='login.html'">로그아웃</button>
+        <span class="v-divider"></span>
+        <button>회원탈퇴</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Dialog : 계정 정보 변경 -->
+<div class="dialog-backdrop" id="dlgAccount">
+  <div class="dialog" role="dialog" aria-modal="true" aria-label="계정 정보 변경">
+    <div class="dlg-header left">
+      <p class="dlg-title">계정 정보 변경</p>
+      <button class="dlg-close" data-close-dialog aria-label="닫기"><span class="ic ic-24 ic-close"><img src="assets/close.svg" alt=""></span></button>
+    </div>
+    <div class="dlg-content">
+      <div class="field-groups">
+        <div class="field">
+          <span class="label">아이디</span>
+          <div class="text-field readonly"><input type="email" value="example@gmail.com" readonly></div>
+        </div>
+        <div class="field">
+          <span class="label">현재 비밀번호</span>
+          <div class="text-field">
+            <input type="password" id="pwCurrent" placeholder="현재 비밀번호 입력">
+            <span class="ic ic-eye" data-toggle-password="pwCurrent"><img src="assets/eye.svg" alt="비밀번호 표시"></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">새 비밀번호</span>
+          <div class="text-field">
+            <input type="password" id="pwNew" placeholder="새 비밀번호 입력">
+            <span class="ic ic-eye" data-toggle-password="pwNew"><img src="assets/eye.svg" alt="비밀번호 표시"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dlg-footer">
+      <button class="btn-dlg" disabled>저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dialog : 회원 정보 수정 -->
+<div class="dialog-backdrop" id="dlgMember">
+  <div class="dialog" role="dialog" aria-modal="true" aria-label="회원 정보 수정">
+    <div class="dlg-header left">
+      <p class="dlg-title">회원 정보 수정</p>
+      <button class="dlg-close" data-close-dialog aria-label="닫기"><span class="ic ic-24 ic-close"><img src="assets/close.svg" alt=""></span></button>
+    </div>
+    <div class="dlg-content">
+      <div class="field-groups">
+        <div class="field">
+          <span class="label">이름</span>
+          <div class="text-field"><input type="text" value="홍길동" maxlength="20"></div>
+          <div class="supporting"><span class="en">3/20</span></div>
+        </div>
+        <div class="field">
+          <span class="label">휴대폰 번호</span>
+          <div class="text-field"><input type="tel" value="010-1234-5678"></div>
+        </div>
+      </div>
+    </div>
+    <div class="dlg-footer">
+      <button class="btn-dlg" disabled>저장</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

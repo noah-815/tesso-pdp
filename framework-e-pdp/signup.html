@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Framework E — Sign Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <nav>
+      <a href="#">Shop</a>
+      <a href="#">About</a>
+      <a href="#">Journal</a>
+      <a href="#">Info</a>
+      <a href="#">The Story</a>
+    </nav>
+    <a class="logo" href="index.html">BRAND</a>
+    <nav>
+      <a href="#">Search</a>
+      <a href="login.html">Sign in</a>
+      <a href="cart.html">Bag [0]</a>
+    </nav>
+  </div>
+</header>
+
+<main class="auth-main">
+
+  <!-- ============ Step 1 : 이메일 입력 ============ -->
+  <div class="auth-box auth-step" data-step="1">
+    <h1 class="auth-title">회원가입</h1>
+    <div class="auth-content">
+      <div class="field">
+        <span class="label">이메일</span>
+        <div class="text-field">
+          <input type="email" id="suEmail" placeholder="이메일 입력">
+        </div>
+        <div class="supporting"></div>
+      </div>
+      <button class="btn-auth disabled" data-watch="suEmail" data-next-step="2">인증 요청</button>
+    </div>
+  </div>
+
+  <!-- ============ Step 2 : 인증번호 입력 ============ -->
+  <div class="auth-box auth-step" data-step="2" hidden>
+    <h1 class="auth-title">회원가입</h1>
+    <div class="auth-content wide-gap">
+      <div class="otp-box">
+        <div class="text-area">
+          <p class="desc">아래 이메일로 전송된 인증번호를 입력하세요</p>
+          <p class="email" id="suEmailEcho">example@gmail.com</p>
+        </div>
+        <div class="otp-fields">
+          <input type="text" inputmode="numeric" maxlength="1">
+          <input type="text" inputmode="numeric" maxlength="1">
+          <input type="text" inputmode="numeric" maxlength="1">
+          <input type="text" inputmode="numeric" maxlength="1">
+          <input type="text" inputmode="numeric" maxlength="1">
+          <input type="text" inputmode="numeric" maxlength="1">
+        </div>
+        <span class="timer">04:59</span>
+      </div>
+      <div class="auth-btn-group wide">
+        <button class="btn-auth disabled" data-otp-submit data-next-step="3">이메일 인증</button>
+        <div class="auth-resend">
+          받은 편지함에서 메일을 찾을 수 없나요?
+          <button>다시 보내기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Step 3 : 정보 입력 ============ -->
+  <div class="auth-box auth-step" data-step="3" hidden>
+    <h1 class="auth-title">회원가입</h1>
+    <div class="auth-content" style="gap: calc(var(--w) * 24);">
+      <div class="field-list">
+        <div class="field">
+          <span class="label">이메일</span>
+          <div class="text-field readonly">
+            <input type="email" id="suEmailDone" value="example@gmail.com" readonly>
+          </div>
+          <div class="supporting">인증 완료된 이메일입니다.</div>
+        </div>
+        <div class="field">
+          <span class="label">비밀번호</span>
+          <div class="text-field">
+            <input type="password" id="suPassword" placeholder="비밀번호 입력">
+            <span class="ic ic-eye" data-toggle-password="suPassword"><img src="assets/eye.svg" alt="비밀번호 표시"></span>
+          </div>
+          <div class="supporting"></div>
+        </div>
+        <div class="field">
+          <span class="label">휴대폰 번호</span>
+          <div class="text-field">
+            <input type="tel" id="suPhone" placeholder="휴대폰 번호 입력">
+          </div>
+          <div class="supporting"></div>
+        </div>
+        <div class="field">
+          <span class="label">이름</span>
+          <div class="text-field">
+            <input type="text" id="suName" placeholder="이름 입력" maxlength="20">
+          </div>
+          <div class="supporting"><span class="en" id="suNameCount">0/20</span></div>
+        </div>
+      </div>
+      <div class="auth-agree">
+        <label class="agree-item">
+          <span class="box"></span>
+          <span>[필수] <u>이용약관</u> 및 <u>개인정보 처리방침</u>에 동의합니다.</span>
+        </label>
+        <label class="agree-item">
+          <span class="box"></span>
+          <span>[선택] 신제품 소식과 할인 혜택을 카카오톡 등으로 받겠습니다.</span>
+        </label>
+      </div>
+      <button class="btn-auth disabled" data-watch="suPassword,suPhone,suName" data-next-step="4">회원가입</button>
+    </div>
+  </div>
+
+  <!-- ============ Step 4 : 가입 완료 ============ -->
+  <div class="auth-box auth-step" data-step="4" hidden>
+    <div class="auth-content wide-gap">
+      <div class="auth-complete-text">
+        <p class="t">가입을 환영합니다!</p>
+        <p class="d">지금 바로 사용할 수 있는 신규 회원 쿠폰이 지급되었어요</p>
+      </div>
+      <div class="coupon-card">
+        <div>
+          <p class="cname">신규 회원 첫 구매 쿠폰</p>
+          <div class="discount">
+            <span class="main"><span><span class="num en">10</span>%</span> 할인</span>
+          </div>
+        </div>
+        <div class="cinfo">
+          <p>50,000원 이상 구매 시, 최대 20,000원 할인</p>
+          <p>2026. 08. 10. 11:00까지</p>
+        </div>
+      </div>
+      <button class="btn-auth" onclick="location.href='index.html'">쇼핑하러 가기</button>
+    </div>
+  </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

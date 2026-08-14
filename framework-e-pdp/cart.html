@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Framework E — Cart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <nav>
+      <a href="#">Shop</a>
+      <a href="#">About</a>
+      <a href="#">Journal</a>
+      <a href="#">Info</a>
+      <a href="#">The Story</a>
+    </nav>
+    <a class="logo" href="#">BRAND</a>
+    <nav>
+      <a href="#">Search</a>
+      <a href="#">Sign in</a>
+      <a href="#">Bag [0]</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page-grid">
+  <h1 class="page-title">장바구니</h1>
+
+  <!-- ============ Cart items ============ -->
+  <div class="grid-main cart-list">
+    <article class="cart-item">
+      <div class="image-area">
+        <div class="thumb"><img src="assets/thumb-product.png" alt="전해질 보충 음료 블러드 오렌지"></div>
+        <span class="checkbox-area"><span class="box"></span></span>
+      </div>
+      <div class="content">
+        <div class="top">
+          <div class="text-area">
+            <p class="name">전해질 보충 음료 블러드 오렌지</p>
+            <div class="options"><span>250ml</span><span>/</span><span>오렌지</span><span>/</span><span>텀블러</span></div>
+          </div>
+          <button class="btn-close" aria-label="삭제"><span class="ic ic-20 ic-close"><img src="assets/close.svg" alt=""></span></button>
+        </div>
+        <div class="button-area">
+          <div class="number-input">
+            <button aria-label="수량 감소"><span class="ic ic-24 ic-minus24"><img src="assets/minus.svg" alt=""></span></button>
+            <span class="value">1</span>
+            <button aria-label="수량 증가"><span class="ic ic-24 ic-plus24"><img src="assets/plus.svg" alt=""></span></button>
+          </div>
+          <div class="price"><span class="num">40,000</span><span class="unit">원</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="cart-item">
+      <div class="image-area">
+        <div class="thumb"><img src="assets/thumb-3.png" alt="전해질 보충 음료 레몬 라임"></div>
+        <span class="checkbox-area"><span class="box"></span></span>
+      </div>
+      <div class="content">
+        <div class="top">
+          <div class="text-area">
+            <p class="name">전해질 보충 음료 레몬 라임</p>
+            <div class="options"><span>250ml</span><span>/</span><span>레몬 라임</span><span>/</span><span>24캔</span></div>
+          </div>
+          <button class="btn-close" aria-label="삭제"><span class="ic ic-20 ic-close"><img src="assets/close.svg" alt=""></span></button>
+        </div>
+        <div class="button-area">
+          <div class="number-input">
+            <button aria-label="수량 감소"><span class="ic ic-24 ic-minus24"><img src="assets/minus.svg" alt=""></span></button>
+            <span class="value">2</span>
+            <button aria-label="수량 증가"><span class="ic ic-24 ic-plus24"><img src="assets/plus.svg" alt=""></span></button>
+          </div>
+          <div class="price"><span class="num">72,000</span><span class="unit">원</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="cart-item">
+      <div class="image-area">
+        <div class="thumb"><img src="assets/thumb-2.jpg" alt="제로 슈가 스파클링 워터"></div>
+        <span class="checkbox-area"><span class="box"></span></span>
+      </div>
+      <div class="content">
+        <div class="top">
+          <div class="text-area">
+            <p class="name">제로 슈가 스파클링 워터</p>
+            <div class="options"><span>355ml</span><span>/</span><span>플레인</span><span>/</span><span>12캔</span></div>
+          </div>
+          <button class="btn-close" aria-label="삭제"><span class="ic ic-20 ic-close"><img src="assets/close.svg" alt=""></span></button>
+        </div>
+        <div class="button-area">
+          <div class="number-input">
+            <button aria-label="수량 감소"><span class="ic ic-24 ic-minus24"><img src="assets/minus.svg" alt=""></span></button>
+            <span class="value">1</span>
+            <button aria-label="수량 증가"><span class="ic ic-24 ic-plus24"><img src="assets/plus.svg" alt=""></span></button>
+          </div>
+          <div class="price"><span class="num">24,000</span><span class="unit">원</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="cart-item">
+      <div class="image-area">
+        <div class="thumb"><img src="assets/thumb-4.jpg" alt="스테인리스 텀블러 500ml"></div>
+        <span class="checkbox-area"><span class="box"></span></span>
+      </div>
+      <div class="content">
+        <div class="top">
+          <div class="text-area">
+            <p class="name">스테인리스 텀블러 500ml</p>
+            <div class="options"><span>500ml</span><span>/</span><span>실버</span><span>/</span><span>단품</span></div>
+          </div>
+          <button class="btn-close" aria-label="삭제"><span class="ic ic-20 ic-close"><img src="assets/close.svg" alt=""></span></button>
+        </div>
+        <div class="button-area">
+          <div class="number-input">
+            <button aria-label="수량 감소"><span class="ic ic-24 ic-minus24"><img src="assets/minus.svg" alt=""></span></button>
+            <span class="value">1</span>
+            <button aria-label="수량 증가"><span class="ic ic-24 ic-plus24"><img src="assets/plus.svg" alt=""></span></button>
+          </div>
+          <div class="price"><span class="num">32,000</span><span class="unit">원</span></div>
+        </div>
+      </div>
+    </article>
+
+    <article class="cart-item">
+      <div class="image-area">
+        <div class="thumb"><img src="assets/detail-1.jpg" alt="전해질 파우더 스틱 20입"></div>
+        <span class="checkbox-area"><span class="box"></span></span>
+      </div>
+      <div class="content">
+        <div class="top">
+          <div class="text-area">
+            <p class="name">전해질 파우더 스틱 20입</p>
+            <div class="options"><span>5g</span><span>/</span><span>오렌지</span><span>/</span><span>20입</span></div>
+          </div>
+          <button class="btn-close" aria-label="삭제"><span class="ic ic-20 ic-close"><img src="assets/close.svg" alt=""></span></button>
+        </div>
+        <div class="button-area">
+          <div class="number-input">
+            <button aria-label="수량 감소"><span class="ic ic-24 ic-minus24"><img src="assets/minus.svg" alt=""></span></button>
+            <span class="value">1</span>
+            <button aria-label="수량 증가"><span class="ic ic-24 ic-plus24"><img src="assets/plus.svg" alt=""></span></button>
+          </div>
+          <div class="price"><span class="num">28,000</span><span class="unit">원</span></div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- ============ Order summary ============ -->
+  <aside class="grid-aside">
+    <div class="payment-info">
+      <p class="sec-title">결제정보</p>
+      <div>
+        <div class="rows-top">
+          <div class="row">
+            <span class="label">상품 금액</span>
+            <span class="val"><span class="num">196,000</span>원</span>
+          </div>
+          <div class="row">
+            <span class="label">배송비</span>
+            <span class="val"><span class="num">0</span>원</span>
+          </div>
+          <div class="row note"><span><span class="num">50,000</span>원 이상 무료</span></div>
+        </div>
+        <div class="rows-bottom">
+          <div class="total">
+            <span class="label">총 결제 금액</span>
+            <span class="val"><span class="num">196,000</span>원</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-order" id="cartOrderBtn">주문하기</button>
+  </aside>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

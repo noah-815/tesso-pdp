@@ -1,0 +1,106 @@
+/* ==========================================================================
+   Framework E · 상품 이미지 캐러셀 (인터랙션 버전)
+   framework-d-pdp와 동일한 방식:
+   루프 없음 + 선택 섬네일 중앙 정렬
+   - 레일: 휠 스크롤/드래그 자유 탐색, 양 끝 클램프, 상/하단 그라데이션 반영
+   - 메인: 전환 효과 없는 즉시 교체 (선택된 이미지만 표시)
+   - 메인 가로 드래그 페이징 미제공 — 전환은 섬네일 클릭으로만
+   치수는 시안(8410:191939) 그대로: 썸네일 142 / 갭 16 / 레일·메인 775 / 그라데이션 120
+   ========================================================================== */
+
+/* --- 세로 섬네일 레일 --- */
+.carousel .thumbnail-list {
+  position: relative;
+  display: block;                       /* 트랙이 스크롤되므로 flex 해제 */
+  width: calc(var(--w) * 142);
+  height: calc(var(--w) * 775);
+  overflow: hidden;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.carousel .thumb-track { will-change: transform; }
+
+.carousel .thumb-track.is-animating {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.carousel .thumb {
+  display: block;
+  width: calc(var(--w) * 142);
+  height: calc(var(--w) * 142);
+  margin-bottom: calc(var(--w) * 16);   /* = 갭. STEP 측정 기준 */
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.carousel .thumb.is-active { opacity: 1; }
+
+.carousel .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* 레일 상/하단 화이트 그라데이션 (시안: 120px)
+   스크롤 위치에 따라 자연스럽게 나타나고 사라짐 */
+.carousel .thumbnail-list::before,
+.carousel .thumbnail-list::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(var(--w) * 120);
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.carousel .thumbnail-list::before {
+  top: 0;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0), #fff 80%);
+}
+
+.carousel .thumbnail-list::after {
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 80%);
+}
+
+.carousel .thumbnail-list.at-top::before { opacity: 0; }
+.carousel .thumbnail-list.at-bottom::after { opacity: 0; }
+
+/* --- 메인 이미지 (드래그 페이징 미제공) --- */
+.carousel .main-stack {
+  position: relative;
+  width: calc(var(--w) * 775);
+  height: calc(var(--w) * 775);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+/* 전환 효과 없는 즉시 교체: 선택된 이미지만 표시 */
+.carousel .main-stack img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.carousel .main-stack img.is-visible {
+  opacity: 1;
+  z-index: 1;
+}

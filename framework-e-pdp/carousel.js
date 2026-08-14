@@ -1,0 +1,143 @@
+/* ==========================================================================
+   Framework E · 상품 이미지 캐러셀
+   루프 없음 + 선택 섬네일 중앙 정렬 (framework-d-pdp와 동일 방식)
+   - 레일: 휠 스크롤/드래그 자유 탐색, 양 끝 클램프, 상/하단 그라데이션 반영
+   - 메인: 전환 효과 없는 즉시 교체 — 선택된 이미지만 표시
+   ========================================================================== */
+(function () {
+  /* 시안 순서: 제품 정면 → 라벨 → 멀티팩 → 제품 정면 → 무드 */
+  var ORDER = ['thumb-product.png', 'thumb-2.jpg', 'thumb-3.png', 'thumb-product.png', 'thumb-4.jpg'];
+  var IMAGES = [];
+  for (var i = 0; i < 15; i++) {
+    IMAGES.push({
+      src: 'assets/' + ORDER[i % ORDER.length],
+      alt: '전해질 보충 음료 블러드 오렌지 — 상품 이미지 ' + (i + 1)
+    });
+  }
+
+  var N = IMAGES.length;
+  var rail = document.querySelector('.js-rail');
+  var track = document.querySelector('.js-track');
+  var main = document.querySelector('.js-main');
+  if (!rail || !track || !main) return;
+
+  /* ---------- 렌더 ---------- */
+  var thumbs = [];
+  IMAGES.forEach(function (img, v) {
+    var b = document.createElement('button');
+    b.className = 'thumb' + (v === 0 ? ' is-active' : '');
+    b.type = 'button';
+    b.dataset.v = v;
+    b.setAttribute('aria-label', '상품 이미지 ' + (v + 1));
+    b.innerHTML = '<img src="' + img.src + '" alt="">';
+    track.appendChild(b);
+    thumbs.push(b);
+  });
+
+  var photos = [];
+  IMAGES.forEach(function (img, k) {
+    var el = document.createElement('img');
+    el.className = k === 0 ? 'is-visible' : '';
+    el.src = img.src;
+    el.alt = img.alt;
+    if (k > 0) el.loading = 'lazy';
+    main.appendChild(el);
+    photos.push(el);
+  });
+
+  /* ---------- 상태 ---------- */
+  var current = 0;           // 선택된 인덱스
+  var scroll = 0;            // 레일 스크롤 오프셋(px)
+  var STEP = 158, SLIDE = 142, railH = 0, maxScroll = 0;
+
+  function measure() {
+    var t = thumbs[0];
+    /* offsetHeight는 정수 반올림이라 끝단이 어긋날 수 있어 소수점 그대로 측정 */
+    SLIDE = t.getBoundingClientRect().height;
+    STEP = SLIDE + parseFloat(getComputedStyle(t).marginBottom);
+    railH = rail.getBoundingClientRect().height;
+    maxScroll = Math.max(0, STEP * N - parseFloat(getComputedStyle(t).marginBottom) - railH);
+  }
+
+  function clamp(px) {
+    return Math.min(maxScroll, Math.max(0, px));
+  }
+
+  /* 선택 섬네일이 레일 중앙에 오는 오프셋 (양 끝에서는 경계에 맞춰 멈춤) */
+  function centerOffset(i) {
+    return clamp(i * STEP - (railH - SLIDE) / 2);
+  }
+
+  function setScroll(px, animate) {
+    scroll = px;
+    track.classList.toggle('is-animating', !!animate);
+    track.style.transform = 'translate3d(0,' + -scroll + 'px,0)';
+    /* 양 끝 도달 여부에 따라 상/하단 그라데이션 표시 갱신 */
+    rail.classList.toggle('at-top', scroll <= 2);
+    rail.classList.toggle('at-bottom', scroll >= maxScroll - 2);
+  }
+
+  /* ---------- 전환 효과 없는 즉시 교체 ---------- */
+  function swapPhoto(next) {
+    photos.forEach(function (p, k) {
+      p.classList.toggle('is-visible', k === next);
+    });
+  }
+
+  function updateActive() {
+    thumbs.forEach(function (t, v) {
+      t.classList.toggle('is-active', v === current);
+    });
+  }
+
+  function select(i) {
+    i = Math.min(N - 1, Math.max(0, i));
+    if (i === current) return;
+    swapPhoto(i);
+    current = i;
+    setScroll(centerOffset(current), true);
+    updateActive();
+  }
+
+  /* ---------- 레일: 클릭 + 세로 드래그 ---------- */
+  var drag = null;
+
+  rail.addEventListener('pointerdown', function (e) {
+    /* pointer capture 이후에는 e.target이 rail로 고정되므로 눌린 섬네일을 미리 기억 */
+    drag = { y: e.clientY, startScroll: scroll, moved: false, pressed: e.target.closest('.thumb') };
+    rail.setPointerCapture(e.pointerId);
+  });
+
+  rail.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dy = e.clientY - drag.y;
+    if (Math.abs(dy) > 5) drag.moved = true;
+    if (drag.moved) setScroll(clamp(drag.startScroll - dy), false);
+  });
+
+  rail.addEventListener('pointerup', function () {
+    if (!drag) return;
+    if (!drag.moved && drag.pressed) select(+drag.pressed.dataset.v);
+    drag = null;
+  });
+
+  rail.addEventListener('pointercancel', function () { drag = null; });
+
+  /* 휠 스크롤: 레일 위에서는 페이지 대신 섬네일 목록을 스크롤.
+     선택(활성 섬네일)은 바뀌지 않는다 — 드래그와 동일한 자유 탐색 */
+  rail.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    setScroll(clamp(scroll + e.deltaY), false);
+  }, { passive: false });
+
+  /* 메인 이미지 가로 스와이프 페이징은 미제공 — 이미지 전환은 섬네일 클릭으로만 */
+
+  /* ---------- 초기화 ---------- */
+  window.addEventListener('resize', function () {
+    measure();
+    setScroll(centerOffset(current), false);
+  });
+
+  measure();
+  setScroll(0, false);
+})();

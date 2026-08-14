@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Framework E — Checkout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ Header ============ -->
+<header class="site-header">
+  <div class="container">
+    <nav>
+      <a href="#">Shop</a>
+      <a href="#">About</a>
+      <a href="#">Journal</a>
+      <a href="#">Info</a>
+      <a href="#">The Story</a>
+    </nav>
+    <a class="logo" href="#">BRAND</a>
+    <nav>
+      <a href="#">Search</a>
+      <a href="#">Sign in</a>
+      <a href="#">Bag [0]</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page-grid">
+  <h1 class="page-title">주문/결제</h1>
+
+  <!-- ============ Left ============ -->
+  <div class="grid-main">
+    <!-- 배송지 정보 -->
+    <section class="checkout-section first">
+      <div class="title-row">
+        <p class="sec-title">배송지 정보</p>
+        <button class="btn-underline" data-open-dialog="dlgAddressList">변경</button>
+      </div>
+      <div class="shipping-content">
+        <p class="addr">[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+        <div class="info-row">
+          <span>이강인</span>
+          <span class="v-divider"></span>
+          <span class="en">010-1234-1234</span>
+        </div>
+        <div class="info-row">
+          <span>배송 요청사항</span>
+          <span class="black">경비실에 맡겨주세요.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 주문 상품 -->
+    <section class="checkout-section products">
+      <div class="title-row">
+        <p class="sec-title">주문 상품</p>
+      </div>
+      <div class="order-products">
+        <article class="order-product">
+          <div class="thumb"><img src="assets/thumb-product.png" alt="전해질 보충 음료 블러드 오렌지"></div>
+          <div class="text-area">
+            <p class="name">전해질 보충 음료 블러드 오렌지</p>
+            <div class="info">
+              <span class="options dim"><span>250ml</span><span>/</span><span>오렌지</span><span>/</span><span>텀블러</span></span>
+              <span class="v-divider"></span>
+              <span class="qty dim"><span class="en">2</span>개</span>
+            </div>
+            <div class="price"><span class="num">80,000</span>원</div>
+          </div>
+        </article>
+        <article class="order-product">
+          <div class="thumb"><img src="assets/thumb-4.jpg" alt="스테인리스 텀블러 500ml"></div>
+          <div class="text-area">
+            <p class="name">스테인리스 텀블러 500ml</p>
+            <div class="info">
+              <span class="options dim"><span>500ml</span><span>/</span><span>실버</span><span>/</span><span>단품</span></span>
+              <span class="v-divider"></span>
+              <span class="qty dim"><span class="en">1</span>개</span>
+            </div>
+            <div class="price"><span class="num">32,000</span>원</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 할인 -->
+    <section class="checkout-section">
+      <div class="title-row">
+        <p class="sec-title">할인</p>
+        <div class="hint">사용 가능 쿠폰 <span><span class="num">2</span>장</span></div>
+      </div>
+      <div class="coupon-selector">
+        <div class="text-field" id="couponFieldText">시즌 오프 할인 쿠폰 (-5,000원)</div>
+        <button class="btn-coupon" data-open-dialog="dlgCoupon">쿠폰 선택</button>
+      </div>
+    </section>
+
+    <!-- 결제 수단 -->
+    <section class="checkout-section">
+      <div class="title-row">
+        <p class="sec-title">결제 수단</p>
+      </div>
+      <div class="radio-button-group">
+        <button class="payment-option selected">신용카드/간편결제</button>
+        <button class="payment-option">실시간 계좌이체</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ Right : 결제정보 ============ -->
+  <aside class="grid-aside">
+    <div class="payment-info">
+      <p class="sec-title">결제정보</p>
+      <div>
+        <div class="rows-top">
+          <div class="row">
+            <span class="label">상품 금액</span>
+            <span class="val"><span class="num">112,000</span>원</span>
+          </div>
+          <div class="row">
+            <span class="label">배송비</span>
+            <span class="val"><span class="num">0</span>원</span>
+          </div>
+          <div class="row note"><span><span class="num">50,000</span>원 이상 무료</span></div>
+          <div class="row">
+            <span class="label">쿠폰 할인</span>
+            <span class="val"><span class="num">-5,000</span>원</span>
+          </div>
+        </div>
+        <div class="rows-bottom">
+          <div class="total">
+            <span class="label">총 결제 금액</span>
+            <span class="val"><span class="num">107,000</span>원</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="aside-actions">
+      <button class="btn-order" onclick="location.href='paysuccess.html'">107,000원 결제하기</button>
+      <div class="agree-row">
+        <span class="text">개인정보 수집/이용 및 처리 동의</span>
+        <button class="btn-underline" data-open-dialog="dlgDisclosure">보기</button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ============ Dialog : 배송지 목록 ============ -->
+<div class="dialog-backdrop" id="dlgAddressList">
+  <div class="dialog" role="dialog" aria-modal="true" aria-label="배송지 목록">
+    <div class="dlg-header">
+      <p class="dlg-title">배송지 목록</p>
+      <button class="dlg-close" data-close-dialog aria-label="닫기"><span class="ic ic-24 ic-close"><img src="assets/close.svg" alt=""></span></button>
+    </div>
+    <div class="dlg-content">
+      <div class="address-list">
+        <article class="address-item">
+          <span class="badge">기본 배송지</span>
+          <div class="text-wrap">
+            <div class="texts">
+              <div class="addr-line">
+                <p class="addr">서울 마포구 양화로 147 아일렉스 빌딩 413호</p>
+                <div class="info">
+                  <span>이강인</span>
+                  <span class="v-divider"></span>
+                  <span class="en">010-1234-1234</span>
+                </div>
+              </div>
+              <div class="request">
+                <span class="lbl">배송 요청사항</span>
+                <span class="msg">경비실에 맡겨주세요.</span>
+              </div>
+            </div>
+            <div class="bottom">
+              <div class="text-btn-group">
+                <button class="text-btn" data-open-dialog="dlgAddress">수정</button>
+                <span class="v-divider"></span>
+                <button class="text-btn danger">삭제</button>
+              </div>
+              <button class="btn-select selected"><span class="ic ic-check"><img src="assets/check.svg" alt=""></span>선택됨</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="address-item">
+          <div class="text-wrap">
+            <div class="texts">
+              <div class="addr-line">
+                <p class="addr">서울 강남구 테헤란로 427 위워크타워 10층</p>
+                <div class="info">
+                  <span>이강인</span>
+                  <span class="v-divider"></span>
+                  <span class="en">010-1234-1234</span>
+                </div>
+              </div>
+              <div class="request">
+                <span class="lbl">배송 요청사항</span>
+                <span class="msg">문 앞에 놓아주세요.</span>
+              </div>
+            </div>
+            <div class="bottom">
+              <div class="text-btn-group">
+                <button class="text-btn" data-open-dialog="dlgAddress">수정</button>
+                <span class="v-divider"></span>
+                <button class="text-btn danger">삭제</button>
+              </div>
+              <button class="btn-select">선택</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="address-item">
+          <div class="text-wrap">
+            <div class="texts">
+              <div class="addr-line">
+                <p class="addr">경기 성남시 분당구 판교역로 235 에이치스퀘어 N동</p>
+                <div class="info">
+                  <span>이강인</span>
+                  <span class="v-divider"></span>
+                  <span class="en">010-1234-1234</span>
+                </div>
+              </div>
+              <div class="request">
+                <span class="lbl">배송 요청사항</span>
+                <span class="msg">배송 전 연락 부탁드립니다.</span>
+              </div>
+            </div>
+            <div class="bottom">
+              <div class="text-btn-group">
+                <button class="text-btn" data-open-dialog="dlgAddress">수정</button>
+                <span class="v-divider"></span>
+                <button class="text-btn danger">삭제</button>
+              </div>
+              <button class="btn-select">선택</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="dlg-footer">
+      <button class="btn-dlg outline" data-open-dialog="dlgAddress">배송지 추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Dialog : 배송지 입력 ============ -->
+<div class="dialog-backdrop" id="dlgAddress">
+  <div class="dialog" role="dialog" aria-modal="true" aria-label="배송지 정보 입력">
+    <div class="dlg-header">
+      <p class="dlg-title">배송지 정보를 입력하세요</p>
+      <button class="dlg-close" data-close-dialog aria-label="닫기"><span class="ic ic-24 ic-close"><img src="assets/close.svg" alt=""></span></button>
+    </div>
+    <div class="dlg-content">
+      <div class="field-groups">
+        <div class="field-group">
+          <div class="field">
+            <span class="label">주소</span>
+            <div class="text-field readonly">
+              <input type="text" value="[12345] 서울 마포구 양화로 147" readonly>
+              <span class="ic ic-search"><img src="assets/search.svg" alt="주소 검색"></span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="text-field">
+              <input type="text" placeholder="상세주소 입력 (예: 건물명, 동/호수)">
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">이름</span>
+          <div class="text-field">
+            <input type="text" placeholder="이름 입력">
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">휴대폰 번호</span>
+          <div class="text-field">
+            <input type="tel" placeholder="휴대폰 번호 입력">
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">배송 요청사항</span>
+          <div class="text-field">
+            <input type="text" placeholder="배달 기사님께 전달할 메시지 입력">
+          </div>
+        </div>
+      </div>
+      <label class="checkbox-row">
+        <span class="box"></span>
+        <span>기본 배송지로 설정</span>
+      </label>
+    </div>
+    <div class="dlg-footer">
+      <button class="btn-dlg" disabled>저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Dialog : 쿠폰 선택 ============ -->
+<div class="dialog-backdrop" id="dlgCoupon">
+  <div class="dialog" role="dialog" aria-modal="true" aria-label="사용 가능 쿠폰">
+    <div class="dlg-header left">
+      <p class="dlg-title">사용 가능 쿠폰</p>
+      <button class="dlg-close" data-close-dialog aria-label="닫기"><span class="ic ic-24 ic-close"><img src="assets/close.svg" alt=""></span></button>
+    </div>
+    <div class="dlg-content">
+      <div class="coupon-list">
+        <button class="coupon-card">
+          <div>
+            <p class="cname">신규 회원 첫 구매 쿠폰</p>
+            <div class="discount">
+              <span class="main"><span><span class="num en">10</span>%</span> 할인</span>
+              <span class="amount"><span class="num en">-11,200</span> 원</span>
+            </div>
+          </div>
+          <div class="cinfo">
+            <p>50,000원 이상 구매 시, 최대 20,000원 할인</p>
+            <p>2026. 08. 10. 11:00까지</p>
+          </div>
+        </button>
+        <button class="coupon-card selected">
+          <div>
+            <p class="cname">시즌 오프 할인 쿠폰</p>
+            <div class="discount">
+              <span class="main"><span><span class="num en">5,000</span>원</span> 할인</span>
+              <span class="amount"><span class="num en">-5,000</span> 원</span>
+            </div>
+          </div>
+          <div class="cinfo">
+            <p>30,000원 이상 구매 시, 최대 5,000원 할인</p>
+            <p>2026. 08. 10. 11:00까지</p>
+          </div>
+        </button>
+        <button class="option-selector">선택 안 함</button>
+      </div>
+    </div>
+    <div class="dlg-footer">
+      <button class="btn-dlg" data-close-dialog>선택 쿠폰 적용하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Dialog : 개인정보 동의 ============ -->
+<div class="dialog-backdrop" id="dlgDisclosure">
+  <div class="dialog" role="dialog" aria-modal="true" aria-label="개인정보 수집/이용 및 처리 동의">
+    <div class="dlg-header left">
+      <p class="dlg-title">개인정보 수집/이용 및 처리 동의 (필수)</p>
+    </div>
+    <div class="dlg-content">
+      <div class="disclosure-body">
+        <section>
+          <h3>1. 개인정보 수집목적 및 이용목적</h3>
+          <p>상품 주문, 결제 및 배송</p>
+        </section>
+        <section>
+          <h3>2. 수집하는 개인정보 항목</h3>
+          <p>주문 시 입력받는 항목 기재 (예시 : [필수] 이름, 주소, 이메일, 휴대전화)</p>
+        </section>
+        <section>
+          <h3>3. 개인정보의 보유기간 및 이용기간</h3>
+          <p>원칙적으로, 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다.<br>
+          단, 다음의 정보에 대해서는 아래의 이유로 명시한 기간 동안 보존합니다.<br>
+          가. 회사 내부 방침에 의한 정보 보유 사유<br>
+          ㅇ 부정거래 방지 및 쇼핑몰 운영방침에 따른 보관 : 5년<br>
+          나. 관련 법령에 의한 정보보유 사유<br>
+          ㅇ 계약 또는 청약철회 등에 관한 기록<br>
+          -보존이유 : 전자상거래등에서의소비자보호에관한법률<br>
+          -보존기간 : 5년<br>
+          ㅇ 대금 결제 및 재화 등의 공급에 관한 기록<br>
+          -보존이유: 전자상거래등에서의소비자보호에관한법률<br>
+          -보존기간 : 5년<br>
+          ㅇ 소비자 불만 또는 분쟁처리에 관한 기록<br>
+          -보존이유 : 전자상거래등에서의소비자보호에관한법률<br>
+          -보존기간 : 3년<br>
+          ㅇ 로그 기록<br>
+          -보존이유: 통신비밀보호법<br>
+          -보존기간 : 3개월</p>
+        </section>
+        <section>
+          <p>※ 동의를 거부할 수 있으나 거부시 구매 서비스 이용이 불가능합니다.</p>
+        </section>
+      </div>
+    </div>
+    <div class="dlg-footer">
+      <button class="btn-dlg" data-close-dialog>확인</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
