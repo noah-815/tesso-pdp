@@ -105,6 +105,7 @@ main { padding-top: var(--header-h); }
   transition: opacity 0.3s ease;
 }
 .hero__dots .dot.is-active { opacity: 1; }
+.hero__dots .dot.is-hidden { display: none; }
 
 /* ============ 상품 정보 ============ */
 .pinfo {

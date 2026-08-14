@@ -4,6 +4,8 @@
    · 전환 방식   : 가로 슬라이드 (translateX) — 이전 이미지는 왼쪽으로 밀려나가고
                    다음 이미지가 오른쪽에서 밀려들어옴
    · 루프        : 없음 (첫/마지막은 이어지지 않음)
+   · 도트        : 최대 4개만 노출. 진행 방향에 이미지가 더 남아 있으면
+                   활성 도트가 창의 끝이 아니라 끝에서 두 번째에 머문다
    · 러버밴딩    : iOS UIScrollView와 동일한 곡선
                    f(x) = (1 − 1 / (x·c/W + 1)) · W ,  c = 0.55
                    → 처음엔 55% 따라오다 점점 뻑뻑해지고 컨테이너 폭(W)에 점근
@@ -12,8 +14,11 @@
 (function () {
   'use strict';
 
-  /* 데스크톱(carousel.js)과 동일한 이미지 구성 */
+  /* 데스크톱(carousel.js)과 동일하게 원본 순서를 순환해 15장 구성 */
   var ORDER = ['thumb-product.png', 'thumb-2.jpg', 'thumb-3.png', 'thumb-product.png', 'thumb-4.jpg'];
+  var TOTAL = 15;
+  var FILES = [];
+  for (var i = 0; i < TOTAL; i++) FILES.push(ORDER[i % ORDER.length]);
 
   var hero = document.querySelector('.js-hero');
   var track = document.querySelector('.js-track');
@@ -21,7 +26,7 @@
   if (!hero || !track || !dotsWrap) return;
 
   /* ---------- 렌더 ---------- */
-  ORDER.forEach(function (file, k) {
+  FILES.forEach(function (file, k) {
     var slide = document.createElement('div');
     slide.className = 'hero__slide';
     var img = document.createElement('img');
@@ -33,7 +38,7 @@
     track.appendChild(slide);
 
     var dot = document.createElement('span');
-    dot.className = 'dot' + (k === 0 ? ' is-active' : '');
+    dot.className = 'dot';
     dotsWrap.appendChild(dot);
   });
 
@@ -61,11 +66,35 @@
     track.style.transform = 'translate3d(' + px + 'px,0,0)';
   }
 
+  /* ---------- 도트 : 최대 4개 노출 + 진행 방향 선반영 ----------
+     활성 도트가 창의 끝에 닿기 전에 창을 한 칸 미리 옮겨,
+     진행 방향에 이미지가 더 남아 있으면 활성이 끝에서 두 번째에 머문다. */
+  var WINDOW = 4;
+  var winStart = 0;
+
+  function renderDots() {
+    if (N <= WINDOW) {                                  /* 4장 이하면 전부 노출 */
+      for (var j = 0; j < dots.length; j++) {
+        dots[j].classList.remove('is-hidden');
+        dots[j].classList.toggle('is-active', j === index);
+      }
+      return;
+    }
+    var hi = index - (index > 0 ? 1 : 0);               /* 이전이 남아 있으면 활성은 두 번째 이후 */
+    var lo = index - (WINDOW - 1) + (index < N - 1 ? 1 : 0); /* 다음이 남아 있으면 끝에서 두 번째 이전 */
+    winStart = Math.max(lo, Math.min(hi, winStart));
+    winStart = Math.max(0, Math.min(N - WINDOW, winStart));
+    var winEnd = winStart + WINDOW - 1;
+    for (var k = 0; k < dots.length; k++) {
+      var inWin = k >= winStart && k <= winEnd;
+      dots[k].classList.toggle('is-hidden', !inWin);
+      dots[k].classList.toggle('is-active', inWin && k === index);
+    }
+  }
+
   function render(animate) {
     setX(-index * W, animate);
-    for (var i = 0; i < dots.length; i++) {
-      dots[i].classList.toggle('is-active', i === index);
-    }
+    renderDots();
   }
 
   /* ---------- 스와이프 ---------- */
