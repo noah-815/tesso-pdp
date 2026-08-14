@@ -4,9 +4,11 @@
    · 전환 방식   : 가로 슬라이드 (translateX) — 이전 이미지는 왼쪽으로 밀려나가고
                    다음 이미지가 오른쪽에서 밀려들어옴
    · 루프        : 없음 (첫/마지막은 이어지지 않음)
-   · 도트        : 최대 4개만 노출. 진행 방향에 이미지가 더 남아 있으면
-                   활성 도트가 창의 끝이 아니라 끝에서 두 번째에 머문다.
-                   창 너머에 더 있으면 그쪽 경계 도트를 4px로 축소 (시안 5px/4px)
+   · 도트        : 인스타그램식 슬라이딩 인디케이터.
+                   4슬롯 창(시안 31px)을 마스크로 두고 트랙 전체가 미끄러진다.
+                   진행 방향에 이미지가 더 남아 있으면 활성 도트가 창의 끝이 아니라
+                   끝에서 두 번째에 머물고, 창 경계 도트는 4px로 축소(시안 5px/4px),
+                   창 밖으로 나가는 도트는 더 작아지며 사라진다 (튀지 않는 연속 모션)
    · 러버밴딩    : iOS UIScrollView와 동일한 곡선
                    f(x) = (1 − 1 / (x·c/W + 1)) · W ,  c = 0.55
                    → 처음엔 55% 따라오다 점점 뻑뻑해지고 컨테이너 폭(W)에 점근
@@ -28,7 +30,8 @@
   var hero = document.querySelector('.js-hero');
   var track = document.querySelector('.js-track');
   var dotsWrap = document.querySelector('.js-dots');
-  if (!hero || !track || !dotsWrap) return;
+  var dotsTrack = document.querySelector('.js-dots-track');
+  if (!hero || !track || !dotsWrap || !dotsTrack) return;
 
   /* ---------- 렌더 ---------- */
   FILES.forEach(function (file, k) {
@@ -44,11 +47,11 @@
 
     var dot = document.createElement('span');
     dot.className = 'dot';
-    dotsWrap.appendChild(dot);
+    dotsTrack.appendChild(dot);
   });
 
   var slides = track.children;
-  var dots = dotsWrap.querySelectorAll('.dot');
+  var dots = dotsTrack.querySelectorAll('.dot');
   var N = slides.length;
 
   /* ---------- 상태 ---------- */
@@ -71,14 +74,24 @@
     track.style.transform = 'translate3d(' + px + 'px,0,0)';
   }
 
-  /* ---------- 도트 : 최대 4개 노출 + 진행 방향 선반영 ----------
-     활성 도트가 창의 끝에 닿기 전에 창을 한 칸 미리 옮겨,
-     진행 방향에 이미지가 더 남아 있으면 활성이 끝에서 두 번째에 머문다. */
+  /* ---------- 도트 : 인스타그램식 슬라이딩 인디케이터 ----------
+     창(4슬롯)은 고정된 마스크이고 트랙 전체가 미끄러진다.
+     활성 도트가 창 끝에 닿기 전에 창을 한 칸 미리 옮겨, 진행 방향에 이미지가
+     더 남아 있으면 활성이 끝에서 두 번째에 머문다.
+     창 밖 도트는 사라지는 대신 작아지며 페이드아웃 → 튀는 느낌이 없다. */
   var WINDOW = 4;
   var winStart = 0;
+  var DOT_STEP = 9;                                     /* 도트 5 + 간격 4 */
+
+  function measureDots() {
+    if (!dots.length) return;
+    var gap = parseFloat(getComputedStyle(dotsTrack).columnGap || getComputedStyle(dotsTrack).gap) || 4;
+    DOT_STEP = dots[0].offsetWidth + gap;               /* offsetWidth는 scale의 영향을 받지 않는다 */
+  }
 
   function renderDots() {
     if (N <= WINDOW) {                                  /* 4장 이하면 전부 노출 */
+      dotsTrack.style.transform = 'translate3d(0,0,0)';
       for (var j = 0; j < dots.length; j++) {
         dots[j].className = 'dot' + (j === index ? ' is-active' : '');
       }
@@ -89,9 +102,13 @@
     winStart = Math.max(lo, Math.min(hi, winStart));
     winStart = Math.max(0, Math.min(N - WINDOW, winStart));
     var winEnd = winStart + WINDOW - 1;
+
+    /* 창이 아니라 트랙을 움직인다 — 도트가 미끄러져 들어오고 나간다 */
+    dotsTrack.style.transform = 'translate3d(' + (-winStart * DOT_STEP) + 'px,0,0)';
+
     for (var k = 0; k < dots.length; k++) {
       var d = dots[k];
-      if (k < winStart || k > winEnd) { d.className = 'dot is-hidden'; continue; }
+      if (k < winStart || k > winEnd) { d.className = 'dot is-out'; continue; }
       if (k === index) { d.className = 'dot is-active'; continue; }
       /* 창 경계 너머에 더 있으면 그 경계 도트를 축소 표시 */
       var isEdge = (k === winStart && winStart > 0) || (k === winEnd && winEnd < N - 1);
@@ -171,9 +188,11 @@
   /* ---------- 초기화 / 리사이즈 ---------- */
   window.addEventListener('resize', function () {
     W = hero.clientWidth || 1;
+    measureDots();
     render(false);                                /* 애니메이션 없이 재정렬 */
   });
 
+  measureDots();
   render(false);
 })();
 

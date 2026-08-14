@@ -24,7 +24,11 @@
   <!-- ============ 상품 이미지 캐러셀 ============ -->
   <section class="hero js-hero" aria-label="상품 이미지">
     <div class="hero__track js-track"><!-- 슬라이드는 JS가 렌더 --></div>
-    <div class="hero__dots js-dots" aria-hidden="true"><!-- 도트는 JS가 렌더 --></div>
+    <div class="hero__dots" aria-hidden="true">
+      <div class="hero__dots-viewport js-dots">
+        <div class="hero__dots-track js-dots-track"><!-- 도트는 JS가 렌더 --></div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ 상품 정보 ============ -->

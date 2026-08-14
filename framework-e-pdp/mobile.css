@@ -89,25 +89,37 @@ main { padding-top: var(--header-h); }
 }
 
 /* 도트 인디케이터 — #ffffff + mix-blend-mode: difference
-   (스킴과 무관하게 밝은 배경 위에서는 어둡게, 어두운 배경 위에서는 밝게 반전) */
+   (스킴과 무관하게 밝은 배경 위에서는 어둡게, 어두운 배경 위에서는 밝게 반전)
+
+   인스타그램식: 도트가 사라졌다 나타나는 게 아니라, 전체 트랙이 미끄러지고
+   창 밖으로 나가는 도트는 작아지며 사라진다. 창은 4슬롯(시안 31px). */
 .hero__dots {
   position: absolute; left: 0; right: 0; bottom: 20px;
   z-index: 2;
-  display: flex; justify-content: center; align-items: center; gap: 4px;
+  display: flex; justify-content: center;
   mix-blend-mode: difference;
   pointer-events: none;
 }
+.hero__dots-viewport {
+  width: 32px;                          /* 4슬롯 = 5×4 + 4×3 */
+  overflow: hidden;
+}
+.hero__dots-track {
+  display: flex; align-items: center; gap: 4px;
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
 .hero__dots .dot {
+  flex: none;
   width: 5px; height: 5px;
   border-radius: 9999px;
   background: #ffffff;
   opacity: 0.3;                         /* 시안: 비활성 0.3 */
-  transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.hero__dots .dot.is-active { opacity: 0.8; }   /* 시안: 활성 0.8 */
-/* 창 너머에 이미지가 더 있음을 알리는 경계 도트 — 시안: 4px */
-.hero__dots .dot.is-small { width: 4px; height: 4px; }
-.hero__dots .dot.is-hidden { display: none; }
+.hero__dots .dot.is-active { opacity: 0.8; }              /* 시안: 활성 0.8 */
+.hero__dots .dot.is-small { transform: scale(0.8); }      /* 시안: 경계 4px */
+.hero__dots .dot.is-out { opacity: 0; transform: scale(0.4); }  /* 창 밖 — 줄며 사라짐 */
 
 /* ============ 상품 정보 ============ */
 .pinfo {
