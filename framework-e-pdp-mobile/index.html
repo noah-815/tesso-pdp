@@ -170,53 +170,66 @@
     letter-spacing: 0;
   }
 
-  /* ── productImage ────────────────────────────────────────────── */
-  .product-image {
+  /* ── productImage ──────────────────────────────────────────────
+     전환 트리거 : 스와이프 (pointer 드래그, 1:1 추종 → 릴리즈 시 스냅)
+     전환 방식   : 가로 슬라이드 translateX — 이전은 왼쪽으로, 다음은 오른쪽에서
+     루프        : 없음 · 끝단 러버밴딩 없음
+     dot        : 4슬롯 창을 마스크로 두고 트랙 전체가 미끄러진다.
+                  진행 방향에 이미지가 남아 있으면 활성 dot 이 끝에서 두 번째에 머물고
+                  창 경계 dot 은 축소, 창 밖 dot 은 작아지며 사라진다.
+     ────────────────────────────────────────────────────────────── */
+  .product-image { position: relative; width: 100%; padding: 12px var(--pad-x) 16px; }
+  .product-image .hero {
     position: relative;
-    width: 100%;
-    padding: 12px var(--pad-x) 16px;   /* 시안 상 12 / 하 16 — 토큰 없음 → px */
-  }
-  .product-image .track {
-    display: flex;
-    width: 100%;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    border-radius: var(--radius-sm);
-  }
-  .product-image .track::-webkit-scrollbar { display: none; }
-  .product-image .track .slide {
-    flex: 0 0 100%;
-    scroll-snap-align: center;
     aspect-ratio: 1 / 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--c-fill);
+    touch-action: pan-y;              /* 세로 스크롤은 브라우저에 양보 */
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
   }
-  .product-image .track .slide img { width: 100%; height: 100%; object-fit: cover; }
-  /* indicator — 이미지 하단에 겹침 (시안 하단에서 25px) */
+  .product-image .hero.is-dragging { cursor: grabbing; }
+  .product-image .track { display: flex; height: 100%; will-change: transform; }
+  .product-image .track.is-animating {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .product-image .slide { flex: 0 0 100%; height: 100%; }
+  .product-image .slide img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+
+  /* indicator — 시안 이미지 하단에서 20px */
   .product-image .indicator {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 41px;                  /* 16(하단 여백) + 25 */
+    bottom: 20px;
+    z-index: 2;
     display: flex;
     justify-content: center;
+    mix-blend-mode: difference;
     pointer-events: none;
   }
+  .dots-viewport { width: 32px; overflow: hidden; }   /* 4슬롯 = 5×4 + 4×3 */
   .dot-indicator {
     display: flex;
     align-items: center;
     gap: var(--mid-4);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    mix-blend-mode: difference;
+    will-change: transform;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
   .dot-indicator .dot {
+    flex: none;
     width: 5px;                    /* 토큰 없음 → px */
     height: 5px;
     border-radius: var(--radius-full);
     background: #fff;
-    opacity: 0.4;
+    opacity: 0.3;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
-  .dot-indicator .dot.is-on { opacity: 0.8; }
+  .dot-indicator .dot.is-on    { opacity: 0.8; }
+  .dot-indicator .dot.is-small { transform: scale(0.8); }
+  .dot-indicator .dot.is-out   { opacity: 0; transform: scale(0.4); }
 
   /* ── productInfo ─────────────────────────────────────────────── */
   .product-info {
@@ -1185,15 +1198,10 @@
 <main>
   <!-- productImage -->
   <section class="product-image">
-    <div class="track" id="imgTrack">
-      <div class="slide"><img src="assets/product-1.png" alt=""></div>
-      <div class="slide"><img src="assets/product-2.png" alt=""></div>
-      <div class="slide"><img src="assets/product-3.png" alt=""></div>
-      <div class="slide"><img src="assets/product-4.png" alt=""></div>
-    </div>
-    <div class="indicator">
-      <div class="dot-indicator" id="dots">
-        <span class="dot is-on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="hero" id="hero">
+      <div class="track" id="imgTrack"><!-- 슬라이드는 JS 가 렌더 --></div>
+      <div class="indicator">
+        <div class="dots-viewport"><div class="dot-indicator" id="dots"></div></div>
       </div>
     </div>
   </section>
@@ -1639,55 +1647,132 @@
   const FS_KEY = 'fw-e-pdp-m-fs';
   const UI_KEY = 'fw-e-pdp-m-ui';
 
-  /* ── productImage ────────────────────────────────────────────
-     note(이미지 동작)
-     · 전환 트리거 : 스와이프 / 가로 슬라이드 (translateX)
-     · dot 은 4개까지만 표시
-       ㄴ 진행 방향에 이미지가 더 남아 있으면 활성 바가 맨 마지막이 아니라
-          끝에서 두 번째에 머문다
-     · 루프 없음 (첫 이미지 ↔ 마지막 이미지 이어지지 않음)
-     · 상품 이미지 1장만 등록 시 indicator 미노출
-     · 이미지 클릭 시 이미지 뷰어 제공                                */
-  const track = $('#imgTrack');
-  const dotsBox = $('#dots');
-  const MAX_DOTS = 4;
-  let imgIndex = 0;
+  /* ── productImage — 스와이프 캐러셀 + 슬라이딩 dot ──────────────
+     framework-e-pdp/mobile.html 프로토타입과 동일한 전환 방식
+     · 드래그 1:1 추종 → 릴리즈 시 스냅 (폭 20% 또는 플릭 0.5px/ms 이면 전환)
+     · 드래그 1회 = 최대 1장 · 루프 없음 · 끝단 러버밴딩 없음
+     · 수평/수직 방향 잠금 — 세로 스크롤은 브라우저에 양보
+     · dot 4슬롯 창 + 트랙 슬라이딩 (창 밖은 축소·페이드)                */
+  const FILES = [
+    'product-1.png', 'product-2.png', 'product-3.png', 'product-4.png',
+    'product-1.png', 'product-2.png', 'product-3.png', 'product-4.png',
+  ];
+  const hero = $('#hero'), track = $('#imgTrack'), dotsTrack = $('#dots');
 
-  function slideCount() {
-    return $$('#imgTrack .slide').filter(el => getComputedStyle(el).display !== 'none').length;
+  FILES.forEach((f, k) => {
+    const sl = document.createElement('div');
+    sl.className = 'slide';
+    const img = document.createElement('img');
+    img.src = 'assets/' + f;
+    img.alt = '전해질 보충 음료 블러드 오렌지 — 상품 이미지 ' + (k + 1);
+    img.draggable = false;
+    if (k > 0) img.loading = 'lazy';
+    sl.appendChild(img);
+    track.appendChild(sl);
+    const d = document.createElement('span');
+    d.className = 'dot';
+    dotsTrack.appendChild(d);
+  });
+
+  const dots = [...dotsTrack.querySelectorAll('.dot')];
+  const N = FILES.length;
+  let imgIndex = 0;
+  let W = hero.clientWidth || 1;
+
+  const COMMIT_RATIO = 0.2;   /* 폭의 20% 이상 끌면 전환 */
+  const FLICK_VEL = 0.5;      /* px/ms — 짧고 빠른 스와이프도 전환 */
+  const DIR_LOCK = 8;         /* 수평 제스처로 인정하는 최소 이동(px) */
+  const DIR_RATIO = 1.2;      /* |dx| > |dy| × 1.2 이면 수평 우세 */
+
+  function setX(x, animate) {
+    track.classList.toggle('is-animating', !!animate);
+    track.style.transform = `translate3d(${x}px,0,0)`;
   }
 
-  /* 활성 dot 위치 — 남은 이미지가 있으면 끝에서 두 번째에 머문다 */
-  function activeDot(i, total) {
-    const shown = Math.min(total, MAX_DOTS);
-    if (total <= MAX_DOTS) return i;
-    if (i <= shown - 2) return i;                 /* 앞쪽 */
-    if (i === total - 1) return shown - 1;        /* 마지막 이미지 → 마지막 dot */
-    return shown - 2;                             /* 그 외 → 끝에서 두 번째 */
+  const WINDOW = 4;
+  let winStart = 0, DOT_STEP = 9;   /* dot 5 + gap 4 */
+
+  function measureDots() {
+    if (!dots.length) return;
+    const cs = getComputedStyle(dotsTrack);
+    const gap = parseFloat(cs.columnGap || cs.gap) || 4;
+    DOT_STEP = dots[0].offsetWidth + gap;   /* offsetWidth 는 scale 영향을 받지 않는다 */
   }
 
   function renderDots() {
-    const total = slideCount();
-    const shown = Math.min(total, MAX_DOTS);
-    const on = activeDot(imgIndex, total);
-    dotsBox.innerHTML = Array.from({ length: shown }, (_, n) =>
-      `<span class="dot${n === on ? ' is-on' : ''}"></span>`).join('');
-    dotsBox.parentElement.style.display = total <= 1 ? 'none' : '';
+    $('.product-image .indicator').style.display = N <= 1 ? 'none' : '';
+    if (N <= WINDOW) {                       /* 4장 이하면 전부 노출 */
+      dotsTrack.style.transform = 'translate3d(0,0,0)';
+      dots.forEach((d, j) => { d.className = 'dot' + (j === imgIndex ? ' is-on' : ''); });
+      return;
+    }
+    const hi = imgIndex - (imgIndex > 0 ? 1 : 0);                       /* 이전이 남아 있으면 두 번째 이후 */
+    const lo = imgIndex - (WINDOW - 1) + (imgIndex < N - 1 ? 1 : 0);    /* 다음이 남아 있으면 끝에서 두 번째 이전 */
+    winStart = Math.max(0, Math.min(N - WINDOW, Math.max(lo, Math.min(hi, winStart))));
+    const winEnd = winStart + WINDOW - 1;
+
+    dotsTrack.style.transform = `translate3d(${-winStart * DOT_STEP}px,0,0)`;
+    dots.forEach((d, k) => {
+      if (k < winStart || k > winEnd) { d.className = 'dot is-out'; return; }
+      if (k === imgIndex) { d.className = 'dot is-on'; return; }
+      const isEdge = (k === winStart && winStart > 0) || (k === winEnd && winEnd < N - 1);
+      d.className = 'dot' + (isEdge ? ' is-small' : '');
+    });
   }
 
-  track.addEventListener('scroll', () => {
-    const i = Math.round(track.scrollLeft / track.clientWidth);
-    if (i === imgIndex) return;
-    imgIndex = i;
-    renderDots();
-  }, { passive: true });
+  function renderHero(animate) { setX(-imgIndex * W, animate); renderDots(); }
 
-  /* 이미지 뷰어 */
+  let drag = null, lastDx = 0;
+  hero.addEventListener('pointerdown', e => {
+    lastDx = 0;
+    W = hero.clientWidth || 1;
+    drag = { x: e.clientX, y: e.clientY, t: performance.now(), locked: false, dx: 0 };
+  });
+  hero.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.locked) {
+      if (Math.abs(dx) > DIR_LOCK && Math.abs(dx) > Math.abs(dy) * DIR_RATIO) {
+        drag.locked = true;
+        hero.classList.add('is-dragging');
+        try { hero.setPointerCapture(e.pointerId); } catch (_) {}
+      } else if (Math.abs(dy) > DIR_LOCK && Math.abs(dy) >= Math.abs(dx)) {
+        drag = null; return;                 /* 세로 스크롤에 양보 */
+      } else return;
+    }
+    /* 이전/다음 이미지가 없으면 더 끌어도 움직이지 않는다 */
+    let d = dx;
+    if ((imgIndex === 0 && d > 0) || (imgIndex === N - 1 && d < 0)) d = 0;
+    drag.dx = d;
+    setX(-imgIndex * W + d, false);
+  });
+  function release() {
+    if (!drag) return;
+    const { locked, dx, t } = drag;
+    const dt = Math.max(performance.now() - t, 1);
+    hero.classList.remove('is-dragging');
+    lastDx = Math.abs(dx);
+    if (locked) {
+      if (Math.abs(dx) > W * COMMIT_RATIO || Math.abs(dx) / dt >= FLICK_VEL) {
+        if (dx < 0 && imgIndex < N - 1) imgIndex++;
+        else if (dx > 0 && imgIndex > 0) imgIndex--;
+      }
+      renderHero(true);                      /* 미달·끝단은 제자리 복귀 */
+    }
+    drag = null;
+  }
+  hero.addEventListener('pointerup', release);
+  hero.addEventListener('pointercancel', release);
+  window.addEventListener('resize', () => { W = hero.clientWidth || 1; measureDots(); renderHero(false); });
+  measureDots();
+  renderHero(false);
+
+  /* 이미지 뷰어 — 이미지 클릭 시 크게 보기 */
   const viewer = $('#viewer'), vTrack = $('#vTrack');
-  track.addEventListener('click', () => {
-    vTrack.innerHTML = $$('#imgTrack .slide')
-      .filter(el => getComputedStyle(el).display !== 'none')
-      .map(el => `<div class="v-slide"><img src="${el.querySelector('img').src}" alt=""></div>`).join('');
+  hero.addEventListener('click', () => {
+    if (lastDx > 3) { lastDx = 0; return; }   /* 드래그 직후의 클릭은 삼킨다 */
+    vTrack.innerHTML = FILES
+      .map(f => `<div class="v-slide"><img src="assets/${f}" alt=""></div>`).join('');
     viewer.classList.add('is-open');
     vTrack.scrollLeft = imgIndex * vTrack.clientWidth;
   });
