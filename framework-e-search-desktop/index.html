@@ -49,8 +49,11 @@
     /* 화면 좌우 마진 — global/desktop-margin-vw = 1vw (19px @1920) */
     --margin: calc(19 * 100vw / 1920);
 
-    /* productCard 가로 간격 — 컴포넌트 정의는 mid-16 (데모에서 전환) */
+    /* productCard 가로 간격 — 컴포넌트 정의는 mid-16 (데모에서 전환)
+       vw 안 : 1920 에서 16px 이 되는 순수 vw. mid 와 달리 8px 하한이 없어
+       화면이 좁아질수록 비례해서 그대로 줄어든다. */
     --card-gap: var(--mid-16);
+    --card-gap-vw: calc(16 * 100vw / 1920);   /* 0.8333vw */
 
     /* Radius / Font / Color -------------------------------------- */
     --radius-2xs: 3px;
@@ -67,8 +70,8 @@
     --c-thumb-bg: #f4f4f4;
   }
 
-  /* 카드 간격 — 컴포넌트는 mid-16 인데 일부 인스턴스가 19(=1vw, 마진과 동일) */
-  body[data-cardgap="vw"] { --card-gap: var(--margin); }
+  /* 카드 간격 2안 — mid-16 (하한 8px) ↔ 16px 을 vw 로 환산 (하한 없음) */
+  body[data-cardgap="vw"] { --card-gap: var(--card-gap-vw); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html {
@@ -415,7 +418,7 @@
   <strong>card gap</strong>
   <div class="demo-seg" id="gapToggle">
     <button type="button" data-cardgap="mid">mid-16</button>
-    <button type="button" data-cardgap="vw">19 (1vw)</button>
+    <button type="button" data-cardgap="vw">16 → vw</button>
   </div>
 
   <p class="demo-readout" id="readout">–</p>
