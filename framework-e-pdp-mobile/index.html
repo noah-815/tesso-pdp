@@ -991,7 +991,8 @@
     display: flex;
     align-items: center;
     padding: 1px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    /* Figma stroke 는 크기를 밀지 않는다 → inset box-shadow (시안 medium 90×30) */
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
     border-radius: var(--radius-xs);
   }
   .number-input button {
@@ -1002,7 +1003,7 @@
     height: 28px;
     padding: var(--mid-2);
   }
-  .number-input button img { width: 100%; height: 100%; }
+  .number-input button img { width: 24px; height: 24px; }   /* 시안 아이콘 고정 24 */
   .number-input button:disabled { opacity: 0.3; }
   /* 컴포넌트 문서 — 숫자 영역 기본 width = 3ch, min-width = 32px (fixed) */
   .number-input .value {

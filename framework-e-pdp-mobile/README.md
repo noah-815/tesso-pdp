@@ -164,6 +164,15 @@ inquiryItem  gap mid-16               inquiryItem  gap mid-24
 앞서 "시안의 실수 같아 `.12` 로 통일했다" 고 적었는데, 컴포넌트 정의를 보니
 **의도된 구분**이었습니다. `is-answered` 클래스로 분기하도록 되돌렸습니다.
 
+### `numberInput` — Figma stroke 보정 (medium 92×30 → 90×30)
+
+Figma 의 stroke 는 크기를 밀지 않는데 CSS `border` 를 써서 2px 커져 있었습니다.
+`box-shadow: inset 0 0 0 1px` 로 옮겨 **시안 90 × 30** 과 일치시켰습니다
+(아이템 28 · 내부 `mid-2` · 아이콘 고정 24).
+
+> 참고 — `large` 사이즈는 시안이 조정되어 **102 × 36**(아이템 34 · 내부 `mid-4`) 입니다.
+> 이 화면들은 `medium` 만 쓰므로 영향 없습니다.
+
 **`ch` 어노테이션**
 
 | 컴포넌트 | 어노테이션 | 구현 |
