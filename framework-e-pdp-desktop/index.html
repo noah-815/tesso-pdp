@@ -68,9 +68,7 @@
     --mid-8:   8px;                        /* 공식 결과도 8px (증감 없음) */
     --mid-10:  calc(  2 * var(--us) + 8px);
     --mid-12:  calc(  4 * var(--us) + 8px);
-    --mid-15:  calc(  7 * var(--us) + 8px);
     --mid-16:  calc(  8 * var(--us) + 8px);
-    --mid-17:  calc(  9 * var(--us) + 8px);
     --mid-20:  calc( 12 * var(--us) + 8px);
     --mid-24:  calc( 16 * var(--us) + 8px);
     --mid-28:  calc( 20 * var(--us) + 8px);
@@ -88,9 +86,7 @@
        않다 → 기본값은 px 고정. 데모에서 mid / vw 안으로 전환할 수 있다. */
     --d-8:  8px;
     --d-10: 10px;
-    --d-15: 15px;
     --d-16: 16px;
-    --d-17: 17px;
     --d-20: 20px;
     --d-24: 24px;
     --d-80: 80px;
@@ -146,9 +142,7 @@
   body[data-inqbox="fluid-mid"] {
     --d-8:  var(--mid-8);
     --d-10: var(--mid-10);
-    --d-15: var(--mid-15);
     --d-16: var(--mid-16);
-    --d-17: var(--mid-17);
     --d-20: var(--mid-20);
     --d-24: var(--mid-24);
     --d-80: var(--mid-80);
@@ -1306,7 +1300,10 @@
   .inq-multiline .field {
     width: 100%;
     height: 327px;                 /* 시안 — 토큰 없음 → px */
-    padding: var(--d-15) var(--d-17);
+    /* annotation — multiLine textField padding 은 3안 모두 em 고정.
+       @em base : P3 (입력 텍스트) → 시안 15 / 17px */
+    font-size: var(--fs-p3);
+    padding: 1.0714em 1.2143em;
     /* Figma stroke 는 inside → 크기를 밀지 않게 inset box-shadow */
     box-shadow: inset 0 0 0 1px var(--c-line);
     border-radius: var(--radius-xs);
