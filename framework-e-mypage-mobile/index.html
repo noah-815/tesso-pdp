@@ -252,6 +252,7 @@
     align-items: flex-start;
     gap: var(--mid-12);
     width: 100%;
+    min-height: var(--mid-100);               /* content min height : mid 100 */
     padding-top: var(--mid-24);
   }
   .order-item { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
@@ -297,7 +298,7 @@
     align-items: flex-start;
     gap: var(--mid-24);
     width: 100%;
-    min-height: 100px;                        /* 시안 — 토큰 없음 → px */
+    min-height: var(--mid-100);               /* content min height : mid 100 */
     padding-top: var(--mid-24);
   }
   .info-block { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-12); width: 100%; }
@@ -595,21 +596,21 @@
   }
   body[data-empty="on"] .screen[data-empty-able] .empty { display: flex; }
   body[data-empty="on"] .screen[data-empty-able] .filled { display: none; }
-  /* 홈 — 섹션 안쪽만 비는 형태 */
+  /* 홈 empty — 섹션마다 전용 문구 · P3 regular · 좌측 정렬 (시안) */
   .sec-empty {
     display: none;
     width: 100%;
-    min-height: 100px;
+    min-height: var(--mid-100);
     padding-top: var(--mid-24);
-    font-weight: 500;
     font-size: var(--fs-p3);
     line-height: var(--lh-p3);
     color: rgba(17, 17, 17, .5);
-    text-align: center;
   }
-  body[data-empty="on"] .sec-empty { display: block; }
+  .addr-empty { display: none; width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); color: rgba(17, 17, 17, .5); }
+  body[data-empty="on"] .sec-empty,
+  body[data-empty="on"] .addr-empty { display: block; }
   body[data-empty="on"] .home-sec .list,
-  body[data-empty="on"] .home-sec .info-list { display: none; }
+  body[data-empty="on"] .addr-vals { display: none; }
 
   /* ── profileDetail — 모바일은 전체 화면 ──────────────────────── */
   .detail {
@@ -779,7 +780,7 @@
         <button type="button" class="link-btn">전체보기<img class="ico" src="assets/chevron-down.svg" alt=""></button>
       </div>
       <div class="list" id="orderList"></div>
-      <p class="sec-empty order">비어있음</p>
+      <p class="sec-empty order">최근 주문내역이 없습니다</p>
     </div>
 
     <div class="sec home-sec">
@@ -794,14 +795,14 @@
         </div>
         <div class="info-block">
           <p class="label">배송지</p>
-          <div class="vals">
+          <div class="vals addr-vals">
             <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
             <div class="inline"><span>홍길동</span><span class="div"></span><span class="en">010-1234-1234</span></div>
           </div>
+          <p class="addr-empty">등록되어 있는 배송지가 없습니다</p>
         </div>
       </div>
     </div>
-    <p class="sec-empty profile">비어있음</p>
   </section>
 
   <!-- ── 위시리스트 ── -->
