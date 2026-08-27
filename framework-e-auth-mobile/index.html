@@ -310,14 +310,13 @@
     padding: 0 var(--mid-4);
   }
   /* 시안(8406:72503) : 남는 폭을 채우되 비율 44:55 고정 · 4방향 min/max 로 clamp.
-     32×40 · 44×55 · 48×60 이 모두 정확히 4:5 라 어느 지점에서 걸려도 형태가 유지된다.
-     394 기준으로 풀면 48×60(상한), 모바일 353 기준이면 44×55 로 떨어진다. */
+     32×40(하한) · 44×55(상한) 이 모두 정확히 4:5 라 어느 지점에서 걸려도 형태가 유지된다. */
   .otp-box .cells input {
     flex: 1 0 0;
     min-width: 32px;                       /* 시안 — 토큰 없음 → px */
-    max-width: 48px;
+    max-width: 44px;
     min-height: 40px;
-    max-height: 60px;
+    max-height: 55px;
     aspect-ratio: 44 / 55;
     padding: var(--mid-2);
     background: var(--c-otp-bg);
