@@ -1,0 +1,1177 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Page — Desktop (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E — My Page · 데스크탑
+     Figma 8484:143885 · 기준 폭 1920 · 1rem = 14px
+     구현 범위 : 홈 · 위시리스트 · 쿠폰 · 리뷰 · 프로필 (+ 프로필 상세 다이얼로그)
+     제외 : 주문내역 탭 · 주문 상세 · 이미지 비율 variation
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value ≤ 1rem 이면 고정 → C2 11 · C1 12 · P4 13 · P3 14 · button 13/14
+        · 가변 : P2 16 · P1 18
+     2) Spacing (mid-*)  (값 − 8) × 100vw / 1920 + 8 · 값 < 8 은 고정
+     3) 그리드 12컬럼 · gutter 16px 고정 · margin = global/desktop-margin-vw (1vw)
+        tabs = 1~3컬럼 · 본문 = 4~9컬럼
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --us: calc(100vw / 1920);                 /* spacing 1px */
+
+    /* Typography ------------------------------------------------- */
+    --fs-c2:    11px;   /* caption-2            0.786rem → 고정 */
+    --fs-c1:    12px;   /* caption-1            0.857rem → 고정 */
+    --fs-p4:    13px;   /* paragraph-4          0.929rem → 고정 */
+    --fs-p3:    14px;   /* paragraph-3          1rem     → 고정 */
+    --fs-btn-s: 13px;   /* button-label-small   0.929rem → 고정 */
+    --fs-btn-m: 13px;   /* button-label-medium  0.929rem → 고정 */
+    --fs-btn-l: 14px;   /* button-label-large   1rem     → 고정 */
+    --fs-p2: calc((1.1429 - 1) * 0.83vw + 1rem);   /* 16px @1920 — 가변 */
+    --fs-p1: calc((1.2857 - 1) * 0.83vw + 1rem);   /* 18px @1920 — 가변 */
+
+    --lh-p1: 1.5;
+    --lh-p2: 1.5;
+    --lh-p3: 1.6;
+    --lh-p4: 1.6;
+    --lh-c1: 1.2;
+
+    /* Spacing — mid-* -------------------------------------------- */
+    --mid-2:   2px;                           /* 값 < 8 → 고정 */
+    --mid-4:   4px;
+    --mid-6:   6px;
+    --mid-8:   8px;
+    --mid-10:  calc(  2 * var(--us) + 8px);
+    --mid-12:  calc(  4 * var(--us) + 8px);
+    --mid-14:  calc(  6 * var(--us) + 8px);
+    --mid-16:  calc(  8 * var(--us) + 8px);
+    --mid-20:  calc( 12 * var(--us) + 8px);
+    --mid-24:  calc( 16 * var(--us) + 8px);
+    --mid-32:  calc( 24 * var(--us) + 8px);
+    --mid-40:  calc( 32 * var(--us) + 8px);
+    --mid-48:  calc( 40 * var(--us) + 8px);
+    --mid-160: calc(152 * var(--us) + 8px);
+
+    /* Grid ------------------------------------------------------- */
+    --margin: calc(19 * 100vw / 1920);        /* global/desktop-margin-vw = 1vw */
+    --gutter: 16px;                           /* global/desktop-gutter-px */
+
+    /* Radius / Font / Color -------------------------------------- */
+    --radius-2xs: 3px;
+    --radius-xs:  4px;
+    --radius-sm:  6px;
+    --radius-md:  8px;
+    --font: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    --font-en: "DM Sans", var(--font);
+    --font-header: "Inter", "DM Sans", var(--font);
+    --header-h: 54px;                         /* set06_header — 토큰 없음 → px */
+    --c-text: #111;
+    --c-sub: #6a6a6a;
+    --c-line: rgba(0, 0, 0, 0.12);
+    --c-line-soft: rgba(0, 0, 0, 0.1);
+    --c-danger: #ef0000;
+    --c-thumb: #ddd;
+    --c-dim: rgba(0, 0, 0, 0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;                          /* 1rem = 14px */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    min-height: 100vh;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+  }
+  body.is-dialog-open { overflow: hidden; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input  { font: inherit; color: inherit; background: none; border: 0; outline: 0; }
+  img { display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── set06_header ────────────────────────────────────────────── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--header-h);
+    padding: 0 16px;
+    background: #fff;
+    font-family: var(--font-header);
+  }
+  .header .container {
+    position: relative;
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+  .header .nav,
+  .header .utilities { display: flex; gap: 12px; height: 100%; align-items: stretch; }
+  .header .depth1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 8px;
+    font-family: var(--font-en);
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    text-transform: uppercase;
+    color: #372320;
+    white-space: nowrap;
+  }
+  .header .logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    color: #372320;
+    white-space: nowrap;
+  }
+
+  /* ── contentArea — 12컬럼 그리드 ──────────────────────────────── */
+  .content-area {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    padding: 0 var(--margin);
+  }
+  .content-area > .title-area {
+    grid-column: 1 / span 12;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--mid-40) 0;
+  }
+  .content-area > .title-area .title {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p1);
+    line-height: var(--lh-p1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .content-area > .body {
+    grid-column: 1 / span 12;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    align-items: start;
+  }
+
+  /* tabs/default — 1~3컬럼 */
+  .tabs {
+    grid-column: 1 / span 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tabs button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px 0;                           /* 시안 — 토큰 없음 → px */
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    white-space: nowrap;
+  }
+  .tabs button:not(.is-on) { opacity: .4; }
+
+  /* 본문 — 4~9컬럼 */
+  .main {
+    grid-column: 4 / span 6;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: var(--mid-8);
+    padding-bottom: var(--mid-160);
+  }
+  .screen { display: none; flex-direction: column; align-items: flex-start; width: 100%; }
+  .screen.is-on { display: flex; }
+  /* 프로필만 좌우 70px 안쪽으로 (시안 — 토큰 없음 → px) */
+  .screen[data-screen="profile"] { padding: 0 70px; }
+
+  /* ── 공통 : 섹션 타이틀 영역 ─────────────────────────────────── */
+  .sec { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+  .sec > .head {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-24);
+    width: 100%;
+    padding-bottom: var(--mid-20);
+    border-bottom: 1px solid var(--c-line-soft);
+  }
+  .sec > .head .t {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p2);
+    line-height: var(--lh-p2);
+  }
+  /* 텍스트 + chevron 버튼 */
+  .link-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;                                 /* 시안 — 토큰 없음 → px */
+    font-weight: 500;
+    font-size: var(--fs-btn-m);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .link-btn .ico { width: 16px; height: 16px; transform: rotate(-90deg); opacity: .9; }
+  /* 밑줄 버튼 (프로필 섹션) */
+  .u-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 1px;
+    border-bottom: 1px solid #111;
+    font-weight: 500;
+    font-size: var(--fs-btn-s);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* ── 홈 ──────────────────────────────────────────────────────── */
+  .greet {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-12);
+    width: 100%;
+    padding-bottom: var(--mid-40);
+  }
+  .greet .hi {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p1);
+    line-height: var(--lh-p1);
+    white-space: nowrap;
+  }
+  .greet .desc { width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); color: var(--c-sub); }
+
+  .home-sec { padding: var(--mid-40) 0; }
+  .home-sec .list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-12);
+    width: 100%;
+    min-height: 144px;                        /* 시안 — 토큰 없음 → px */
+    padding-top: var(--mid-32);
+  }
+  .order-item { display: flex; align-items: flex-start; gap: var(--mid-20); width: 100%; }
+  .order-item .thumb {
+    flex-shrink: 0;
+    width: 160px;                             /* 시안 — 토큰 없음 → px */
+    height: 160px;
+    overflow: hidden;
+    background: var(--c-thumb);
+    border-radius: var(--radius-xs);
+  }
+  .order-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .order-item .body { display: flex; flex: 1 0 0; min-width: 0; align-items: flex-end; }
+  .order-item .text {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-8);
+    line-height: var(--lh-p3);
+    white-space: nowrap;
+  }
+  .order-item .date { font-family: var(--font-en); font-size: var(--fs-p4); color: var(--c-sub); font-variation-settings: "opsz" 14; }
+  .order-item .name-row {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-4);
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+  }
+  .order-item .name-row > * { overflow: hidden; text-overflow: ellipsis; }
+  .order-item .name-row .cnt { display: flex; align-items: center; flex-shrink: 0; }
+  .order-item .name-row .cnt .n { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  /* annotation : price 의 숫자 영역(value) min-width = 10ch */
+  .order-item .price {
+    display: flex;
+    align-items: baseline;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+  }
+  /* 숫자는 10ch 를 확보하되 왼쪽 정렬 — 시안 렌더가 상품명과 좌측 정렬이고,
+     확보된 폭 덕분에 여러 행의 '원' 위치가 세로로 맞는다 */
+  .order-item .price .v {
+    display: inline-flex;
+    min-width: 10ch;
+    font-family: var(--font-en);
+    font-variation-settings: "opsz" 14;
+  }
+
+  .home-sec .info-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-32);
+    width: 100%;
+    min-height: 120px;                        /* 시안 — 토큰 없음 → px */
+    padding: var(--mid-32) 0;
+  }
+  .info-block { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-12); width: 100%; }
+  .info-block .label { width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); color: var(--c-sub); }
+  .info-block .vals { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-8); width: 100%; }
+  .info-block .vals p { width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .info-block .vals .en { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .inline { display: flex; align-items: center; gap: var(--mid-8); width: 100%; }
+  .inline .div { flex-shrink: 0; width: 1px; height: 12px; background: var(--c-line); }
+
+  /* ── 위시리스트 ──────────────────────────────────────────────── */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--mid-40);
+    width: 100%;
+  }
+  .card { display: flex; flex-direction: column; align-items: flex-start; }
+  .card .image-area {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f4f4f4;
+    border-radius: var(--radius-md);
+  }
+  .card .image-area img { width: 100%; height: 100%; object-fit: cover; }
+  /* badge — 위치는 px, padding 은 em (@em base : C2) */
+  .card .badge {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    padding: 0.5455em 0.7273em;
+    background: #111;
+    border-radius: var(--radius-2xs);
+    font-family: var(--font-en);
+    font-size: var(--fs-c2);
+    line-height: 1.2;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .card .wish {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+  .card .wish img { width: 100%; height: 100%; }
+  .card .info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-6);
+    width: 100%;
+    padding: var(--mid-16) var(--mid-4) 0;
+  }
+  .card .name {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card .price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--mid-4);
+    width: 100%;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    white-space: nowrap;
+  }
+  .card .price .amount { display: flex; align-items: center; }
+  .card .price .amount .num { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .card .price .original { position: relative; display: flex; align-items: center; opacity: .5; }
+  .card .price .original::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 1px;
+    background: #111;
+    transform: translateY(-50%);
+  }
+
+  /* ── 쿠폰 ────────────────────────────────────────────────────── */
+  .coupon-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gutter);
+    width: 100%;
+  }
+  .coupon {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-20);
+    padding: var(--mid-24);
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+  }
+  .coupon .summary { display: flex; flex-direction: column; gap: var(--mid-6); width: 100%; }
+  .coupon .name { font-size: var(--fs-c1); line-height: var(--lh-c1); opacity: .6; }
+  .coupon .benefit {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-6);
+    font-weight: 600;
+    font-size: var(--fs-p1);
+    line-height: var(--lh-p1);
+    white-space: nowrap;
+  }
+  .coupon .benefit .off {
+    font-weight: 600;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    color: #ff6058;
+  }
+  .coupon .cinfo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-2);
+    width: 100%;
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+  }
+  .coupon .cinfo p { opacity: .8; }
+
+  /* ── 리뷰 ────────────────────────────────────────────────────── */
+  .review-list { display: flex; flex-direction: column; width: 100%; }
+  .review-row {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-48);
+    width: 100%;
+    padding: var(--mid-20) 0;
+    border-bottom: 1px solid var(--c-line-soft);
+  }
+  .review-row .prod { display: flex; flex: 1 0 0; min-width: 0; gap: var(--mid-20); align-items: flex-start; }
+  .review-row .thumb {
+    flex-shrink: 0;
+    width: 80px;                              /* 시안 — 토큰 없음 → px */
+    height: 80px;
+    overflow: hidden;
+    background: var(--c-thumb);
+    border-radius: var(--radius-2xs);
+  }
+  .review-row .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .review-row .text { display: flex; flex: 1 0 0; min-width: 0; flex-direction: column; gap: var(--mid-4); }
+  .review-row .name { font-weight: 500; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .review-row .opt {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-2);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    white-space: nowrap;
+  }
+  .review-row .opt span { opacity: .5; }
+  /* annotation : Button 의 min width = 11em */
+  .review-row .btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 11em;
+    /* padding = em (@ button-label-large 14) — 시안 15 / 22px */
+    font-size: var(--fs-btn-l);
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 1.0714em 1.5714em;
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+    white-space: nowrap;
+  }
+
+  /* ── 프로필 ──────────────────────────────────────────────────── */
+  .p-sec {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-20);
+    width: 100%;
+    padding-bottom: var(--mid-32);
+    border-bottom: 1px solid var(--c-line-soft);
+  }
+  .p-sec + .p-sec { padding-top: var(--mid-32); }
+  .p-sec > .head { display: flex; align-items: center; gap: var(--mid-24); width: 100%; }
+  .p-sec > .head .t { flex: 1 0 0; min-width: 0; font-weight: 500; font-size: var(--fs-p2); line-height: var(--lh-p2); }
+  .p-sec .rows { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-8); width: 100%; }
+  .p-sec .row { display: flex; align-items: flex-start; gap: var(--mid-8); width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .p-sec .row .k { flex-shrink: 0; width: 112px; color: var(--c-sub); }   /* 시안 — 토큰 없음 → px */
+  .p-sec .row .v { flex: 1 0 0; min-width: 0; }
+  .p-sec .row .dots { display: flex; align-items: center; height: calc(1em * var(--lh-p3)); letter-spacing: .18em; }
+
+  /* 배송지 */
+  .addr-sec { gap: var(--mid-12); padding-bottom: var(--mid-20); }
+  .addr-list { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+  .addr-item { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; width: 100%; padding: var(--mid-20) 0; }
+  .addr-item .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 9px;                         /* 시안 — 토큰 없음 → px */
+    box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .1);
+    border-radius: var(--radius-2xs);
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+    white-space: nowrap;
+  }
+  .addr-item .body { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
+  .addr-item .text { display: flex; flex: 1 0 0; min-width: 0; flex-direction: column; gap: var(--mid-12); }
+  .addr-item .head-text { display: flex; flex-direction: column; gap: var(--mid-6); width: 100%; }
+  .addr-item .addr { width: 100%; font-weight: 500; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .addr-item .who { display: flex; align-items: center; gap: var(--mid-8); font-size: var(--fs-p3); line-height: var(--lh-p3); color: var(--c-sub); white-space: nowrap; }
+  .addr-item .who .div { flex-shrink: 0; width: 1px; height: 12px; background: var(--c-line); }
+  .addr-item .req { display: flex; gap: var(--mid-8); width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .addr-item .req .k { flex-shrink: 0; opacity: .5; white-space: nowrap; }
+  .addr-item .req .v { flex: 1 0 0; min-width: 0; opacity: .8; }
+  .addr-item .acts { flex-shrink: 0; display: flex; align-items: center; justify-content: flex-end; gap: var(--mid-12); }
+  .addr-item .acts button { font-weight: 500; font-size: var(--fs-btn-s); line-height: 1.2; white-space: nowrap; }
+  .addr-item .acts .del { color: var(--c-danger); }
+  .addr-item .acts .div { width: 1px; height: 12px; background: var(--c-line); }
+
+  /* 마케팅 */
+  .mkt { gap: 0; padding-top: var(--mid-32); padding-bottom: var(--mid-32); }
+  .mkt .head-col { display: flex; flex-direction: column; justify-content: center; gap: var(--mid-4); width: 100%; }
+  .mkt .line { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .mkt .line .t { font-weight: 500; font-size: var(--fs-p2); line-height: var(--lh-p2); white-space: nowrap; }
+  .mkt .desc { width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); opacity: .5; }
+  .switch {
+    position: relative;
+    flex-shrink: 0;
+    width: 32px;                              /* 시안 — 토큰 없음 → px */
+    height: 18px;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, .12);
+    transition: background .18s ease;
+  }
+  .switch::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+    transition: transform .18s ease;
+  }
+  .switch.is-on { background: #111; }
+  .switch.is-on::after { transform: translateX(14px); }
+
+  .p-foot { display: flex; align-items: flex-start; justify-content: center; width: 100%; padding: var(--mid-40) 0; }
+  .p-foot .group { display: flex; flex: 1 0 0; min-width: 0; align-items: center; gap: var(--mid-8); }
+  .p-foot .group button {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 0;                           /* 시안 — 토큰 없음 → px */
+    font-weight: 500;
+    font-size: var(--fs-btn-s);
+    line-height: 1.2;
+    color: rgba(17, 17, 17, .8);
+    white-space: nowrap;
+  }
+  .p-foot .group .div { flex-shrink: 0; width: 1px; height: 14px; background: var(--c-line); }
+
+  /* ── empty ───────────────────────────────────────────────────── */
+  .empty {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 320px;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    color: var(--c-sub);
+  }
+  body[data-empty="on"] .screen[data-empty-able] .empty { display: flex; }
+  body[data-empty="on"] .screen[data-empty-able] .filled { display: none; }
+
+  /* ── profileDetail — 데스크탑은 다이얼로그 ───────────────────── */
+  .dim { position: fixed; inset: 0; z-index: 600; background: var(--c-dim); display: none; }
+  .dim.is-open { display: block; }
+  .dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 601;
+    transform: translate(-50%, -50%);
+    display: none;
+    flex-direction: column;
+    width: 560px;                             /* 시안 — 토큰 없음 → px (문의 다이얼로그와 동일) */
+    max-height: 85vh;
+    overflow: hidden;
+    background: #fff;
+    border-radius: var(--radius-sm);
+  }
+  .dialog.is-open { display: flex; }
+  .dialog .d-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    width: 100%;
+    padding: var(--mid-20) var(--mid-16) var(--mid-4) var(--mid-24);
+  }
+  .dialog .d-head .t { flex: 1 0 0; min-width: 0; font-weight: 500; font-size: var(--fs-p2); line-height: var(--lh-p2); }
+  .icon-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-xs);
+  }
+  .icon-btn img { width: 24px; height: 24px; }
+  .dialog .d-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-24);
+    padding: var(--mid-16) var(--mid-24) var(--mid-24);
+  }
+  .dialog .d-body::-webkit-scrollbar { display: none; }
+  .field { display: flex; flex-direction: column; gap: var(--mid-10); width: 100%; }
+  .field .label { width: 100%; padding: 0 var(--mid-2); font-size: var(--fs-p4); line-height: var(--lh-p4); }
+  .field .box { display: flex; flex-direction: column; gap: var(--mid-8); width: 100%; }
+  .text-field {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-12);
+    width: 100%;
+    /* padding = em (@em base : P4) — 시안 13 / 17px */
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    padding: 1em 1.3077em;
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+  }
+  .text-field.is-readonly { background: rgba(0, 0, 0, .02); }
+  .text-field input { flex: 1 0 0; min-width: 0; width: 100%; }
+  .text-field input::placeholder { color: rgba(17, 17, 17, .3); }
+  .text-field.is-readonly input { color: rgba(17, 17, 17, .4); }
+  .text-field .eye { flex-shrink: 0; display: flex; width: 1.5385em; height: 1.5385em; opacity: .45; }
+  .text-field .eye img { width: 100%; height: 100%; }
+  .field .support {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    min-height: 14px;
+    padding: 0 var(--mid-2);
+    font-family: var(--font-en);
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+    color: rgba(17, 17, 17, .6);
+  }
+  .dialog .d-foot { flex-shrink: 0; padding: var(--mid-8) var(--mid-24) var(--mid-24); }
+  .btn-save {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: var(--fs-btn-l);
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 1.0714em 1.5714em;
+    border-radius: var(--radius-xs);
+    background: #ebebeb;
+    color: #c5c5c5;
+  }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소 ─────────────────────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 700;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .12);
+    font-family: var(--font);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .demo-nav strong { font-size: 10px; letter-spacing: .04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, .1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, .1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-seg button:disabled { opacity: .3; cursor: default; }
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 2px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, .08);
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <span class="depth1">Shop</span><span class="depth1">About</span><span class="depth1">Journal</span>
+      <span class="depth1">Info</span><span class="depth1">The Story</span>
+    </nav>
+    <p class="logo">BRAND</p>
+    <nav class="utilities">
+      <span class="depth1">Search</span><span class="depth1">Sign in</span><span class="depth1">Bag [0]</span>
+    </nav>
+  </div>
+</header>
+
+<main class="content-area">
+  <div class="title-area"><p class="title">마이페이지</p></div>
+
+  <div class="body">
+    <!-- tabs/default -->
+    <nav class="tabs" id="tabs">
+      <button type="button" class="is-on" data-go="home">홈</button>
+      <button type="button" data-go="orders" disabled title="구현 범위 제외">주문내역</button>
+      <button type="button" data-go="wishlist">위시리스트</button>
+      <button type="button" data-go="coupon">쿠폰</button>
+      <button type="button" data-go="review">리뷰</button>
+      <button type="button" data-go="profile">프로필</button>
+    </nav>
+
+    <div class="main">
+
+      <!-- ── 홈 ── -->
+      <section class="screen is-on" data-screen="home">
+        <div class="greet">
+          <p class="hi"><span>홍길동</span><span>님, 안녕하세요</span></p>
+          <p class="desc">마이페이지에서 나의 쇼핑 정보를 확인해보세요</p>
+        </div>
+
+        <div class="sec home-sec">
+          <div class="head">
+            <p class="t">최근 주문내역</p>
+            <button type="button" class="link-btn">전체보기<img class="ico" src="assets/chevron-down.svg" alt=""></button>
+          </div>
+          <div class="list" id="orderList"></div>
+        </div>
+
+        <div class="sec home-sec">
+          <div class="head">
+            <p class="t">프로필</p>
+            <button type="button" class="link-btn" data-go="profile">프로필 관리<img class="ico" src="assets/chevron-down.svg" alt=""></button>
+          </div>
+          <div class="info-list">
+            <div class="info-block">
+              <p class="label">내 정보</p>
+              <div class="vals">
+                <p>홍길동</p>
+                <p class="en">010-1234-1234</p>
+              </div>
+            </div>
+            <div class="info-block">
+              <p class="label">배송지</p>
+              <div class="vals">
+                <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+                <div class="inline">
+                  <span>홍길동</span><span class="div"></span><span class="en">010-1234-1234</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 위시리스트 ── -->
+      <section class="screen" data-screen="wishlist" data-empty-able>
+        <div class="product-grid filled" id="wishGrid"></div>
+        <div class="empty">위시리스트에 담은 상품이 없어요</div>
+      </section>
+
+      <!-- ── 쿠폰 ── -->
+      <section class="screen" data-screen="coupon" data-empty-able>
+        <div class="coupon-grid filled" id="couponGrid"></div>
+        <div class="empty">사용 가능한 쿠폰이 없어요</div>
+      </section>
+
+      <!-- ── 리뷰 ── -->
+      <section class="screen" data-screen="review" data-empty-able>
+        <div class="review-list filled" id="reviewList"></div>
+        <div class="empty">작성할 수 있는 리뷰가 없어요</div>
+      </section>
+
+      <!-- ── 프로필 ── -->
+      <section class="screen" data-screen="profile">
+        <div class="p-sec">
+          <div class="head">
+            <p class="t">계정 정보</p>
+            <button type="button" class="u-btn" data-dialog="account">변경</button>
+          </div>
+          <div class="rows">
+            <div class="row"><span class="k">아이디</span><span class="v">example@gmail.com</span></div>
+            <div class="row"><span class="k">비밀번호</span><span class="v dots">●●●●●●●●●</span></div>
+          </div>
+        </div>
+
+        <div class="p-sec">
+          <div class="head">
+            <p class="t">회원 정보</p>
+            <button type="button" class="u-btn" data-dialog="member">수정</button>
+          </div>
+          <div class="rows">
+            <div class="row"><span class="k">이름</span><span class="v">홍길동</span></div>
+            <div class="row"><span class="k">휴대폰 번호</span><span class="v">010-1234-1234</span></div>
+          </div>
+        </div>
+
+        <div class="p-sec addr-sec">
+          <div class="head">
+            <p class="t">배송지 정보</p>
+            <button type="button" class="u-btn">추가</button>
+          </div>
+          <div class="addr-list" id="addrList"></div>
+        </div>
+
+        <div class="p-sec mkt">
+          <div class="head-col">
+            <div class="line">
+              <p class="t">마케팅 정보 수신 설정</p>
+              <button type="button" class="switch" id="mktSwitch" role="switch" aria-checked="false" aria-label="마케팅 정보 수신"></button>
+            </div>
+            <p class="desc">신제품 소식과 혜택 정보를 받아보세요</p>
+          </div>
+        </div>
+
+        <div class="p-foot">
+          <div class="group">
+            <button type="button">로그아웃</button>
+            <span class="div"></span>
+            <button type="button">회원탈퇴</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<!-- profileDetail — 데스크탑은 다이얼로그 -->
+<div class="dim" id="dim"></div>
+
+<div class="dialog" id="dlgAccount" role="dialog" aria-modal="true" aria-labelledby="dlgAccountT">
+  <div class="d-head">
+    <p class="t" id="dlgAccountT">계정 정보 변경</p>
+    <button type="button" class="icon-btn" data-close aria-label="닫기"><img src="assets/close.svg" alt=""></button>
+  </div>
+  <div class="d-body">
+    <div class="field">
+      <p class="label">아이디</p>
+      <div class="box"><div class="text-field is-readonly"><input value="example@gmail.com" readonly></div></div>
+    </div>
+    <div class="field">
+      <p class="label">현재 비밀번호</p>
+      <div class="box">
+        <div class="text-field">
+          <input type="password" placeholder="현재 비밀번호 입력">
+          <span class="eye"><img src="assets/eye.svg" alt=""></span>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <p class="label">새 비밀번호</p>
+      <div class="box">
+        <div class="text-field">
+          <input type="password" placeholder="새 비밀번호 입력">
+          <span class="eye"><img src="assets/eye.svg" alt=""></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="d-foot"><button type="button" class="btn-save" disabled>저장</button></div>
+</div>
+
+<div class="dialog" id="dlgMember" role="dialog" aria-modal="true" aria-labelledby="dlgMemberT">
+  <div class="d-head">
+    <p class="t" id="dlgMemberT">회원 정보 수정</p>
+    <button type="button" class="icon-btn" data-close aria-label="닫기"><img src="assets/close.svg" alt=""></button>
+  </div>
+  <div class="d-body">
+    <div class="field">
+      <p class="label">이름</p>
+      <div class="box">
+        <div class="text-field"><input value="홍길동" maxlength="20" data-count></div>
+        <p class="support"><span class="counter">3/20</span></p>
+      </div>
+    </div>
+    <div class="field">
+      <p class="label">휴대폰 번호</p>
+      <div class="box"><div class="text-field"><input type="tel" value="010-1234-5678"></div></div>
+    </div>
+  </div>
+  <div class="d-foot"><button type="button" class="btn-save" disabled>저장</button></div>
+</div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav">
+  <strong>screen</strong>
+  <div class="demo-seg" id="screenToggle">
+    <button type="button" data-go="home">홈</button>
+    <button type="button" data-go="wishlist">위시리스트</button>
+    <button type="button" data-go="coupon">쿠폰</button>
+    <button type="button" data-go="review">리뷰</button>
+    <button type="button" data-go="profile">프로필</button>
+  </div>
+
+  <strong>state</strong>
+  <div class="demo-seg" id="emptyToggle">
+    <button type="button" data-empty="off">목록</button>
+    <button type="button" data-empty="on">empty</button>
+  </div>
+
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const SC_KEY = 'fw-e-mypage-screen';
+  const EM_KEY = 'fw-e-mypage-empty';
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  const won = n => n.toLocaleString('ko-KR');
+
+  function px(k) {
+    const d = document.createElement('div');
+    d.style.width = `var(${k})`;
+    document.body.appendChild(d);
+    const v = parseFloat(getComputedStyle(d).width);
+    d.remove();
+    return v;
+  }
+
+  /* ── 더미 데이터 ─────────────────────────────────────────── */
+  const NAMES = [
+    '전해질 보충 음료 블러드 오렌지',
+    '전해질 보충 음료 레몬 라임',
+    '제로 슈가 스파클링 워터 자몽',
+    '데일리 미네랄 워터 500ml',
+  ];
+  const PRICES = [[40000, 50000], [38000, null], [42000, 48000], [22000, null]];
+  const img = i => `assets/product-${(i % 4) + 1}.png`;
+
+  /* 최근 주문내역 3건 */
+  $('#orderList').innerHTML = [0, 1, 2].map(i => `
+    <div class="order-item">
+      <div class="thumb"><img src="${img(i)}" alt=""></div>
+      <div class="body">
+        <div class="text">
+          <p class="date">2026. 0${8 - i}. 1${i}.</p>
+          <p class="name-row">
+            <span>${NAMES[i]}</span><span>외</span>
+            <span class="cnt"><span class="n">${i + 1}</span><span>건</span></span>
+          </p>
+          <p class="price"><span class="v">${won(PRICES[i][0] * (i + 2))}</span><span>원</span></p>
+        </div>
+      </div>
+    </div>`).join('');
+
+  /* 위시리스트 12개 */
+  $('#wishGrid').innerHTML = Array.from({ length: 12 }, (_, i) => {
+    const [p, was] = PRICES[i % 4];
+    return `
+    <a class="card" href="#">
+      <div class="image-area">
+        <img src="${img(i)}" alt="">
+        ${i === 0 ? '<span class="badge">SOLD OUT</span>' : ''}
+        <span class="wish"><img src="assets/wishlist-filled.svg" alt=""></span>
+      </div>
+      <div class="info">
+        <p class="name">${NAMES[i % 4]}</p>
+        <p class="price">
+          <span class="amount"><span class="num">${won(p)}</span><span>원</span></span>
+          ${was ? `<span class="original"><span class="num">${won(was)}</span><span>원</span></span>` : ''}
+        </p>
+      </div>
+    </a>`;
+  }).join('');
+
+  /* 쿠폰 6개 */
+  const COUPONS = [
+    ['신규 회원 웰컴 쿠폰', '10%', null, '30,000원 이상 구매 시, 최대 20,000원 할인'],
+    ['가을 시즌 오프 쿠폰', '15%', '-7,500', '50,000원 이상 구매 시, 최대 30,000원 할인'],
+    ['생일 축하 쿠폰', '5,000원', null, '20,000원 이상 구매 시 사용 가능'],
+    ['리뷰 작성 감사 쿠폰', '3,000원', null, '10,000원 이상 구매 시 사용 가능'],
+    ['첫 정기구독 쿠폰', '20%', '-12,000', '60,000원 이상 구매 시, 최대 40,000원 할인'],
+    ['앱 전용 쿠폰', '7%', null, '30,000원 이상 구매 시, 최대 10,000원 할인'],
+  ];
+  $('#couponGrid').innerHTML = COUPONS.map(([n, v, off, cond]) => `
+    <div class="coupon">
+      <div class="summary">
+        <p class="name">${n}</p>
+        <p class="benefit"><span>${v} 할인</span>${off ? `<span class="off">${off}원</span>` : ''}</p>
+      </div>
+      <div class="cinfo">
+        <p>${cond}</p>
+        <p>2026. 09. 30. 23:59까지</p>
+      </div>
+    </div>`).join('');
+
+  /* 리뷰 10건 */
+  $('#reviewList').innerHTML = Array.from({ length: 10 }, (_, i) => `
+    <div class="review-row">
+      <div class="prod">
+        <div class="thumb"><img src="${img(i)}" alt=""></div>
+        <div class="text">
+          <p class="name">${NAMES[i % 4]}</p>
+          <p class="opt"><span>250ml</span><span>/</span><span>6개입</span><span>/</span><span>정기배송</span></p>
+        </div>
+      </div>
+      <button type="button" class="btn">리뷰 작성</button>
+    </div>`).join('');
+
+  /* 배송지 2건 */
+  $('#addrList').innerHTML = [true, false].map(badge => `
+    <div class="addr-item">
+      ${badge ? '<span class="badge">기본 배송지</span>' : ''}
+      <div class="body">
+        <div class="text">
+          <div class="head-text">
+            <p class="addr">[12345] 서울 마포구 양화로 147 아일렉스 빌딩 413호</p>
+            <p class="who"><span>이강인</span><span class="div"></span><span>010-1234-1234</span></p>
+          </div>
+          <p class="req"><span class="k">배송 요청사항</span><span class="v">경비실에 맡겨주세요</span></p>
+        </div>
+        <div class="acts">
+          <button type="button">수정</button>
+          <span class="div"></span>
+          <button type="button" class="del">삭제</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  /* ── 화면 전환 ─────────────────────────────────────────────── */
+  function show(name) {
+    const next = $(`.screen[data-screen="${name}"]`);
+    if (!next) return;
+    $$('.screen').forEach(s => s.classList.toggle('is-on', s === next));
+    $$('#tabs button').forEach(b => b.classList.toggle('is-on', b.dataset.go === name));
+    $$('#screenToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.go === name));
+    scrollTo(0, 0);
+    store(SC_KEY, name);
+    readout();
+  }
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (go && !go.disabled) { show(go.dataset.go); return; }
+    const dlg = e.target.closest('[data-dialog]');
+    if (dlg) { openDialog(dlg.dataset.dialog); return; }
+    if (e.target.closest('[data-close]') || e.target.id === 'dim') { closeDialog(); return; }
+    const sw = e.target.closest('.switch');
+    if (sw) {
+      const on = sw.getAttribute('aria-checked') !== 'true';
+      sw.setAttribute('aria-checked', String(on));
+      sw.classList.toggle('is-on', on);
+    }
+  });
+
+  /* ── profileDetail 다이얼로그 ──────────────────────────────── */
+  function openDialog(kind) {
+    closeDialog();
+    $(kind === 'account' ? '#dlgAccount' : '#dlgMember').classList.add('is-open');
+    $('#dim').classList.add('is-open');
+    document.body.classList.add('is-dialog-open');
+  }
+  function closeDialog() {
+    $$('.dialog').forEach(d => d.classList.remove('is-open'));
+    $('#dim').classList.remove('is-open');
+    document.body.classList.remove('is-dialog-open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDialog(); });
+
+  /* 이름 글자 수 카운터 */
+  document.addEventListener('input', e => {
+    if (!e.target.hasAttribute('data-count')) return;
+    const c = $('.counter', e.target.closest('.box'));
+    if (c) c.textContent = `${e.target.value.length}/${e.target.maxLength}`;
+  });
+
+  /* ── 데모 ──────────────────────────────────────────────────── */
+  function setEmpty(mode) {
+    document.body.dataset.empty = mode;
+    $$('#emptyToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.empty === mode));
+    store(EM_KEY, mode);
+    readout();
+  }
+  $('#emptyToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-empty]'); if (b) setEmpty(b.dataset.empty);
+  });
+
+  function readout() {
+    const main = $('.main').getBoundingClientRect();
+    const tabs = $('.tabs').getBoundingClientRect();
+    $('#readout').innerHTML =
+      `viewport <b>${innerWidth}px</b> · margin <b>${px('--margin').toFixed(2)}</b> · ` +
+      `gutter <b>16.00</b><br>` +
+      `tabs(3col) <b>${tabs.width.toFixed(2)}</b> · 본문(6col) <b>${main.width.toFixed(2)}</b> · ` +
+      `mid-40 <b>${px('--mid-40').toFixed(2)}</b> · P2 <b>${px('--fs-p2').toFixed(2)}</b>`;
+  }
+  window.addEventListener('resize', readout);
+
+  setEmpty(load(EM_KEY, 'off'));
+  show(load(SC_KEY, 'home'));
+})();
+</script>
