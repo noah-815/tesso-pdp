@@ -885,6 +885,7 @@
     border-radius: var(--radius-xs);
     padding: 1px;                  /* 토큰 없음 → px */
     background: #fff;
+    overflow: hidden;              /* 시안 overflow-clip */
   }
   .select-field {
     display: flex;
@@ -900,7 +901,8 @@
     border-radius: var(--radius-xs);
     text-align: left;
   }
-  .select-wrap.is-open .select-field { border: 0; padding: 0.6923em 0.9231em 0.6923em 1.2308em; }
+  /* 시안에는 필드와 옵션 목록 사이에 선이 없다 — 필드 자체의 선은 완전히 제거 */
+  .select-wrap.is-open .select-field { border: 0; box-shadow: none; padding: 0.6923em 0.9231em 0.6923em 1.2308em; }
   .select-field .label { flex: 1 0 0; min-width: 0; }
   /* annotation — select/Field 아이콘 크기 : em */
   .select-field img { flex-shrink: 0; width: 1.5385em; height: 1.5385em; }

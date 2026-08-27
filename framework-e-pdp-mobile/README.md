@@ -197,6 +197,13 @@ Figma 의 stroke 는 **inside** 라 요소 크기를 밀지 않습니다. CSS `b
 > 크기를 명시한 요소(`check-box` 16×16 등)는 `box-sizing: border-box` 라 `border` 가
 > 크기를 밀지 않으므로 그대로 뒀습니다.
 
+> **펼침 상태의 필드 선.** 시안(`8394:59460`)에서 펼쳐진 select 는 **바깥 테두리 하나뿐**이고
+> 필드와 옵션 목록 사이에는 선이 없습니다(내부 필드는 `border-0 border-transparent`).
+> border → inset box-shadow 변환 때 `.select-wrap.is-open .select-field { border: 0 }` 이
+> box-shadow 를 지우지 못해 **필드 하단에 선이 생겼던 것을 `box-shadow: none` 으로 제거**했습니다.
+> 래퍼에는 시안의 `overflow-clip` 에 맞춰 `overflow: hidden` 을 추가했습니다.
+> (펼침 높이 255.26 — 시안 255, 여닫을 때 글자 이동 0/0 유지)
+
 **`ch` 어노테이션**
 
 | 컴포넌트 | 어노테이션 | 구현 |
