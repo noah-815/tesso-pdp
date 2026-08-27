@@ -1069,6 +1069,7 @@
     right: 8px;
     bottom: 80px;
     z-index: 500;
+    max-width: calc(100vw - 16px);
     display: grid;
     grid-template-columns: auto auto;
     gap: 6px 8px;
@@ -1119,6 +1120,47 @@
     border-radius: 3px;
     font-size: 11px;
     color: #111;
+    background: #fff;
+  }
+  /* TYPE — 손가락으로 누르기 쉬운 스테퍼 */
+  .demo-type { display: grid; gap: 4px; }
+  .demo-type .row { display: flex; align-items: center; gap: 4px; }
+  .demo-type .row > .k { width: 20px; color: #777; }
+  .demo-type .step {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    color: #111;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    background: #fff;
+  }
+  .demo-type .step:active { background: #f0f0f0; }
+  .demo-type input[type="number"] {
+    width: 44px;
+    height: 26px;
+    padding: 0 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: #111;
+    -moz-appearance: textfield;
+  }
+  .demo-type input[type="number"]::-webkit-outer-spin-button,
+  .demo-type input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .demo-type .row.all { padding-top: 2px; }
+  .demo-type .row.all button {
+    height: 26px;
+    padding: 0 8px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    color: #777;
     background: #fff;
   }
   .demo-reset { padding: 3px 7px; border: 1px solid rgba(0,0,0,0.1); border-radius: 3px; color: #777; background: #fff; }
@@ -1558,12 +1600,32 @@
   </div>
 
   <strong>type</strong>
-  <div class="demo-fields" id="typeFields">
-    <label>P1<input type="number" id="fsP1" min="8" max="48" step="1" value="16"></label>
-    <label>P3<input type="number" id="fsP3" min="8" max="48" step="1" value="14"></label>
-    <label>P4<input type="number" id="fsP4" min="8" max="48" step="1" value="13"></label>
-    <label>C1<input type="number" id="fsC1" min="8" max="48" step="1" value="12"></label>
-    <button type="button" class="demo-reset" id="fsReset">reset</button>
+  <div class="demo-type" id="typeFields">
+    <div class="row"><span class="k">P1</span>
+      <button type="button" class="step" data-fs="p1" data-d="-1">−</button>
+      <input type="number" id="fsP1" min="8" max="48" step="1" value="16" inputmode="numeric">
+      <button type="button" class="step" data-fs="p1" data-d="1">+</button></div>
+    <div class="row"><span class="k">P2</span>
+      <button type="button" class="step" data-fs="p2" data-d="-1">−</button>
+      <input type="number" id="fsP2" min="8" max="48" step="1" value="15" inputmode="numeric">
+      <button type="button" class="step" data-fs="p2" data-d="1">+</button></div>
+    <div class="row"><span class="k">P3</span>
+      <button type="button" class="step" data-fs="p3" data-d="-1">−</button>
+      <input type="number" id="fsP3" min="8" max="48" step="1" value="14" inputmode="numeric">
+      <button type="button" class="step" data-fs="p3" data-d="1">+</button></div>
+    <div class="row"><span class="k">P4</span>
+      <button type="button" class="step" data-fs="p4" data-d="-1">−</button>
+      <input type="number" id="fsP4" min="8" max="48" step="1" value="13" inputmode="numeric">
+      <button type="button" class="step" data-fs="p4" data-d="1">+</button></div>
+    <div class="row"><span class="k">C1</span>
+      <button type="button" class="step" data-fs="c1" data-d="-1">−</button>
+      <input type="number" id="fsC1" min="8" max="48" step="1" value="12" inputmode="numeric">
+      <button type="button" class="step" data-fs="c1" data-d="1">+</button></div>
+    <div class="row all">
+      <button type="button" id="fsAllDown">전체 −</button>
+      <button type="button" id="fsAllUp">전체 +</button>
+      <button type="button" class="demo-reset" id="fsReset">reset</button>
+    </div>
   </div>
 
   <p class="demo-readout" id="readout">–</p>
@@ -1853,7 +1915,8 @@
   $('#caseFields').addEventListener('change', applyCase);
 
   /* ── 데모 — P1 / P3 / P4 / C1 크기 조절 ─────────────────────── */
-  const FS_DEFAULT = { p1: 16, p3: 14, p4: 13, c1: 12 };
+  const FS_DEFAULT = { p1: 16, p2: 15, p3: 14, p4: 13, c1: 12 };
+  const FS_KEYS = ['p1', 'p2', 'p3', 'p4', 'c1'];
   const fsVal = k => {
     const el = $(`#fs${k.toUpperCase()}`);
     const v = parseInt(el.value, 10);
@@ -1865,7 +1928,7 @@
 
   function applyFs() {
     const vals = {};
-    ['p1', 'p3', 'p4', 'c1'].forEach(k => {
+    FS_KEYS.forEach(k => {
       const v = fsVal(k);
       vals[k] = v;
       document.body.style.setProperty(`--fs-${k}`, fsExpr(v));
@@ -1884,7 +1947,7 @@
   }
 
   function readout() {
-    const type = ['p1', 'p3', 'p4', 'c1']
+    const type = FS_KEYS
       .map(k => `${k.toUpperCase()} <b>${px('--fs-' + k).toFixed(2)}</b>`)
       .join(' · ');
     $('#readout').innerHTML =
@@ -1897,6 +1960,23 @@
   $('#typeFields').addEventListener('input', e => {
     if (e.target.matches('input[type="number"]')) applyFs();
   });
+  /* − / + 스테퍼 */
+  $('#typeFields').addEventListener('click', e => {
+    const b = e.target.closest('.step'); if (!b) return;
+    const el = $(`#fs${b.dataset.fs.toUpperCase()}`);
+    el.value = Math.min(48, Math.max(8, fsVal(b.dataset.fs) + (+b.dataset.d)));
+    applyFs();
+  });
+  /* 전체 한 번에 증감 */
+  const bumpAll = d => {
+    FS_KEYS.forEach(k => {
+      const el = $(`#fs${k.toUpperCase()}`);
+      el.value = Math.min(48, Math.max(8, fsVal(k) + d));
+    });
+    applyFs();
+  };
+  $('#fsAllUp').addEventListener('click', () => bumpAll(1));
+  $('#fsAllDown').addEventListener('click', () => bumpAll(-1));
   $('#typeFields').addEventListener('change', e => {
     if (!e.target.matches('input[type="number"]')) return;
     e.target.value = fsVal(e.target.id.slice(2).toLowerCase());
