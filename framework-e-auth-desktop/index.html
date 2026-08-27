@@ -532,6 +532,10 @@
     line-height: 1.4;
     white-space: nowrap;
   }
+  /* box pad 토글 — OTP 박스 · 쿠폰이 있는 화면에서만 노출 */
+  #bpLabel, #bpToggle { display: none; }
+  body[data-boxpad-on] #bpLabel { display: block; }
+  body[data-boxpad-on] #bpToggle { display: flex; }
   .demo-nav strong { font-size: 10px; letter-spacing: .04em; color: #999; text-transform: uppercase; }
   .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, .1); border-radius: 3px; overflow: hidden; }
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
@@ -838,7 +842,7 @@
     <button type="button" data-screen-go="find-email">비번찾기</button>
   </div>
 
-  <strong>box pad</strong>
+  <strong id="bpLabel">box pad</strong>
   <div class="demo-seg" id="bpToggle">
     <button type="button" data-bp="mid">mid (시안)</button>
     <button type="button" data-bp="px">px 고정</button>
@@ -880,6 +884,9 @@
     if (!next) return;
     $$('.screen').forEach(s => s.classList.toggle('is-on', s === next));
     $$('#screenToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.screenGo === name));
+    /* box pad 토글은 OTP 박스 · 쿠폰이 실제로 있는 화면에서만 */
+    if (BP_SCREENS.includes(name)) document.body.dataset.boxpadOn = '';
+    else document.body.removeAttribute('data-boxpad-on');
     scrollTo(0, 0);
     syncButtons(next);
     startTimer(next);
@@ -972,6 +979,7 @@
 
   /* ── 데모 — OTP 박스 · 쿠폰 내부 여백 (mid ↔ px) ──────────── */
   const BP_KEY = 'fw-e-auth-boxpad';
+  const BP_SCREENS = ['signup-verify', 'signup-complete', 'find-verify'];
   function setBoxPad(mode) {
     document.body.dataset.boxpad = mode;
     $$('#bpToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.bp === mode));

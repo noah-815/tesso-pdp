@@ -502,6 +502,9 @@
     white-space: nowrap;
   }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; border-color: #111; }
+  /* box pad 토글 — OTP 박스 · 쿠폰이 있는 화면에서만 노출 */
+  #bpToggle { display: none; }
+  body[data-boxpad-on] #bpToggle { display: flex; }
   .demo-readout {
     margin-top: 5px;
     padding-top: 4px;
@@ -797,6 +800,9 @@
     if (!next) return;
     $$('.screen').forEach(s => s.classList.toggle('is-on', s === next));
     $$('#screenToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.screenGo === name));
+    /* box pad 토글은 OTP 박스 · 쿠폰이 실제로 있는 화면에서만 */
+    if (BP_SCREENS.includes(name)) document.body.dataset.boxpadOn = '';
+    else document.body.removeAttribute('data-boxpad-on');
     scrollTo(0, 0);
     syncButtons(next);
     startTimer(next);
@@ -900,6 +906,7 @@
 
   /* OTP 박스 · 쿠폰 내부 여백 (mid ↔ px) */
   const BP_KEY = 'fw-e-auth-m-boxpad';
+  const BP_SCREENS = ['signup-verify', 'signup-complete', 'find-verify'];
   function setBoxPad(mode) {
     document.body.dataset.boxpad = mode;
     $$('#bpToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.bp === mode));
