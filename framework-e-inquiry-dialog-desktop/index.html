@@ -1,0 +1,480 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>상품 문의 다이얼로그 — Desktop (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E — dialog/inquiry (상품 문의) · 데스크탑
+     Figma 10131:113377 · 기준 폭 1920 · 1rem = 14px
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value ≤ 1rem 이면 고정 → C1 12 · P3 14 · button-large 14 고정
+        · 가변 : P2 16 · P1 18
+     2) Spacing (mid-*)  (값 − 8) × 100vw / 1920 + 8 · 값 < 8 은 고정
+     3) 다이얼로그 여백 3안 (데모 토글)
+        · 560 + px   — 시안 바인딩 그대로 (다이얼로그 내부 여백이 px 고정)
+        · 560 + mid  — 같은 값을 mid 토큰으로 (뷰포트 따라 증감)
+        · vw + mid   — 박스 너비까지 가변 (1920 에서 560px = 29.1667vw)
+     4) 높이 최대값 85vh · 헤더/버튼 영역 고정, 콘텐츠만 스크롤
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --us: calc(100vw / 1920);       /* spacing 1px */
+
+    /* Typography ------------------------------------------------- */
+    --fs-c1:    12px;               /* caption-1          ≤ 1rem → 고정 */
+    --fs-p4:    13px;               /* paragraph-4        ≤ 1rem → 고정 */
+    --fs-p3:    14px;               /* paragraph-3         = 1rem → 고정 */
+    --fs-btn-l: 14px;               /* button-label-large  = 1rem → 고정 */
+    --fs-p2:    calc((1.1429 - 1) * 0.83vw + 1rem);   /* 16px @1920 — 가변 */
+    --fs-p1:    calc((1.2857 - 1) * 0.83vw + 1rem);   /* 18px @1920 — 가변 */
+    /* 헤더 타이틀 — 시안 기본값은 P2 */
+    --fs-title: var(--fs-p2);
+
+    --lh-c1: 1.2;
+    --lh-p3: 1.6;
+    --lh-p2: 1.5;
+
+    /* Spacing — mid-* -------------------------------------------- */
+    --mid-1:  1px;                  /* 값 < 8 → 값 그대로 고정 */
+    --mid-2:  2px;
+    --mid-4:  4px;
+    --mid-8:  8px;                  /* 공식 결과도 8px */
+    --mid-10: calc(  2 * var(--us) + 8px);
+    --mid-16: calc(  8 * var(--us) + 8px);
+    --mid-20: calc( 12 * var(--us) + 8px);
+    --mid-24: calc( 16 * var(--us) + 8px);
+    --mid-80: calc( 72 * var(--us) + 8px);
+
+    /* 다이얼로그 내부 여백 — 3안 토글 대상 -------------------------
+       기본값(= 시안) 은 px 고정. mid 안에서는 아래 값들이 mid-* 로 바뀐다. */
+    --d-8:  8px;
+    --d-10: 10px;
+    --d-16: 16px;
+    --d-20: 20px;
+    --d-24: 24px;
+    --d-80: 80px;
+
+    /* 다이얼로그 box ---------------------------------------------- */
+    --dialog-w-fixed: 560px;
+    --dialog-w-fluid: 29.1667vw;    /* 560 / 1920 — 순수 vw */
+    --dialog-w-mid: calc(552 * var(--us) + 8px);   /* mid 공식 (560−8)×100vw/1920+8 */
+    --dialog-w: var(--dialog-w-fixed);
+    --dialog-max-h: 85vh;
+
+    /* radius / Font / Color -------------------------------------- */
+    --radius-3xs: 2px;
+    --radius-2xs: 3px;
+    --radius-xs:  4px;
+    --radius-sm:  6px;
+    --font: "DM Sans", "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    --c-text: #111;
+    --c-sub: rgba(17, 17, 17, 0.6);
+    --c-placeholder: rgba(17, 17, 17, 0.3);
+    --c-line: rgba(0, 0, 0, 0.12);
+    --c-dim: rgba(0, 0, 0, 0.5);
+  }
+
+  /* ── 여백 4안 ─────────────────────────────────────────────────
+     560 + px   (기본·시안) — 위 :root 값 그대로
+     560 + mid  — 내부 여백을 mid 토큰으로
+     vw + mid   — 내부 여백 mid + 박스 너비는 순수 vw (비례 축소)
+     mid + mid  — 내부 여백 mid + 박스 너비도 mid 공식 (하한 8px) */
+  body[data-box="fixed-mid"],
+  body[data-box="fluid-mid"],
+  body[data-box="mid-mid"] {
+    --d-8:  var(--mid-8);
+    --d-10: var(--mid-10);
+    --d-16: var(--mid-16);
+    --d-20: var(--mid-20);
+    --d-24: var(--mid-24);
+    --d-80: var(--mid-80);
+  }
+  body[data-box="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
+  body[data-box="mid-mid"]   { --dialog-w: var(--dialog-w-mid); }
+
+  /* 헤더 타이틀 사이즈 전환 (데모) */
+  body[data-title="p1"] { --fs-title: var(--fs-p1); }
+  body[data-title="p2"] { --fs-title: var(--fs-p2); }
+  body[data-title="p3"] { --fs-title: var(--fs-p3); }
+  body[data-title="p4"] { --fs-title: var(--fs-p4); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; font-size: 14px; }   /* 1rem = 14px */
+  body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+
+  .dim { position: absolute; inset: 0; z-index: 1; background: var(--c-dim); }
+
+  /* ── dialog ──────────────────────────────────────────────────── */
+  .dialog {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: var(--dialog-w);
+    max-height: var(--dialog-max-h);   /* 85vh */
+    overflow: hidden;
+    background: #fff;
+    border-radius: var(--radius-sm);
+  }
+
+  /* ── header ──────────────────────────────────────────────────── */
+  .dialog .header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--d-8);
+    width: 100%;
+    padding: var(--d-20) var(--d-16) var(--mid-4) var(--d-24);
+    background: #fff;
+  }
+  .dialog .header .title {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-title);
+    line-height: var(--lh-p2);
+  }
+  /* iconButton/default — 32 박스 · 아이콘 24 (토큰 없음 → px) */
+  .icon-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-xs);
+  }
+  .icon-btn img { width: 24px; height: 24px; }
+
+  /* ── contentArea ─────────────────────────────────────────────── */
+  .dialog .content-area {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    overflow-y: auto;
+    /* 스크롤바 미노출 (시안에 없는 요소) */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .dialog .content-area::-webkit-scrollbar { display: none; }
+  .dialog .content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--d-24);
+    width: 100%;
+    padding: var(--d-16) var(--d-24) var(--d-24);
+  }
+
+  /* productList/default — 다이얼로그 안 */
+  .product {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--d-20);
+    width: 100%;
+  }
+  .product .thumb {
+    flex-shrink: 0;
+    width: var(--d-80);
+    height: var(--d-80);
+    border-radius: var(--radius-2xs);
+    overflow: hidden;
+    background: #ddd;
+  }
+  .product .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .product .name {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+  }
+
+  /* multiLine */
+  .multi-line { display: flex; flex-direction: column; gap: var(--d-10); width: 100%; }
+  .multi-line .field {
+    width: 100%;
+    height: 327px;                 /* 시안 — 토큰 없음 → px */
+    /* annotation — multiLine textField padding 은 3안 모두 em 고정.
+       @em base : P3 (입력 텍스트) → 시안 15 / 17px */
+    font-size: var(--fs-p3);
+    padding: 1.0714em 1.2143em;
+    /* Figma stroke 는 inside — 크기를 밀지 않으므로 inset box-shadow */
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+  }
+  .multi-line textarea {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    outline: 0;
+    resize: none;
+    font: inherit;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    color: var(--c-text);
+    background: none;
+  }
+  .multi-line textarea::placeholder { color: var(--c-placeholder); }
+  .multi-line .supporting {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    width: 100%;
+    padding-right: var(--mid-2);
+  }
+  .check-box {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    padding: var(--mid-1) 0;
+    cursor: pointer;
+  }
+  .check-box .box {
+    position: relative;
+    flex-shrink: 0;
+    width: 16px;                   /* checkBox — 토큰 없음 → px */
+    height: 16px;
+    border: 1px solid #d3d3d3;
+    border-radius: var(--radius-3xs);
+  }
+  .check-box input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .check-box input:checked + .box { background: #111; border-color: #111; }
+  .check-box input:checked + .box::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 2px;
+    width: 5px; height: 8px;
+    border: solid #fff;
+    border-width: 0 1.6px 1.6px 0;
+    transform: rotate(45deg);
+  }
+  .check-box .label {
+    flex: 1 0 0;
+    min-width: 0;
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+  }
+  .counter {
+    flex-shrink: 0;
+    min-width: 90px;               /* 시안 — 토큰 없음 → px */
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+    color: var(--c-sub);
+    text-align: right;
+    white-space: nowrap;
+    font-variation-settings: "opsz" 14;
+  }
+
+  /* ── buttonArea ──────────────────────────────────────────────── */
+  .dialog .button-area {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    padding: var(--d-8) var(--d-24) var(--d-24);
+    background: #fff;
+  }
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    /* 버튼류 padding = em (@ button-label-large 14px) — 시안 15 / 22px */
+    font-size: var(--fs-btn-l);
+    padding: 1.0714em 1.5714em;
+    border-radius: var(--radius-xs);
+    background: #111;
+    color: #fff;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-family: var(--font);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; white-space: nowrap; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin-top: 2px;
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+
+<div class="dim"></div>
+
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+  <div class="header">
+    <p class="title" id="dlgTitle">상품 문의</p>
+    <button type="button" class="icon-btn" aria-label="닫기"><img src="assets/close.svg" alt=""></button>
+  </div>
+
+  <div class="content-area">
+    <div class="content">
+      <div class="product">
+        <div class="thumb"><img src="assets/product-1.png" alt=""></div>
+        <p class="name">전해질 보충 음료 블러드 오렌지</p>
+      </div>
+
+      <div class="multi-line">
+        <div class="field">
+          <textarea id="body" maxlength="5000" placeholder="문의하실 내용을 입력해 주세요.">안녕하세요. 제품을 구매한 뒤 만족스럽게 이용하고 있어 추가 구매를 고려하고 있습니다. 혹시 정기적으로 할인 행사나 프로모션이 진행되는지, 또는 여러 개를 한 번에 구매할 경우 추가 혜택이 있는지도 궁금합니다.</textarea>
+        </div>
+        <div class="supporting">
+          <label class="check-box">
+            <input type="checkbox">
+            <span class="box"></span>
+            <span class="label">비밀글로 문의하기</span>
+          </label>
+          <span class="counter" id="counter">0/5,000</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="button-area">
+    <button type="button" class="btn">문의 등록</button>
+  </div>
+</div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 -->
+<nav class="demo-nav">
+  <strong>box</strong>
+  <div class="demo-seg" id="boxToggle">
+    <button type="button" data-box="fixed-px">560 + px</button>
+    <button type="button" data-box="fixed-mid">560 + mid</button>
+    <button type="button" data-box="fluid-mid">vw + mid</button>
+    <button type="button" data-box="mid-mid">mid + mid</button>
+  </div>
+
+  <strong>title</strong>
+  <div class="demo-seg" id="titleToggle">
+    <button type="button" data-title="p1">P1</button>
+    <button type="button" data-title="p2">P2</button>
+    <button type="button" data-title="p3">P3</button>
+    <button type="button" data-title="p4">P4</button>
+  </div>
+
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const BOX_KEY = 'fw-e-inq-box';
+  const TITLE_KEY = 'fw-e-inq-title';
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+
+  function px(k) {
+    const d = document.createElement('div');
+    d.style.width = `var(${k})`;
+    document.body.appendChild(d);
+    const v = parseFloat(getComputedStyle(d).width);
+    d.remove();
+    return v;
+  }
+
+  /* 스크롤바를 숨겼으므로 콘텐츠 폭이 깎이지 않는다 →
+     좌우 여백은 선언값 그대로가 '실제 여백'. 아래는 그걸 실측으로 확인해 보여준다. */
+  function readout() {
+    const ca = $('.content-area');
+    const cs = getComputedStyle($('.content'));
+    const sb = ca.offsetWidth - ca.clientWidth;              /* 스크롤바 점유 폭 */
+    const padL = parseFloat(cs.paddingLeft);
+    const padR = parseFloat(cs.paddingRight);
+    const inner = $('.multi-line .field').getBoundingClientRect().width;
+    const scrolling = ca.scrollHeight > ca.clientHeight;
+    $('#readout').innerHTML =
+      `viewport <b>${innerWidth}px</b> · 다이얼로그 <b>${$('.dialog').getBoundingClientRect().width.toFixed(2)}px</b> · ` +
+      `max-height <b>${(innerHeight * 0.85).toFixed(0)}px</b> · 스크롤 <b>${scrolling ? 'O' : 'X'}</b><br>` +
+      `실제 여백 L <b>${padL.toFixed(2)}</b> / R <b>${padR.toFixed(2)}</b> ` +
+      `(스크롤바 점유 <b>${sb.toFixed(2)}</b>) · 콘텐츠 폭 <b>${inner.toFixed(2)}</b><br>` +
+      `토큰 24 <b>${px('--d-24').toFixed(2)}</b> · 20 <b>${px('--d-20').toFixed(2)}</b> · ` +
+      `16 <b>${px('--d-16').toFixed(2)}</b> · 10 <b>${px('--d-10').toFixed(2)}</b> · ` +
+      `썸네일 <b>${px('--d-80').toFixed(2)}</b> · 타이틀 <b>${parseFloat(getComputedStyle($('#dlgTitle')).fontSize).toFixed(2)}</b>`;
+  }
+
+  function setBox(mode) {
+    document.body.dataset.box = mode;
+    $$('#boxToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.box === mode));
+    store(BOX_KEY, mode);
+    readout();
+  }
+  function setTitle(v) {
+    document.body.dataset.title = v;
+    $$('#titleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.title === v));
+    store(TITLE_KEY, v);
+    readout();
+  }
+  $('#boxToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-box]'); if (b) setBox(b.dataset.box);
+  });
+  $('#titleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-title]'); if (b) setTitle(b.dataset.title);
+  });
+  window.addEventListener('resize', readout);
+
+  /* 글자 수 카운터 */
+  const ta = $('#body'), counter = $('#counter');
+  const sync = () => { counter.textContent = `${ta.value.length.toLocaleString('ko-KR')}/5,000`; };
+  ta.addEventListener('input', sync);
+  sync();
+
+  setBox(load(BOX_KEY, 'fixed-px'));
+  setTitle(load(TITLE_KEY, 'p2'));
+})();
+</script>
