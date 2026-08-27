@@ -55,6 +55,14 @@
     /* px-* — 뷰포트 무관 고정 ------------------------------------ */
     --px-20: 20px;
 
+    /* OTP 박스 · 쿠폰 내부 여백 — mid ↔ px 비교용 (데모 토글)
+       기본값은 시안 바인딩 그대로 mid. 값이 8 미만인 mid-2/4/6 은
+       두 안에서 결과가 같아 토글 대상이 아니다. */
+    --b-20: var(--mid-20);
+    --b-24: var(--mid-24);
+    --b-32: var(--mid-32);
+    --b-40: var(--mid-40);
+
     /* 콘텐츠 영역 너비 (데모에서 조절) --------------------------- */
     --cw-raw: 21vw;
     --cw-min: 360px;
@@ -81,6 +89,14 @@
     --c-otp-bg: #f4f4f4;
     --c-btn-off-bg: #ebebeb;
     --c-btn-off-text: #c5c5c5;
+  }
+
+  /* 여백 2안 — mid(시안) ↔ px 고정 */
+  body[data-boxpad="px"] {
+    --b-20: 20px;
+    --b-24: 24px;
+    --b-32: 32px;
+    --b-40: 40px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -304,13 +320,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--mid-24);
+    gap: var(--b-24);
     width: 100%;
-    padding: var(--mid-40) var(--mid-24) var(--mid-32);
+    padding: var(--b-40) var(--b-24) var(--b-32);
     box-shadow: inset 0 0 0 1px var(--c-line-soft);
     border-radius: var(--radius-sm);
   }
-  .otp-box .head { display: flex; flex-direction: column; align-items: center; gap: var(--mid-32); width: 100%; }
+  .otp-box .head { display: flex; flex-direction: column; align-items: center; gap: var(--b-32); width: 100%; }
   .otp-box .text-area {
     display: flex;
     flex-direction: column;
@@ -423,9 +439,9 @@
   .coupon {
     display: flex;
     flex-direction: column;
-    gap: var(--mid-20);
+    gap: var(--b-20);
     width: 100%;
-    padding: var(--mid-24);
+    padding: var(--b-24);
     background: #fff;
     box-shadow: inset 0 0 0 1px var(--c-line);
     border-radius: var(--radius-xs);
@@ -822,6 +838,12 @@
     <button type="button" data-screen-go="find-email">비번찾기</button>
   </div>
 
+  <strong>box pad</strong>
+  <div class="demo-seg" id="bpToggle">
+    <button type="button" data-bp="mid">mid (시안)</button>
+    <button type="button" data-bp="px">px 고정</button>
+  </div>
+
   <strong>content w</strong>
   <div class="demo-fields" id="cwFields">
     <label>vw<input type="number" id="cwRaw" min="5" max="100" step="0.5" value="21"></label>
@@ -948,6 +970,19 @@
     if (b) snack(b.dataset.snack);
   });
 
+  /* ── 데모 — OTP 박스 · 쿠폰 내부 여백 (mid ↔ px) ──────────── */
+  const BP_KEY = 'fw-e-auth-boxpad';
+  function setBoxPad(mode) {
+    document.body.dataset.boxpad = mode;
+    $$('#bpToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.bp === mode));
+    store(BP_KEY, mode);
+    readout();
+  }
+  $('#bpToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-bp]');
+    if (b) setBoxPad(b.dataset.bp);
+  });
+
   /* ── 데모 — 콘텐츠 영역 너비 ──────────────────────────────── */
   const CW_DEFAULT = { raw: 21, min: 360, max: 480, minOn: true, maxOn: true };
   function applyCw() {
@@ -985,8 +1020,11 @@
     $('#readout').innerHTML =
       `viewport <b>${innerWidth}px</b> · 콘텐츠 <b>${col.toFixed(2)}px</b> ` +
       `(raw ${raw.toFixed(2)} → <b>${note}</b>)<br>` +
-      `mid-40 <b>${px('--mid-40').toFixed(2)}</b> · mid-100 <b>${px('--mid-100').toFixed(2)}</b> · ` +
-      `H5 <b>${px('--fs-h5').toFixed(2)}</b> · P4 <b>${px('--fs-p4').toFixed(2)}</b>`;
+      `mid-100 <b>${px('--mid-100').toFixed(2)}</b> · H5 <b>${px('--fs-h5').toFixed(2)}</b> · ` +
+      `P4 <b>${px('--fs-p4').toFixed(2)}</b><br>` +
+      `box pad <b>${document.body.dataset.boxpad || 'mid'}</b> — ` +
+      `40 <b>${px('--b-40').toFixed(2)}</b> · 32 <b>${px('--b-32').toFixed(2)}</b> · ` +
+      `24 <b>${px('--b-24').toFixed(2)}</b> · 20 <b>${px('--b-20').toFixed(2)}</b>`;
   }
   window.addEventListener('resize', readout);
 
@@ -998,6 +1036,7 @@
     }
   } catch (e) {}
   applyCw();
+  setBoxPad(load(BP_KEY, 'mid'));
   show('login');
 })();
 </script>
