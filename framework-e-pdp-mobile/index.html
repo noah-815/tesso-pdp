@@ -947,6 +947,7 @@
     padding: 1.4286em 1.4286em 1.5em;
     border-bottom: 1px solid var(--c-line-soft);
   }
+  .so-item:last-child { border-bottom: 0; }
   .so-item .name-area { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
   .so-item .name-area .name {
     flex: 1 0 0;
@@ -1840,13 +1841,15 @@
     const box = $('#selectedOption');
     box.classList.toggle('is-empty', cart.length === 0);
     if (!cart.length) { box.innerHTML = ''; return; }
+    /* 시안(옵션 없을 때) — 상품명 우측 아이콘 버튼과 summary 미노출 */
+    const bare = !hasOption;
     const totalQty = cart.reduce((s, c) => s + c.qty, 0);
     const totalAmt = cart.reduce((s, c) => s + c.qty * c.price, 0);
     box.innerHTML = cart.map(c => `
       <div class="so-item" data-id="${c.id}">
         <div class="name-area">
           <p class="name">${c.name}</p>
-          <button type="button" class="close" data-act="remove" aria-label="옵션 삭제"><img src="assets/close.svg" alt=""></button>
+          ${bare ? '' : `<button type="button" class="close" data-act="remove" aria-label="옵션 삭제"><img src="assets/close.svg" alt=""></button>`}
         </div>
         <div class="qty-price">
           <div class="number-input">
@@ -1856,11 +1859,11 @@
           </div>
           <span class="item-price">${won(c.qty * c.price)}원</span>
         </div>
-      </div>`).join('') + `
+      </div>`).join('') + (bare ? '' : `
       <div class="so-summary">
         <span class="label"><span class="dim-t">총</span><span class="n">${totalQty}</span><span class="dim-t">개 상품 금액</span></span>
         <span class="total">${won(totalAmt)}원</span>
-      </div>`;
+      </div>`);
   }
 
   $('#selectedOption').addEventListener('click', e => {
