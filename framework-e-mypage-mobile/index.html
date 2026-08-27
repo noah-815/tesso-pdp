@@ -53,6 +53,8 @@
     --mid-28: calc( 20 * var(--us) + 8px);
     --mid-32: calc( 24 * var(--us) + 8px);
     --mid-40: calc( 32 * var(--us) + 8px);
+    --mid-80: calc( 72 * var(--us) + 8px);
+    --mid-100: calc( 92 * var(--us) + 8px);
 
     /* px-* — 뷰포트 무관 고정 ------------------------------------ */
     --px-12: 12px;
@@ -255,8 +257,8 @@
   .order-item { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
   .order-item .thumb {
     flex-shrink: 0;
-    width: 100px;                             /* 시안 — 토큰 없음 → px */
-    height: 100px;
+    width: var(--mid-100);                    /* 시안 바인딩 : mid-100 */
+    height: var(--mid-100);
     overflow: hidden;
     background: var(--c-thumb);
     border-radius: var(--radius-xs);
@@ -441,8 +443,8 @@
   .review-row .prod { display: flex; gap: var(--mid-16); align-items: flex-start; width: 100%; }
   .review-row .thumb {
     flex-shrink: 0;
-    width: 100px;                             /* 시안 — 토큰 없음 → px */
-    height: 100px;
+    width: var(--mid-100);                    /* 시안 바인딩 : mid-100 */
+    height: var(--mid-100);
     overflow: hidden;
     background: var(--c-thumb);
     border-radius: var(--radius-2xs);
@@ -473,6 +475,12 @@
     box-shadow: inset 0 0 0 1px var(--c-line);
     border-radius: var(--radius-xs);
     white-space: nowrap;
+  }
+  /* disabled — 구매 후 90일 경과 */
+  .review-row .btn:disabled {
+    background: rgba(0, 0, 0, .02);
+    color: var(--c-sub);
+    cursor: default;
   }
 
   /* ── 프로필 ──────────────────────────────────────────────────── */
@@ -565,19 +573,39 @@
   }
   .p-foot .group .div { flex-shrink: 0; width: 1px; height: 14px; background: var(--c-line); }
 
-  /* ── empty ───────────────────────────────────────────────────── */
+  /* ── empty ───────────────────────────────────────────────────
+     시안 empty 컴포넌트 : "비어있음" P3 medium · rgba(17,17,17,.5)
+     (시안 852 화면에서 627 = 852 − 헤더 114 − title 56 − tabs 55) */
   .empty {
     display: none;
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 280px;
+    min-height: calc(100vh - var(--header-h) - 111px);
+    padding-bottom: var(--mid-100);
+    font-weight: 500;
     font-size: var(--fs-p3);
     line-height: var(--lh-p3);
-    color: var(--c-sub);
+    color: rgba(17, 17, 17, .5);
+    text-align: center;
   }
   body[data-empty="on"] .screen[data-empty-able] .empty { display: flex; }
   body[data-empty="on"] .screen[data-empty-able] .filled { display: none; }
+  /* 홈 — 섹션 안쪽만 비는 형태 */
+  .sec-empty {
+    display: none;
+    width: 100%;
+    min-height: 100px;
+    padding-top: var(--mid-24);
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    color: rgba(17, 17, 17, .5);
+    text-align: center;
+  }
+  body[data-empty="on"] .sec-empty { display: block; }
+  body[data-empty="on"] .home-sec .list,
+  body[data-empty="on"] .home-sec .info-list { display: none; }
 
   /* ── profileDetail — 모바일은 전체 화면 ──────────────────────── */
   .detail {
@@ -735,7 +763,7 @@
 
 <main>
   <!-- ── 홈 ── -->
-  <section class="screen is-on home" data-screen="home">
+  <section class="screen is-on home" data-screen="home" data-empty-able>
     <div class="greet">
       <p class="hi"><span>홍길동</span><span>님, 안녕하세요</span></p>
       <p class="desc">마이페이지에서 나의 쇼핑 정보를 확인해보세요</p>
@@ -747,6 +775,7 @@
         <button type="button" class="link-btn">전체보기<img class="ico" src="assets/chevron-down.svg" alt=""></button>
       </div>
       <div class="list" id="orderList"></div>
+      <p class="sec-empty order">비어있음</p>
     </div>
 
     <div class="sec home-sec">
@@ -768,24 +797,25 @@
         </div>
       </div>
     </div>
+    <p class="sec-empty profile">비어있음</p>
   </section>
 
   <!-- ── 위시리스트 ── -->
   <section class="screen" data-screen="wishlist" data-empty-able>
     <div class="product-grid filled" id="wishGrid"></div>
-    <div class="empty">위시리스트에 담은 상품이 없어요</div>
+    <div class="empty">비어있음</div>
   </section>
 
   <!-- ── 쿠폰 ── -->
   <section class="screen" data-screen="coupon" data-empty-able>
     <div class="coupon-list filled" id="couponList"></div>
-    <div class="empty">사용 가능한 쿠폰이 없어요</div>
+    <div class="empty">비어있음</div>
   </section>
 
   <!-- ── 리뷰 ── -->
   <section class="screen" data-screen="review" data-empty-able>
     <div class="review-list filled" id="reviewList"></div>
-    <div class="empty">작성할 수 있는 리뷰가 없어요</div>
+    <div class="empty">비어있음</div>
   </section>
 
   <!-- ── 프로필 ── -->
@@ -981,6 +1011,11 @@
       <div class="cinfo"><p>${cond}</p><p>2026. 09. 30. 23:59까지</p></div>
     </div>`).join('');
 
+  /* 리뷰 버튼 3상태 — 작성 / 작성한 리뷰 보기 / 90일 경과(disabled) */
+  const REVIEW_BTN = i =>
+    i === 2 ? '<button type="button" class="btn">작성한 리뷰 보기</button>' :
+    i === 9 ? '<button type="button" class="btn" disabled>리뷰 작성은 구매 후 90일까지 가능해요</button>' :
+              '<button type="button" class="btn">리뷰 작성</button>';
   $('#reviewList').innerHTML = Array.from({ length: 10 }, (_, i) => `
     <div class="review-row">
       <div class="prod">
@@ -990,7 +1025,7 @@
           <p class="opt"><span>250ml</span><span>/</span><span>6개입</span><span>/</span><span>정기배송</span></p>
         </div>
       </div>
-      <button type="button" class="btn">리뷰 작성</button>
+      ${REVIEW_BTN(i)}
     </div>`).join('');
 
   $('#addrList').innerHTML = [true, false].map(badge => `
