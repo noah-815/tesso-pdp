@@ -323,7 +323,7 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: #f4f4f4;
+    background: var(--c-thumb);
     border-radius: var(--radius-sm);          /* 모바일 6 (데스크탑 8) */
   }
   .card .image-area img { width: 100%; height: 100%; object-fit: cover; }
@@ -340,15 +340,19 @@
     color: #fff;
     white-space: nowrap;
   }
+  /* iconButton/default — 32 박스 · 아이콘 24 (시안), 위치는 px */
   .card .wish {
     position: absolute;
     right: 10px;
     top: 10px;
     display: flex;
-    width: 24px;
-    height: 24px;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-xs);
   }
-  .card .wish img { width: 100%; height: 100%; }
+  .card .wish img { width: 24px; height: 24px; }
   .card .info {
     display: flex;
     flex-direction: column;
@@ -870,18 +874,20 @@
   <div class="d-body">
     <div class="field">
       <p class="label">아이디</p>
-      <div class="box"><div class="text-field is-readonly"><input value="example@gmail.com" readonly></div></div>
+      <div class="box"><div class="text-field is-readonly"><input value="example@gmail.com" readonly></div><p class="support"></p></div>
     </div>
     <div class="field">
       <p class="label">현재 비밀번호</p>
       <div class="box">
         <div class="text-field"><input type="password" placeholder="현재 비밀번호 입력"><span class="eye"><img src="assets/eye.svg" alt=""></span></div>
+              <p class="support"></p>
       </div>
     </div>
     <div class="field">
       <p class="label">새 비밀번호</p>
       <div class="box">
         <div class="text-field"><input type="password" placeholder="새 비밀번호 입력"><span class="eye"><img src="assets/eye.svg" alt=""></span></div>
+              <p class="support"></p>
       </div>
     </div>
   </div>
@@ -903,7 +909,7 @@
     </div>
     <div class="field">
       <p class="label">휴대폰 번호</p>
-      <div class="box"><div class="text-field"><input type="tel" value="010-1234-5678"></div></div>
+      <div class="box"><div class="text-field"><input type="tel" value="010-1234-5678"></div><p class="support"></p></div>
     </div>
   </div>
   <div class="d-foot"><button type="button" class="btn-save" disabled>저장</button></div>

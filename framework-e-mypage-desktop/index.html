@@ -359,7 +359,7 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: #f4f4f4;
+    background: var(--c-thumb);
     border-radius: var(--radius-md);
   }
   .card .image-area img { width: 100%; height: 100%; object-fit: cover; }
@@ -377,6 +377,7 @@
     color: #fff;
     white-space: nowrap;
   }
+  /* iconButton/default — 32 박스 · 아이콘 24 (시안), 위치는 px */
   .card .wish {
     position: absolute;
     right: 10px;
@@ -384,10 +385,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-xs);
   }
-  .card .wish img { width: 100%; height: 100%; }
+  .card .wish img { width: 24px; height: 24px; }
   .card .info {
     display: flex;
     flex-direction: column;
@@ -678,9 +680,13 @@
     align-items: center;
     gap: var(--mid-8);
     width: 100%;
-    padding: var(--mid-20) var(--mid-16) var(--mid-4) var(--mid-24);
+    /* 시안 header 64 = pt 24 + title 24 + pb 16 · pl 24 / pr 16 */
+    padding: var(--mid-24) var(--mid-16) var(--mid-16) var(--mid-24);
   }
   .dialog .d-head .t { flex: 1 0 0; min-width: 0; font-weight: 500; font-size: var(--fs-p2); line-height: var(--lh-p2); }
+  /* 시안 header 64 — 타이틀 1줄(24) 이 행 높이를 정하고 32 아이콘 버튼은 위아래로 넘친다
+     (PDP iconArea 와 같은 규칙). 폰트가 커져도 헤더 높이가 타이틀에 따라간다 */
+  .dialog .d-head .icon-btn { margin-block: calc((1lh - 32px) / 2); }
   .icon-btn {
     flex-shrink: 0;
     display: flex;
@@ -734,7 +740,7 @@
     line-height: var(--lh-c1);
     color: rgba(17, 17, 17, .6);
   }
-  .dialog .d-foot { flex-shrink: 0; padding: var(--mid-8) var(--mid-24) var(--mid-24); }
+  .dialog .d-foot { flex-shrink: 0; padding: var(--mid-12) var(--mid-24) var(--mid-24); }   /* 시안 pt 12 */
   .btn-save {
     display: flex;
     align-items: center;
@@ -944,7 +950,7 @@
   <div class="d-body">
     <div class="field">
       <p class="label">아이디</p>
-      <div class="box"><div class="text-field is-readonly"><input value="example@gmail.com" readonly></div></div>
+      <div class="box"><div class="text-field is-readonly"><input value="example@gmail.com" readonly></div><p class="support"></p></div>
     </div>
     <div class="field">
       <p class="label">현재 비밀번호</p>
@@ -953,6 +959,7 @@
           <input type="password" placeholder="현재 비밀번호 입력">
           <span class="eye"><img src="assets/eye.svg" alt=""></span>
         </div>
+              <p class="support"></p>
       </div>
     </div>
     <div class="field">
@@ -962,6 +969,7 @@
           <input type="password" placeholder="새 비밀번호 입력">
           <span class="eye"><img src="assets/eye.svg" alt=""></span>
         </div>
+              <p class="support"></p>
       </div>
     </div>
   </div>
@@ -983,7 +991,7 @@
     </div>
     <div class="field">
       <p class="label">휴대폰 번호</p>
-      <div class="box"><div class="text-field"><input type="tel" value="010-1234-5678"></div></div>
+      <div class="box"><div class="text-field"><input type="tel" value="010-1234-5678"></div><p class="support"></p></div>
     </div>
   </div>
   <div class="d-foot"><button type="button" class="btn-save" disabled>저장</button></div>
