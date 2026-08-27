@@ -1,0 +1,512 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search — Desktop (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E — Search · 데스크탑
+     Figma 10131:121405 · 기준 폭 1920 · 1rem = 14px
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value ≤ 1rem 이면 고정 → C2 11 · C1 12 · P4 13 · P3 14
+        · 가변 : P1 18
+     2) Spacing (mid-*)  (값 − 8) × 100vw / 1920 + 8 · 값 < 8 은 고정
+     3) 좌우 마진 = global/desktop-margin-vw
+        annotation(search) : "좌우 padding : 1vw (글로벌 마진과 동일)"
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --us: calc(100vw / 1920);                 /* spacing 1px */
+
+    /* Typography ------------------------------------------------- */
+    --fs-c2: 11px;    /* caption-2     0.786rem → 고정 */
+    --fs-c1: 12px;    /* caption-1     0.857rem → 고정 */
+    --fs-p4: 13px;    /* paragraph-4   0.929rem → 고정 */
+    --fs-p3: 14px;    /* paragraph-3   1rem     → 고정 */
+    --fs-p1: calc((1.2857 - 1) * 0.83vw + 1rem);   /* 18px @1920 — 가변 */
+
+    --lh-p1: 1.5;
+    --lh-p3: 1.6;
+    --lh-p4: 1.6;
+    --lh-c1: 1.2;
+    --lh-c2: 1.2;
+
+    /* Spacing — mid-* -------------------------------------------- */
+    --mid-2:  2px;                            /* 값 < 8 → 고정 */
+    --mid-4:  4px;
+    --mid-6:  6px;
+    --mid-8:  8px;
+    --mid-12: calc(  4 * var(--us) + 8px);
+    --mid-16: calc(  8 * var(--us) + 8px);
+    --mid-24: calc( 16 * var(--us) + 8px);
+    --mid-28: calc( 20 * var(--us) + 8px);
+    --mid-56: calc( 48 * var(--us) + 8px);
+    --mid-80: calc( 72 * var(--us) + 8px);
+
+    /* 화면 좌우 마진 — global/desktop-margin-vw = 1vw (19px @1920) */
+    --margin: calc(19 * 100vw / 1920);
+
+    /* productCard 가로 간격 — 컴포넌트 정의는 mid-16 (데모에서 전환) */
+    --card-gap: var(--mid-16);
+
+    /* Radius / Font / Color -------------------------------------- */
+    --radius-2xs: 3px;
+    --radius-xs:  4px;
+    --radius-sm:  6px;
+    --radius-md:  8px;
+    --font: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    --font-en: "DM Sans", var(--font);
+    --font-header: "Inter", "DM Sans", var(--font);
+    --header-h: 54px;                         /* set06_header — 토큰 없음 → px */
+    --c-text: #111;
+    --c-placeholder: rgba(17, 17, 17, 0.3);
+    --c-line-soft: rgba(0, 0, 0, 0.1);
+    --c-thumb-bg: #f4f4f4;
+  }
+
+  /* 카드 간격 — 컴포넌트는 mid-16 인데 일부 인스턴스가 19(=1vw, 마진과 동일) */
+  body[data-cardgap="vw"] { --card-gap: var(--margin); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;                          /* 1rem = 14px */
+    /* 브라우저 스크롤바 미노출 (시안에 없는 요소) */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    min-height: 100vh;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input  { font: inherit; color: inherit; background: none; border: 0; outline: 0; }
+  img { display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── set06_header ────────────────────────────────────────────── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--header-h);                  /* 54px — 토큰 없음 → px */
+    padding: 0 16px;
+    background: #fff;
+    font-family: var(--font-header);
+  }
+  .header .container {
+    position: relative;
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+  .header .nav,
+  .header .utilities { display: flex; gap: 12px; height: 100%; align-items: stretch; }
+  .header .depth1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 8px;
+    font-family: var(--font-en);
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    text-transform: uppercase;
+    color: #372320;
+    white-space: nowrap;
+  }
+  .header .depth1.is-on { font-weight: 500; }
+  .header .logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    color: #372320;
+    white-space: nowrap;
+  }
+
+  /* ── search ──────────────────────────────────────────────────
+     annotation : 좌우 padding = 1vw (글로벌 마진과 동일)
+     상하 28px 은 바인딩 없음 → px 고정 */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-24);
+    width: 100%;
+    padding: 28px var(--margin);
+    background: #fff;
+  }
+  .search-bar .field { flex: 1 0 0; min-width: 0; display: flex; align-items: center; overflow: hidden; }
+  .search-bar input {
+    width: 100%;
+    font-size: var(--fs-p1);
+    line-height: var(--lh-p1);
+    color: var(--c-text);
+  }
+  .search-bar input::placeholder { color: var(--c-placeholder); }
+  .search-bar .total {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--mid-6);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    white-space: nowrap;
+  }
+  .search-bar .total .num { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+
+  /* ── productGroup ────────────────────────────────────────────── */
+  .product-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-56);
+    width: 100%;
+    padding: var(--mid-28) var(--margin) var(--mid-80);
+  }
+  .product-group .row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--card-gap);
+    width: 100%;
+  }
+
+  /* ── productCard ─────────────────────────────────────────────── */
+  .card {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .card .image-area {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--c-thumb-bg);
+    border-radius: var(--radius-md);         /* 데스크탑 8 · 모바일 6 */
+  }
+  .card .image-area img { width: 100%; height: 100%; object-fit: cover; }
+  /* badge — 위치·padding 모두 바인딩 없음 → px */
+  .card .badge {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    padding: 6px 8px;
+    background: #111;
+    border-radius: var(--radius-2xs);
+    font-family: var(--font-en);
+    font-size: var(--fs-c2);
+    line-height: var(--lh-c2);
+    color: #fff;
+    white-space: nowrap;
+  }
+  .card .info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-6);
+    width: 100%;
+    padding: var(--mid-16) var(--mid-4) 0;
+  }
+  /* 이름 — 줄바꿈 허용 + 넘치면 말줄임 (시안 : 데스크탑 1줄 · 모바일 2줄) */
+  .card .name {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card .price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--mid-4);
+    width: 100%;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    white-space: nowrap;
+  }
+  .card .price .amount { display: flex; align-items: center; }
+  .card .price .amount .num { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .card .price .original {
+    position: relative;
+    display: flex;
+    align-items: center;
+    opacity: .5;
+  }
+  /* 취소선 — 시안은 1px 선 오브젝트 */
+  .card .price .original::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: #111;
+    transform: translateY(-50%);
+  }
+
+  /* ── pagination ──────────────────────────────────────────────── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--mid-56) var(--mid-8);
+  }
+  .pagination .inner { display: flex; align-items: center; gap: var(--mid-8); }
+  .pagination .page-list { display: flex; align-items: center; gap: var(--mid-2); }
+  /* paginationItem — 컨테이너 padding 은 mid-2,
+     숫자 영역은 annotation(number min width & height : 3ch) */
+  .pagination .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--mid-2);
+    font-size: var(--fs-p4);
+    line-height: 1.6;
+    opacity: .8;
+  }
+  .pagination .item .num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3ch;
+    min-height: 3ch;
+    font-family: var(--font-en);
+    font-variation-settings: "opsz" 14;
+  }
+  .pagination .item:not(.is-on) { opacity: .48; }
+  .pagination .item.is-on { font-weight: 500; }
+  /* iconButton/contained — 어노테이션 없음 → px */
+  .pagination .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--c-line-soft);
+    border-radius: var(--radius-xs);
+  }
+  .pagination .nav-btn span {
+    display: block;
+    width: 16px;
+    height: 16px;
+    font-size: 13px;
+    line-height: 16px;
+    text-align: center;
+  }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .12);
+    font-family: var(--font);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .demo-nav strong { font-size: 10px; letter-spacing: .04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, .1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, .1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 2px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, .08);
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <span class="depth1">Shop</span>
+      <span class="depth1">About</span>
+      <span class="depth1">Journal</span>
+      <span class="depth1">Info</span>
+      <span class="depth1">The Story</span>
+    </nav>
+    <p class="logo">BRAND</p>
+    <nav class="utilities">
+      <span class="depth1 is-on">Search</span>
+      <span class="depth1">Sign in</span>
+      <span class="depth1">Bag [0]</span>
+    </nav>
+  </div>
+</header>
+
+<!-- search -->
+<div class="search-bar">
+  <div class="field">
+    <input type="search" id="q" value="전해질" placeholder="검색어를 입력하세요" aria-label="검색어">
+  </div>
+  <p class="total">검색 결과 <span class="num" id="total">12</span></p>
+</div>
+
+<main>
+  <!-- productGroup -->
+  <div class="product-group" id="grid"></div>
+  <!-- pagination -->
+  <nav class="pagination" id="pagination">
+    <div class="inner">
+      <button type="button" class="nav-btn" aria-label="이전"><span>‹</span></button>
+      <div class="page-list">
+        <button type="button" class="item is-on"><span class="num">1</span></button>
+        <button type="button" class="item"><span class="num">2</span></button>
+        <button type="button" class="item"><span class="num">3</span></button>
+        <button type="button" class="item"><span class="num">4</span></button>
+        <button type="button" class="item"><span class="num">5</span></button>
+        <button type="button" class="item"><span class="num">6</span></button>
+        <button type="button" class="item"><span class="num">7</span></button>
+        <button type="button" class="item"><span class="num">8</span></button>
+        <button type="button" class="item"><span class="num">9</span></button>
+        <button type="button" class="item"><span class="num">10</span></button>
+      </div>
+      <button type="button" class="nav-btn" aria-label="다음"><span>›</span></button>
+    </div>
+  </nav>
+</main>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav">
+  <strong>result</strong>
+  <div class="demo-seg" id="rowsToggle">
+    <button type="button" data-rows="2">2행 (8개)</button>
+    <button type="button" data-rows="3">3행 + 페이지네이션</button>
+  </div>
+
+  <strong>card gap</strong>
+  <div class="demo-seg" id="gapToggle">
+    <button type="button" data-cardgap="mid">mid-16</button>
+    <button type="button" data-cardgap="vw">19 (1vw)</button>
+  </div>
+
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const ROWS_KEY = 'fw-e-search-rows';
+  const GAP_KEY  = 'fw-e-search-gap';
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+
+  function px(k) {
+    const d = document.createElement('div');
+    d.style.width = `var(${k})`;
+    document.body.appendChild(d);
+    const v = parseFloat(getComputedStyle(d).width);
+    d.remove();
+    return v;
+  }
+
+  /* ── productGroup 렌더 — 한 행에 4개 ─────────────────────── */
+  const NAMES = [
+    '전해질 보충 음료 블러드 오렌지',
+    '전해질 보충 음료 레몬 라임',
+    '제로 슈가 스파클링 워터 자몽',
+    '데일리 미네랄 워터 500ml',
+  ];
+  const PRICES = [[40000, 50000], [38000, null], [42000, 48000], [22000, null]];
+
+  function card(i) {
+    const name = NAMES[i % NAMES.length];
+    const [price, was] = PRICES[i % PRICES.length];
+    const img = `assets/product-${(i % 4) + 1}.png`;
+    const won = n => n.toLocaleString('ko-KR');
+    return `
+      <a class="card" href="#">
+        <div class="image-area">
+          <img src="${img}" alt="">
+          ${i === 0 ? '<span class="badge">SOLD OUT</span>' : ''}
+        </div>
+        <div class="info">
+          <p class="name">${name}</p>
+          <p class="price">
+            <span class="amount"><span class="num">${won(price)}</span><span>원</span></span>
+            ${was ? `<span class="original"><span class="num">${won(was)}</span><span>원</span></span>` : ''}
+          </p>
+        </div>
+      </a>`;
+  }
+
+  function render(rows) {
+    $('#grid').innerHTML = Array.from({ length: rows }, (_, r) =>
+      `<div class="row">${Array.from({ length: 4 }, (_, c) => card(r * 4 + c)).join('')}</div>`
+    ).join('');
+    $('#total').textContent = rows * 4;
+    $('#pagination').hidden = rows < 3;
+  }
+
+  function setRows(n) {
+    render(+n);
+    $$('#rowsToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.rows === String(n)));
+    store(ROWS_KEY, n);
+    readout();
+  }
+  function setGap(mode) {
+    document.body.dataset.cardgap = mode;
+    $$('#gapToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cardgap === mode));
+    store(GAP_KEY, mode);
+    readout();
+  }
+  $('#rowsToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-rows]'); if (b) setRows(b.dataset.rows);
+  });
+  $('#gapToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cardgap]'); if (b) setGap(b.dataset.cardgap);
+  });
+
+  function readout() {
+    const c = $('.card');
+    $('#readout').innerHTML =
+      `viewport <b>${innerWidth}px</b> · margin <b>${px('--margin').toFixed(2)}</b> · ` +
+      `card gap <b>${px('--card-gap').toFixed(2)}</b><br>` +
+      `카드 <b>${c ? c.getBoundingClientRect().width.toFixed(2) : '–'}px</b> · ` +
+      `행 간격 <b>${px('--mid-56').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b>`;
+  }
+  window.addEventListener('resize', readout);
+
+  setGap(load(GAP_KEY, 'mid'));
+  setRows(load(ROWS_KEY, '3'));
+})();
+</script>

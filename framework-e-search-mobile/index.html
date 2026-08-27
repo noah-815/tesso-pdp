@@ -1,0 +1,456 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Search — Mobile (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E — Search · 모바일
+     Figma 10131:121405 · 기준 폭 390 · 1rem = 14px
+
+     1) Typography  font-size = size value × 100vw / 390   (450px 에서 상한)
+        · 데스크탑의 "≤ 1rem 고정" 예외는 모바일에 적용하지 않는다
+     2) Spacing (mid-*)  (값 − 8) × 100vw / 390 + 8 · 값 < 8 은 고정
+     3) 가로 여백은 px-16 고정 (뷰포트 무관) · 세로는 mid
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --tw: min(100vw, 450px);                  /* typography 기준 폭 */
+    --ut: calc(var(--tw) / 390);              /* type 1px */
+    --us: calc(100vw / 390);                  /* spacing 1px */
+
+    /* Typography ------------------------------------------------- */
+    --fs-c2: calc(11 * var(--ut));
+    --fs-c1: calc(12 * var(--ut));
+    --fs-p4: calc(13 * var(--ut));
+    --fs-p3: calc(14 * var(--ut));
+    --fs-p2: calc(15 * var(--ut));
+
+    --lh-p2: 1.5;
+    --lh-p3: 1.6;
+    --lh-p4: 1.6;
+    --lh-c1: 1.2;
+    --lh-c2: 1.2;
+
+    /* Spacing — mid-* -------------------------------------------- */
+    --mid-2:  2px;                            /* 값 < 8 → 고정 */
+    --mid-4:  4px;
+    --mid-6:  6px;
+    --mid-8:  8px;
+    --mid-12: calc(  4 * var(--us) + 8px);
+    --mid-32: calc( 24 * var(--us) + 8px);
+    --mid-40: calc( 32 * var(--us) + 8px);
+
+    /* px-* — 뷰포트 무관 고정 ------------------------------------ */
+    --px-16: 16px;                            /* 화면 좌우 여백 */
+
+    /* Radius / Font / Color -------------------------------------- */
+    --radius-2xs: 3px;
+    --radius-xs:  4px;
+    --radius-sm:  6px;
+    --font: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    --font-en: "DM Sans", var(--font);
+    --font-header: "Inter", "DM Sans", var(--font);
+    --header-h: 60px;                         /* mobileH_header — 토큰 없음 → px */
+    --c-text: #111;
+    --c-placeholder: rgba(17, 17, 17, 0.3);
+    --c-line-soft: rgba(0, 0, 0, 0.1);
+    --c-thumb-bg: #f4f4f4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;                          /* 1rem = 14px */
+    overflow-x: hidden;                       /* 100vw 기반 계산 시 가로 스크롤 방지 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    min-height: 100vh;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input  { font: inherit; color: inherit; background: none; border: 0; outline: 0; border-radius: 0; -webkit-appearance: none; }
+  img { display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── mobileH_header ──────────────────────────────────────────── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);                  /* 60px — 토큰 없음 → px */
+    padding: 0 var(--px-16);
+    background: #fff;
+  }
+  .header .side {
+    display: flex;
+    align-items: center;
+    min-width: 48px;
+    height: 48px;
+    font-family: var(--font-en);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    text-transform: uppercase;
+    color: #372320;
+    white-space: nowrap;
+  }
+  .header .side.right { justify-content: flex-end; }
+  .header .logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-header);
+    font-weight: 600;
+    font-size: 20px;                          /* 로고 — 가변 로직 제외 */
+    line-height: 28px;
+    color: #372320;
+    white-space: nowrap;
+  }
+
+  /* ── search ──────────────────────────────────────────────────
+     상하 24px 은 바인딩 없음 → px 고정 · 좌우는 px-16 */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-12);
+    width: 100%;
+    padding: 24px var(--px-16);
+    background: #fff;
+  }
+  .search-bar .field { flex: 1 0 0; min-width: 0; display: flex; align-items: center; overflow: hidden; }
+  .search-bar input {
+    width: 100%;
+    font-size: var(--fs-p2);
+    line-height: var(--lh-p2);
+    color: var(--c-text);
+  }
+  .search-bar input::placeholder { color: var(--c-placeholder); }
+  .search-bar .total {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--mid-6);
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+    white-space: nowrap;
+  }
+  .search-bar .total .num { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+
+  /* ── productGroup ────────────────────────────────────────────── */
+  .product-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-40);
+    width: 100%;
+    padding: var(--mid-12) var(--px-16) var(--mid-40);
+  }
+  .product-group .row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--mid-12);
+    width: 100%;
+  }
+
+  /* ── productCard ─────────────────────────────────────────────── */
+  .card {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .card .image-area {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--c-thumb-bg);
+    border-radius: var(--radius-sm);          /* 모바일 6 (데스크탑은 8) */
+  }
+  .card .image-area img { width: 100%; height: 100%; object-fit: cover; }
+  /* badge — 위치·padding 모두 바인딩 없음 → px */
+  .card .badge {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    padding: 6px 8px;
+    background: #111;
+    border-radius: var(--radius-2xs);
+    font-family: var(--font-en);
+    font-size: var(--fs-c2);
+    line-height: var(--lh-c2);
+    color: #fff;
+    white-space: nowrap;
+  }
+  .card .info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-6);
+    width: 100%;
+    padding: var(--mid-12) var(--mid-4) 0;    /* 모바일 pt = mid-12 */
+  }
+  /* 이름 — 줄바꿈 허용 (시안 : 모바일에서 2줄) */
+  .card .name {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card .price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--mid-4);
+    width: 100%;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    white-space: nowrap;
+  }
+  .card .price .amount { display: flex; align-items: center; }
+  .card .price .amount .num { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .card .price .original { position: relative; display: flex; align-items: center; opacity: .5; }
+  .card .price .original::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: #111;
+    transform: translateY(-50%);
+  }
+
+  /* ── pagination — 모바일은 pageCounter 형태 ──────────────────── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--mid-32) var(--mid-8);
+  }
+  .pagination .inner { display: flex; align-items: center; gap: var(--mid-8); }
+  /* iconButton/contained — 어노테이션 없음 → px */
+  .pagination .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--c-line-soft);
+    border-radius: var(--radius-xs);
+  }
+  .pagination .nav-btn span {
+    display: block;
+    width: 16px;
+    height: 16px;
+    font-size: 13px;
+    line-height: 16px;
+    text-align: center;
+  }
+  /* pageCounter — annotation : current, total min-width = 2ch */
+  .pagination .counter {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    padding: var(--mid-4);
+    font-family: var(--font-en);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    color: #1d1d1d;
+    font-variation-settings: "opsz" 14;
+  }
+  .pagination .counter .n {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2ch;
+  }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소 ─────────────────────────── */
+  .demo-nav {
+    position: fixed;
+    right: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    z-index: 500;
+    max-width: calc(100vw - 16px);
+    padding: 7px 8px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .12);
+    font-family: var(--font);
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .demo-nav.is-min .demo-body { display: none; }
+  .demo-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .demo-head strong { font-size: 9px; letter-spacing: .04em; color: #999; text-transform: uppercase; }
+  .demo-head button { width: 18px; height: 18px; border: 1px solid rgba(0, 0, 0, .12); border-radius: 3px; color: #777; line-height: 1; }
+  .demo-body { margin-top: 6px; }
+  .demo-seg { display: flex; flex-wrap: wrap; gap: 3px; }
+  .demo-seg button {
+    padding: 4px 7px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 3px;
+    color: #777;
+    background: #fff;
+    white-space: nowrap;
+  }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; border-color: #111; }
+  .demo-readout {
+    margin-top: 5px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(0, 0, 0, .08);
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+
+<header class="header">
+  <span class="side">Menu</span>
+  <p class="logo">BRAND</p>
+  <span class="side right">Bag [0]</span>
+</header>
+
+<!-- search -->
+<div class="search-bar">
+  <div class="field">
+    <input type="search" id="q" value="전해질" placeholder="검색어를 입력하세요" aria-label="검색어">
+  </div>
+  <p class="total">검색 결과 <span class="num" id="total">12</span></p>
+</div>
+
+<main>
+  <!-- productGroup -->
+  <div class="product-group" id="grid"></div>
+  <!-- pagination -->
+  <nav class="pagination" id="pagination">
+    <div class="inner">
+      <button type="button" class="nav-btn" aria-label="이전"><span>‹</span></button>
+      <div class="counter"><span class="n">1</span><span>/</span><span class="n">10</span></div>
+      <button type="button" class="nav-btn" aria-label="다음"><span>›</span></button>
+    </div>
+  </nav>
+</main>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <div class="demo-head">
+    <strong>result</strong>
+    <button type="button" id="demoToggle" aria-label="패널 접기">–</button>
+  </div>
+  <div class="demo-body">
+    <div class="demo-seg" id="rowsToggle">
+      <button type="button" data-rows="4">4행 (8개)</button>
+      <button type="button" data-rows="6">6행 + 페이지네이션</button>
+    </div>
+    <p class="demo-readout" id="readout">–</p>
+  </div>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const ROWS_KEY = 'fw-e-search-m-rows';
+  const UI_KEY = 'fw-e-search-m-ui';
+
+  function px(k) {
+    const d = document.createElement('div');
+    d.style.width = `var(${k})`;
+    document.body.appendChild(d);
+    const v = parseFloat(getComputedStyle(d).width);
+    d.remove();
+    return v;
+  }
+
+  const NAMES = [
+    '전해질 보충 음료 블러드 오렌지',
+    '전해질 보충 음료 레몬 라임',
+    '제로 슈가 스파클링 워터 자몽',
+    '데일리 미네랄 워터 500ml',
+  ];
+  const PRICES = [[40000, 50000], [38000, null], [42000, 48000], [22000, null]];
+
+  function card(i) {
+    const name = NAMES[i % NAMES.length];
+    const [price, was] = PRICES[i % PRICES.length];
+    const img = `assets/product-${(i % 4) + 1}.png`;
+    const won = n => n.toLocaleString('ko-KR');
+    return `
+      <a class="card" href="#">
+        <div class="image-area">
+          <img src="${img}" alt="">
+          ${i === 0 ? '<span class="badge">SOLD OUT</span>' : ''}
+        </div>
+        <div class="info">
+          <p class="name">${name}</p>
+          <p class="price">
+            <span class="amount"><span class="num">${won(price)}</span><span>원</span></span>
+            ${was ? `<span class="original"><span class="num">${won(was)}</span><span>원</span></span>` : ''}
+          </p>
+        </div>
+      </a>`;
+  }
+
+  function render(rows) {
+    $('#grid').innerHTML = Array.from({ length: rows }, (_, r) =>
+      `<div class="row">${Array.from({ length: 2 }, (_, c) => card(r * 2 + c)).join('')}</div>`
+    ).join('');
+    $('#total').textContent = rows * 2;
+    $('#pagination').hidden = rows < 6;
+  }
+
+  function setRows(n) {
+    render(+n);
+    $$('#rowsToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.rows === String(n)));
+    try { localStorage.setItem(ROWS_KEY, n); } catch (e) {}
+    readout();
+  }
+  $('#rowsToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-rows]'); if (b) setRows(b.dataset.rows);
+  });
+
+  function readout() {
+    const c = $('.card');
+    $('#readout').innerHTML =
+      `viewport <b>${innerWidth}px</b> · 좌우 <b>${px('--px-16').toFixed(2)}</b> · ` +
+      `카드 간격 <b>${px('--mid-12').toFixed(2)}</b><br>` +
+      `카드 <b>${c ? c.getBoundingClientRect().width.toFixed(2) : '–'}px</b> · ` +
+      `행 간격 <b>${px('--mid-40').toFixed(2)}</b> · P3 <b>${px('--fs-p3').toFixed(2)}</b>`;
+  }
+  window.addEventListener('resize', readout);
+
+  $('#demoToggle').addEventListener('click', () => {
+    const min = !$('#demoNav').classList.contains('is-min');
+    $('#demoNav').classList.toggle('is-min', min);
+    $('#demoToggle').textContent = min ? '+' : '–';
+    try { localStorage.setItem(UI_KEY, min ? 'min' : 'open'); } catch (e) {}
+  });
+  try {
+    if (localStorage.getItem(UI_KEY) === 'min') { $('#demoNav').classList.add('is-min'); $('#demoToggle').textContent = '+'; }
+  } catch (e) {}
+
+  let saved = '6';
+  try { saved = localStorage.getItem(ROWS_KEY) || '6'; } catch (e) {}
+  setRows(saved);
+})();
+</script>
