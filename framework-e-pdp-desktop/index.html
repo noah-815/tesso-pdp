@@ -1411,7 +1411,8 @@
   }
   body.is-inq-open #demoNav { display: none; }
   #inqNav { display: none; }
-  body.is-inq-open #inqNav { display: grid; }
+  /* dim(600) · 다이얼로그(601) 보다 위 — 딤 위에서 조작할 수 있게 */
+  body.is-inq-open #inqNav { display: grid; z-index: 700; }
   .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
   .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
