@@ -178,7 +178,8 @@
                   진행 방향에 이미지가 남아 있으면 활성 dot 이 끝에서 두 번째에 머물고
                   창 경계 dot 은 축소, 창 밖 dot 은 작아지며 사라진다.
      ────────────────────────────────────────────────────────────── */
-  .product-image { position: relative; width: 100%; padding: 12px var(--pad-x) 16px; }
+  /* 상 12 / 하 16 은 mid 토큰 (get_variable_defs 로 확인) */
+  .product-image { position: relative; width: 100%; padding: var(--v-12) var(--pad-x) var(--v-16); }
   .product-image .hero {
     position: relative;
     aspect-ratio: 1 / 1;
@@ -203,7 +204,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 20px;
+    bottom: var(--mid-20);          /* 시안 mid-20 */
     z-index: 2;
     display: flex;
     justify-content: center;
@@ -827,8 +828,8 @@
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    gap: 8px;                      /* 시안 px */
-    padding: 20px 8px 2px var(--pad-x);   /* 시안 px — 가로만 버전 연동 */
+    gap: var(--mid-8);
+    padding: var(--mid-20) var(--mid-8) var(--mid-2) var(--pad-x);
     background: #fff;
   }
   .sheet .sheet-head .title {
@@ -848,13 +849,14 @@
   .sheet .sheet-body .inner {
     display: flex;
     flex-direction: column;
-    gap: 20px;                     /* 시안 content gap */
-    padding-top: 20px;
+    gap: var(--mid-20);            /* 시안 content gap */
+    padding-top: var(--mid-20);
     padding-bottom: var(--v-12);
   }
   .sheet .sheet-foot {
     flex-shrink: 0;
-    padding: 12px var(--pad-x) calc(16px + env(safe-area-inset-bottom, 0px));   /* 시안 buttonArea + 안전영역 */
+    /* 시안 buttonArea — 상 12 = px-12, 하 16 = px-16 (둘 다 고정) + 안전영역 */
+    padding: 12px var(--pad-x) calc(16px + env(safe-area-inset-bottom, 0px));
     background: #fff;
   }
   .sheet .button-group { display: flex; align-items: center; gap: var(--mid-8); width: 100%; }

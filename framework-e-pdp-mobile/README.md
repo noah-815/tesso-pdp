@@ -57,6 +57,40 @@ font-size = size value × 100vw / 390        (size value = rem, 1rem = 14px)
 `mid-*` 는 타이포와 달리 **450px 고정 없이 100vw 로 계속 증가**합니다(명세 그대로).
 타이포와 함께 멈추려면 `--us` 를 `calc(var(--tw) / 390)` 으로 바꾸면 됩니다.
 
+### 토큰 재검수 (`get_variable_defs` 교차 확인)
+
+Figma MCP 의 Tailwind 출력은 **padding · gap 은 변수를 물면 `var(...)` 래퍼가 보이지만
+`size-` / `w-` / `h-` 는 raw px 로 나올 수 있습니다.** 그래서 크기 계열은
+`get_variable_defs` 로 따로 확인해야 합니다.
+
+전 컴포넌트를 훑은 결과 — **px 로 두는 게 맞는 것 (변수 바인딩 없음, 확인 완료)**
+
+| 요소 | 값 | 확인 노드 |
+|---|---|---|
+| `thumbnail` (1:1 / 4:5 / 3:4) | 120 / 150 / 160 | `8394:59347` → 변수 없음 |
+| `iconButton/default` | 32 · 아이콘 24 | `8394:59126` → `radius-xs` 뿐 |
+| `iconButton/contained` | padding 6 · 아이콘 16 | `8400:4881` → 없음 |
+| `numberInput` large / medium | 아이템 36 / 28 | `8394:74626` · `8643:92544` → `mid-6`·`mid-2` (내부 padding) 뿐 |
+| `rating` | 별 20 | `8406:72011` → 없음 |
+| `checkBox` | 16 | `8394:59228` → 없음 |
+| `dotIndicator` | dot 5 (gap 은 `mid-4`) | `8394:74595` → `radius-full`·`mid-4` |
+| `tab/productDetail` | 상하 17/16 · 텍스트 10/4 (gap 은 `mid-100`) | `8394:59332` → `mid-100` 뿐 |
+| 캐러셀 썸네일 · 메인 | 142 / 775 (= 1컬럼 / 5컬럼) | `8406:74850` → `radius-sm`·`mid-16` 뿐 |
+| 캐러셀 gradient | 120 | 〃 |
+| `productDetail` 더보기 gradient · 버튼 | 360 / 286 | `8406:74113` → `mid-24`·`mid-48` 뿐 |
+
+**px 로 굳어 있던 `mid` 토큰 (수정함)**
+
+| 위치 | 이전 | 시안 토큰 |
+|---|---|---|
+| `productImage` 상 / 하 여백 | 12px / 16px | **`mid-12` / `mid-16`** |
+| `indicator` 하단 오프셋 | 20px | **`mid-20`** |
+| 바텀시트 header padding · gap | 20 / 8 / 2px | **`mid-20` / `mid-8` / `mid-2`** |
+| 바텀시트 content gap · pt | 20px | **`mid-20`** |
+
+바텀시트 `buttonArea` 의 상 12 / 하 16 은 각각 **`px-12` · `px-16`** 이라 고정이 맞습니다
+(같은 12·16 이어도 `productImage` 쪽은 `mid`, 시트 쪽은 `px` — 토큰이 다릅니다).
+
 ### 1-3. `px-*` — 뷰포트 무관 고정
 
 `--px-16: 16px` — 화면 좌우 여백. 모바일 시안은 모든 섹션이 `px-16` 을 씁니다.
