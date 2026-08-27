@@ -68,7 +68,9 @@
     --mid-8:   8px;                        /* 공식 결과도 8px (증감 없음) */
     --mid-10:  calc(  2 * var(--us) + 8px);
     --mid-12:  calc(  4 * var(--us) + 8px);
+    --mid-15:  calc(  7 * var(--us) + 8px);
     --mid-16:  calc(  8 * var(--us) + 8px);
+    --mid-17:  calc(  9 * var(--us) + 8px);
     --mid-20:  calc( 12 * var(--us) + 8px);
     --mid-24:  calc( 16 * var(--us) + 8px);
     --mid-28:  calc( 20 * var(--us) + 8px);
@@ -78,7 +80,24 @@
     --mid-56:  calc( 48 * var(--us) + 8px);
     --mid-64:  calc( 56 * var(--us) + 8px);
     --mid-100: calc( 92 * var(--us) + 8px);
+    --mid-80:  calc( 72 * var(--us) + 8px);
     --mid-120: calc(112 * var(--us) + 8px);
+
+    /* ── dialog/inquiry (상품 문의) ─────────────────────────────
+       시안(8410:208670)은 다이얼로그 내부 여백에 mid 토큰이 바인딩돼 있지
+       않다 → 기본값은 px 고정. 데모에서 mid / vw 안으로 전환할 수 있다. */
+    --d-8:  8px;
+    --d-10: 10px;
+    --d-15: 15px;
+    --d-16: 16px;
+    --d-17: 17px;
+    --d-20: 20px;
+    --d-24: 24px;
+    --d-80: 80px;
+    --dialog-w-fixed: 560px;
+    --dialog-w-fluid: 29.1667vw;   /* 560 / 1920 */
+    --dialog-w: var(--dialog-w-fixed);
+    --dialog-max-h: 85vh;
 
     /* ── Radius ───────────────────────────────────────────────── */
     --radius-3xs: 2px;
@@ -120,6 +139,22 @@
   body[data-cgap="px"]    { --carousel-gap-x: 16px; --carousel-gap-y: 16px; }
   /* split — 가로는 페이지 거터와 같은 16px 고정, 세로는 가변 mid-16 */
   body[data-cgap="split"] { --carousel-gap-x: 16px; --carousel-gap-y: var(--mid-16); }
+
+  /* 상품 문의 다이얼로그 여백 3안
+     560 + px  (기본·시안) · 560 + mid · vw + mid */
+  body[data-inqbox="fixed-mid"],
+  body[data-inqbox="fluid-mid"] {
+    --d-8:  var(--mid-8);
+    --d-10: var(--mid-10);
+    --d-15: var(--mid-15);
+    --d-16: var(--mid-16);
+    --d-17: var(--mid-17);
+    --d-20: var(--mid-20);
+    --d-24: var(--mid-24);
+    --d-80: var(--mid-80);
+  }
+  body[data-inqbox="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
+  body.is-inq-open { overflow: hidden; }
 
   /* 브라우저 스크롤바 미노출 (시안에 없는 요소) */
   html { scrollbar-width: none; -ms-overflow-style: none; }
@@ -1168,6 +1203,177 @@
   .order-info .oi-img img { width: 100%; height: 100%; object-fit: cover; }
 
   /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  /* ── dialog/inquiry (상품 문의) — Figma 10131:113377 ──────────
+     PDP 위에 dim + 중앙 다이얼로그. 클래스는 PDP 와 겹치지 않게 inq- 접두. */
+  .inq-dim {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(0, 0, 0, .5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s;
+  }
+  .inq-dim.is-open { opacity: 1; visibility: visible; }
+
+  .inq-dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 601;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: var(--dialog-w);
+    max-height: var(--dialog-max-h);       /* 85vh */
+    overflow: hidden;
+    background: #fff;
+    border-radius: var(--radius-sm);
+    /* 중앙 정렬용 translate 만 — scale 을 쓰면 실측값이 왜곡되므로 페이드만 */
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s;
+  }
+  .inq-dialog.is-open { opacity: 1; visibility: visible; }
+
+  .inq-dialog .inq-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--d-8);
+    width: 100%;
+    padding: var(--d-20) var(--d-16) var(--mid-4) var(--d-24);
+    background: #fff;
+  }
+  .inq-dialog .inq-head .title {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p2);
+    line-height: var(--lh-p2);
+  }
+
+  .inq-dialog .inq-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    overflow-y: auto;
+    /* 스크롤바 미노출 (시안에 없는 요소) */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .inq-dialog .inq-body::-webkit-scrollbar { display: none; }
+  .inq-dialog .inq-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--d-24);
+    width: 100%;
+    padding: var(--d-16) var(--d-24) var(--d-24);
+  }
+
+  /* productList/default */
+  .inq-product { display: flex; align-items: flex-start; gap: var(--d-20); width: 100%; }
+  .inq-product .pic {
+    flex-shrink: 0;
+    width: var(--d-80);
+    height: var(--d-80);
+    overflow: hidden;
+    background: #f4f4f4;
+    border-radius: var(--radius-2xs);
+  }
+  .inq-product .pic img { width: 100%; height: 100%; object-fit: cover; }
+  .inq-product .name {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+  }
+
+  /* multiLine */
+  .inq-multiline { display: flex; flex-direction: column; gap: var(--d-10); width: 100%; }
+  .inq-multiline .field {
+    width: 100%;
+    height: 327px;                 /* 시안 — 토큰 없음 → px */
+    padding: var(--d-15) var(--d-17);
+    /* Figma stroke 는 inside → 크기를 밀지 않게 inset box-shadow */
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+  }
+  .inq-multiline textarea {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    outline: 0;
+    resize: none;
+    font: inherit;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    color: var(--c-text);
+    background: none;
+  }
+  .inq-multiline textarea::placeholder { color: rgba(17, 17, 17, .3); }
+  .inq-multiline .supporting {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    width: 100%;
+    padding-right: var(--mid-2);
+  }
+  .inq-check {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    padding: var(--mid-1) 0;
+    cursor: pointer;
+  }
+  .inq-check input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .inq-check .box {
+    position: relative;
+    flex-shrink: 0;
+    width: 16px;                   /* 시안 — 토큰 없음 → px */
+    height: 16px;
+    border: 1px solid #d3d3d3;
+    border-radius: var(--radius-3xs);
+  }
+  .inq-check input:checked + .box { background: #111; border-color: #111; }
+  .inq-check input:checked + .box::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 2px;
+    width: 5px; height: 8px;
+    border: solid #fff;
+    border-width: 0 1.6px 1.6px 0;
+    transform: rotate(45deg);
+  }
+  .inq-check .label { flex: 1 0 0; min-width: 0; font-size: var(--fs-c1); line-height: 1.2; }
+  .inq-counter {
+    flex-shrink: 0;
+    min-width: 90px;               /* 시안 — 토큰 없음 → px */
+    font-size: var(--fs-c1);
+    line-height: 1.2;
+    color: rgba(17, 17, 17, .6);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .inq-dialog .inq-foot {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    padding: var(--d-8) var(--d-24) var(--d-24);
+    background: #fff;
+  }
+  .inq-dialog .inq-foot .btn { flex: none; width: 100%; }
+
   .demo-nav {
     position: fixed;
     right: 16px;
@@ -1189,6 +1395,9 @@
     line-height: 1.4;
     white-space: nowrap;
   }
+  body.is-inq-open #demoNav { display: none; }
+  #inqNav { display: none; }
+  body.is-inq-open #inqNav { display: grid; }
   .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
   .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
@@ -1491,7 +1700,7 @@
     <section class="section" id="inquiry">
       <div class="section-head with-btn">
         <h2 class="title"><span>상품 문의</span></h2>
-        <button type="button" class="btn-small">문의하기</button>
+        <button type="button" class="btn-small" id="inqOpen">문의하기</button>
       </div>
       <div class="filter-bar">
         <label class="check-box">
@@ -1694,6 +1903,53 @@
 </nav>
 
 <!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<!-- dialog/inquiry — 상품 문의 (Figma 10131:113377) -->
+<div class="inq-dim" id="inqDim"></div>
+<div class="inq-dialog" id="inqDialog" role="dialog" aria-modal="true" aria-labelledby="inqTitle">
+  <div class="inq-head">
+    <p class="title" id="inqTitle">상품 문의</p>
+    <button type="button" class="icon-btn" id="inqClose" aria-label="닫기"><img src="assets/close.svg" alt=""></button>
+  </div>
+
+  <div class="inq-body">
+    <div class="inq-content">
+      <div class="inq-product">
+        <div class="pic"><img src="assets/product-1.png" alt=""></div>
+        <p class="name">전해질 보충 음료 블러드 오렌지</p>
+      </div>
+
+      <div class="inq-multiline">
+        <div class="field">
+          <textarea id="inqText" maxlength="5000" placeholder="문의하실 내용을 입력해 주세요."></textarea>
+        </div>
+        <div class="supporting">
+          <label class="inq-check">
+            <input type="checkbox">
+            <span class="box"></span>
+            <span class="label">비밀글로 문의하기</span>
+          </label>
+          <span class="inq-counter" id="inqCounter">0/5,000</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="inq-foot">
+    <button type="button" class="btn filled">문의 등록</button>
+  </div>
+</div>
+
+<!-- 데모 — 다이얼로그가 열려 있는 동안에만 노출 -->
+<nav class="demo-nav" id="inqNav">
+  <strong>dialog</strong>
+  <div class="demo-seg" id="inqBoxToggle">
+    <button type="button" data-inqbox="fixed-px">560 + px</button>
+    <button type="button" data-inqbox="fixed-mid">560 + mid</button>
+    <button type="button" data-inqbox="fluid-mid">vw + mid</button>
+  </div>
+  <p class="demo-readout" id="inqReadout">–</p>
+</nav>
+
 <nav class="demo-nav" id="demoNav">
   <strong>template</strong>
   <div class="demo-seg" id="tplToggle">
@@ -2061,7 +2317,7 @@
     $('#pwMaxOn').checked = PW_DEFAULT.maxOn;
     applyPw();
   });
-  window.addEventListener('resize', readout);
+  window.addEventListener('resize', () => { readout(); inqReadout(); });
 
   try {
     const saved = JSON.parse(localStorage.getItem(FS_KEY) || 'null');
@@ -2080,6 +2336,57 @@
     }
   } catch (e) {}
   applyPw();
+
+  /* ── 상품 문의 다이얼로그 ─────────────────────────────────── */
+  const INQ_KEY = 'fw-e-pdp-inqbox';
+  const inqDialog = $('#inqDialog'), inqDim = $('#inqDim');
+
+  function inqReadout() {
+    if (!document.body.classList.contains('is-inq-open')) return;
+    const body = $('.inq-body'), cs = getComputedStyle($('.inq-content'));
+    const sb = body.offsetWidth - body.clientWidth;
+    $('#inqReadout').innerHTML =
+      `viewport <b>${innerWidth}px</b> · 다이얼로그 <b>${inqDialog.getBoundingClientRect().width.toFixed(2)}px</b> · ` +
+      `max-height <b>${(innerHeight * 0.85).toFixed(0)}px</b> · 스크롤 <b>${body.scrollHeight > body.clientHeight ? 'O' : 'X'}</b><br>` +
+      `실제 여백 L <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / R <b>${parseFloat(cs.paddingRight).toFixed(2)}</b> ` +
+      `(스크롤바 점유 <b>${sb.toFixed(2)}</b>) · 콘텐츠 폭 <b>${$('.inq-multiline .field').getBoundingClientRect().width.toFixed(2)}</b><br>` +
+      `토큰 24 <b>${px('--d-24').toFixed(2)}</b> · 20 <b>${px('--d-20').toFixed(2)}</b> · ` +
+      `16 <b>${px('--d-16').toFixed(2)}</b> · 10 <b>${px('--d-10').toFixed(2)}</b> · ` +
+      `썸네일 <b>${px('--d-80').toFixed(2)}</b>`;
+  }
+  function setInqBox(mode) {
+    document.body.dataset.inqbox = mode;
+    $$('#inqBoxToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.inqbox === mode));
+    store(INQ_KEY, mode);
+    inqReadout();
+  }
+  function openInq() {
+    document.body.classList.add('is-inq-open');
+    inqDim.classList.add('is-open');
+    inqDialog.classList.add('is-open');
+    inqReadout();
+    $('#inqText').focus({ preventScroll: true });
+  }
+  function closeInq() {
+    document.body.classList.remove('is-inq-open');
+    inqDim.classList.remove('is-open');
+    inqDialog.classList.remove('is-open');
+  }
+  $('#inqOpen').addEventListener('click', openInq);
+  $('#inqClose').addEventListener('click', closeInq);
+  inqDim.addEventListener('click', closeInq);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.body.classList.contains('is-inq-open')) closeInq();
+  });
+  $('#inqBoxToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-inqbox]');
+    if (b) setInqBox(b.dataset.inqbox);
+  });
+  const inqText = $('#inqText'), inqCounter = $('#inqCounter');
+  const syncInqCount = () => { inqCounter.textContent = `${inqText.value.length.toLocaleString('ko-KR')}/5,000`; };
+  inqText.addEventListener('input', syncInqCount);
+  syncInqCount();
+  setInqBox(load(INQ_KEY, 'fixed-px'));
 
   /* ── 스낵바 — 뜨고 3초 후 사라짐 (annotation) ─────────────── */
   const snack = $('#snackbar');
