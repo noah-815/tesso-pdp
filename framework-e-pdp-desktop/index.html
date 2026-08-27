@@ -91,7 +91,8 @@
     --d-24: 24px;
     --d-80: 80px;
     --dialog-w-fixed: 560px;
-    --dialog-w-fluid: 29.1667vw;   /* 560 / 1920 */
+    --dialog-w-fluid: 29.1667vw;              /* 560 / 1920 — 순수 vw */
+    --dialog-w-mid: calc(552 * var(--us) + 8px);   /* mid 공식 (560−8)×100vw/1920+8 */
     --dialog-w: var(--dialog-w-fixed);
     --dialog-max-h: 85vh;
 
@@ -136,10 +137,11 @@
   /* split — 가로는 페이지 거터와 같은 16px 고정, 세로는 가변 mid-16 */
   body[data-cgap="split"] { --carousel-gap-x: 16px; --carousel-gap-y: var(--mid-16); }
 
-  /* 상품 문의 다이얼로그 여백 3안
-     560 + px  (기본·시안) · 560 + mid · vw + mid */
+  /* 상품 문의 다이얼로그 여백 4안
+     560 + px  (기본·시안) · 560 + mid · vw + mid · mid + mid */
   body[data-inqbox="fixed-mid"],
-  body[data-inqbox="fluid-mid"] {
+  body[data-inqbox="fluid-mid"],
+  body[data-inqbox="mid-mid"] {
     --d-8:  var(--mid-8);
     --d-10: var(--mid-10);
     --d-16: var(--mid-16);
@@ -148,6 +150,7 @@
     --d-80: var(--mid-80);
   }
   body[data-inqbox="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
+  body[data-inqbox="mid-mid"]   { --dialog-w: var(--dialog-w-mid); }
   body.is-inq-open { overflow: hidden; }
 
   /* 브라우저 스크롤바 미노출 (시안에 없는 요소) */
@@ -1953,6 +1956,7 @@
     <button type="button" data-inqbox="fixed-px">560 + px</button>
     <button type="button" data-inqbox="fixed-mid">560 + mid</button>
     <button type="button" data-inqbox="fluid-mid">vw + mid</button>
+    <button type="button" data-inqbox="mid-mid">mid + mid</button>
   </div>
   <p class="demo-readout" id="inqReadout">–</p>
 </nav>
