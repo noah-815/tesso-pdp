@@ -102,6 +102,33 @@ em 이 풀리도록 `.option` · `.reply .r-info` 에 `font-size: var(--fs-p4)`,
 > `reply > infoArea` 는 Figma 에 어노테이션이 붙어 있지 않지만
 > 같은 성격의 메타 행이라 em 이 맞다고 확인받아 적용했습니다.
 
+### inquiryItem 구조 — 시안 대조 수정
+
+컴포넌트(`8406:73933`)의 구조가 **답변 여부에 따라 다릅니다.** 이전 구현은 두 경우를
+같은 마크업으로 쓰고 있어서 바로잡았습니다.
+
+```
+미답변                                답변완료
+inquiryItem  gap mid-16               inquiryItem  gap mid-24
+  ├ titleArea (내 문의일 때)            ├ question  gap mid-16
+  └ textArea                           │   ├ titleArea (내 문의일 때)
+      ├ infoArea                       │   └ textArea
+      ├ content                        │       ├ infoArea
+      └ private                        │       ├ content
+                                       │       └ private
+                                       └ reply
+```
+
+| 항목 | 이전 | 시안 |
+|---|---|---|
+| `question` 래퍼 | 항상 있음 | **답변완료에만** |
+| `titleArea`(배지 + 수정·삭제) | `question` 밖 | **답변완료 시 `question` 안** |
+| 컨테이너 gap | 답변 유무 무관 `mid-16` (reply 있으면 24) | 미답변 `mid-16` / **답변완료 `mid-24`** |
+| 구분선 | 전부 `rgba(0,0,0,.12)` | 미답변 `.12` / **답변완료 `rgba(0,0,0,.1)`** |
+
+앞서 "시안의 실수 같아 `.12` 로 통일했다" 고 적었는데, 컴포넌트 정의를 보니
+**의도된 구분**이었습니다. `is-answered` 클래스로 분기하도록 되돌렸습니다.
+
 **`ch` 어노테이션**
 
 | 컴포넌트 | 어노테이션 | 구현 |
@@ -228,6 +255,7 @@ CTA 가 비활성 — `background: #ebebeb`, `color: #c5c5c5`, 라벨은 `품절
 
 우측 하단 패널 (시안에 없는 요소 — 삭제해도 무방)
 
+- **SPACING** — 여백 버전 3가지 (아래 표)
 - **CASE** — 이미지(복수 / 1장) · 카테고리(있음 / 없음)
 - **STATE** — 판매중 / 품절 / 판매중지 · 옵션(있음 / 없음)
 - **TYPE** — P1 / P3 / P4 / C1 크기 조절 + reset (모바일 수식 `size × 100vw / 390` 유지)
@@ -273,3 +301,38 @@ CTA 가 비활성 — `background: #ebebeb`, `color: #c5c5c5`, 라벨은 `품절
 | 이미지 뷰어 | 클릭 → 열림(4장) · 닫힘 ✓ |
 
 가로 오버플로 없음, 콘솔 에러 없음.
+
+
+## 9. 여백 버전 3가지 (SPACING 토글)
+
+가로 여백(화면 좌우)과 세로 padding 을 각각 고정 / 가변으로 바꿔 비교합니다.
+**PDP 본문뿐 아니라 이어지는 플로우(옵션 바텀시트)에도 동일하게 적용**됩니다.
+
+| 버전 | 가로 여백 | 세로 padding | 비고 |
+|---|---|---|---|
+| **A `px / mid`** | `px-16` 고정 16px | `mid` 가변 | 기본 · 시안 바인딩 그대로 |
+| **B `px / px`** | `px-16` 고정 16px | `px` 고정 | 세로도 뷰포트와 무관 |
+| **C `mid / mid`** | `mid-16` 가변 | `mid` 가변 | 전부 가변 |
+
+```css
+:root {
+  --pad-x: var(--px-16);        /* 가로 여백 */
+  --v-16: var(--mid-16); --v-20: var(--mid-20); --v-24: var(--mid-24);
+  --v-28: var(--mid-28); --v-36: var(--mid-36); --v-40: var(--mid-40);
+}
+body[data-vpad="px"]  { --v-16: 16px; --v-20: 20px; --v-24: 24px;
+                        --v-28: 28px; --v-36: 36px; --v-40: 40px; }
+body[data-hpad="mid"] { --pad-x: var(--mid-16); }
+```
+
+375 실측
+
+| | 가로 여백 | `v-24` | `v-40` | 시트 좌우 |
+|---|---|---|---|---|
+| A px / mid | 16.00 | 23.38 | 38.77 | 16.00 |
+| B px / px | 16.00 | **24.00** | **40.00** | 16.00 |
+| C mid / mid | **15.69** | 23.38 | 38.77 | **15.69** |
+
+> `em` 으로 정의된 곳(`productDetailInfo` textArea, `selectedOptionItem`, 버튼 padding)과
+> 시안이 원래 px 인 곳(썸네일 상하 12/16, 시트 header 20/2, buttonArea 12/16)은
+> 버전과 무관하게 그대로입니다.

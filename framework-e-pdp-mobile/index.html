@@ -73,6 +73,20 @@
     /* px-* — 뷰포트 무관 고정 ------------------------------------ */
     --px-16: 16px;                      /* 화면 좌우 여백 */
 
+    /* 여백 버전 (데모 전환) ---------------------------------------
+       --pad-x : 가로 여백   px-16(고정) ↔ mid-16(가변)
+       --v-*   : 세로 padding  mid(가변) ↔ px(고정)
+       A(기본) 가로 px / 세로 mid · B 가로 px / 세로 px · C 가로 mid / 세로 mid */
+    --pad-x: var(--px-16);
+    --v-12: var(--mid-12);
+    --v-16: var(--mid-16);
+    --v-20: var(--mid-20);
+    --v-24: var(--mid-24);
+    --v-28: var(--mid-28);
+    --v-32: var(--mid-32);
+    --v-36: var(--mid-36);
+    --v-40: var(--mid-40);
+
     /* radius ----------------------------------------------------- */
     --radius-3xs: 2px;
     --radius-2xs: 3px;
@@ -101,6 +115,14 @@
     font-size: 14px;               /* 1rem = 14px */
     overflow-x: hidden;            /* 100vw 기반 계산 시 가로 스크롤 방지 */
   }
+  /* B — 세로 padding 을 px 고정으로 */
+  body[data-vpad="px"] {
+    --v-12: 12px; --v-16: 16px; --v-20: 20px; --v-24: 24px;
+    --v-28: 28px; --v-32: 32px; --v-36: 36px; --v-40: 40px;
+  }
+  /* C — 가로 여백을 mid 가변으로 */
+  body[data-hpad="mid"] { --pad-x: var(--mid-16); }
+
   /* 시트가 열려 있는 동안 뒤 화면 스크롤 잠금 */
   body.is-locked { overflow: hidden; }
 
@@ -152,7 +174,7 @@
   .product-image {
     position: relative;
     width: 100%;
-    padding: 12px var(--px-16) 16px;   /* 시안 상 12 / 하 16 — 토큰 없음 → px */
+    padding: 12px var(--pad-x) 16px;   /* 시안 상 12 / 하 16 — 토큰 없음 → px */
   }
   .product-image .track {
     display: flex;
@@ -202,10 +224,10 @@
     flex-direction: column;
     gap: var(--mid-40);
     width: 100%;
-    padding-top: var(--mid-16);
-    padding-bottom: var(--mid-40);
+    padding-top: var(--v-16);
+    padding-bottom: var(--v-40);
   }
-  .product-info .pi-body { width: 100%; padding: 0 var(--px-16); }
+  .product-info .pi-body { width: 100%; padding: 0 var(--pad-x); }
   .overview { display: flex; flex-direction: column; gap: var(--mid-32); width: 100%; }
 
   .title-area { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
@@ -275,7 +297,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: var(--mid-24) var(--px-16) 0;
+    padding: var(--v-24) var(--pad-x) 0;
     border-top: 1px solid var(--c-line-faint);
     border-bottom: 1px solid var(--c-line-faint);
   }
@@ -322,7 +344,7 @@
   .detail-info .text-area.is-open { display: block; }
 
   /* ── productDetail (상세 이미지 + 더보기) ────────────────────── */
-  .product-detail { width: 100%; padding: var(--mid-40) var(--px-16) 0; }
+  .product-detail { width: 100%; padding: var(--v-40) var(--pad-x) 0; }
   .product-detail .pd-content {
     position: relative;
     width: 100%;
@@ -369,13 +391,13 @@
   .product-detail.is-expanded .more-area { display: none; }
 
   /* ── 섹션 공통 (review / inquiry / orderInfo) ────────────────── */
-  .section { width: 100%; padding-top: var(--mid-40); }
+  .section { width: 100%; padding-top: var(--v-40); }
   .section-head {
     display: flex;
     align-items: center;
     gap: var(--mid-16);
     width: 100%;
-    padding: var(--mid-24) var(--px-16);
+    padding: var(--v-24) var(--pad-x);
     border-bottom: 1px solid var(--c-line-soft);
   }
   .section-head .title {
@@ -403,7 +425,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: var(--mid-20) var(--px-16);
+    padding: var(--v-20) var(--pad-x);
     border-bottom: 1px solid var(--c-line-soft);
   }
   .check-box { display: flex; align-items: center; gap: var(--mid-8); }
@@ -494,7 +516,7 @@
     align-items: flex-start;
     gap: var(--mid-24);
     width: 100%;
-    padding: var(--mid-24) var(--px-16);
+    padding: var(--v-24) var(--pad-x);
     border-bottom: 1px solid var(--c-line);
   }
   .review-item .ri-top { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
@@ -570,7 +592,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: var(--mid-36) var(--mid-8);
+    padding: var(--v-36) var(--mid-8);
   }
   .pagination .inner { display: flex; align-items: center; gap: var(--mid-8); }
   /* iconButton/contained (outlined subtle, small) — 어노테이션 없음 → px */
@@ -632,10 +654,15 @@
     align-items: flex-start;
     gap: var(--mid-16);
     width: 100%;
-    padding: var(--mid-28) var(--px-16);
+    padding: var(--v-28) var(--pad-x);
     border-bottom: 1px solid var(--c-line);
   }
-  .inquiry-item:has(.reply) { gap: var(--mid-24); }
+  /* 시안 — 답변완료 항목은 gap mid-24, 구분선 rgba(0,0,0,.1) */
+  .inquiry-item.is-answered {
+    gap: var(--mid-24);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+  }
+  /* 시안 — question 래퍼는 답변완료 항목에만 존재 (titleArea + textArea, gap mid-16) */
   .inquiry-item .question { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
   .inquiry-item .q-text   { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
   .inquiry-item .info-area {
@@ -672,7 +699,7 @@
     flex-direction: column;
     gap: var(--mid-16);
     width: 100%;
-    padding: var(--mid-24) var(--mid-20);
+    padding: var(--v-24) var(--mid-20);
     background: var(--c-reply);
     border-radius: var(--radius-xs);
   }
@@ -702,14 +729,14 @@
   .inquiry-item:not(.is-open) .info-area img { transform: rotate(180deg); }
 
   /* ── orderInfo ───────────────────────────────────────────────── */
-  .order-info { width: 100%; padding-top: var(--mid-40); }
+  .order-info { width: 100%; padding-top: var(--v-40); }
   .order-info .oi-content {
     display: flex;
     flex-direction: column;
     gap: var(--mid-40);
     width: 100%;
     min-height: 600px;             /* 시안 — 토큰 없음 → px */
-    padding: var(--mid-40) var(--px-16);
+    padding: var(--v-40) var(--pad-x);
   }
   .order-info .oi-text {
     display: flex;
@@ -733,7 +760,7 @@
     z-index: 300;
     display: flex;
     flex-direction: column;
-    padding: 0 16px calc(16px + env(safe-area-inset-bottom, 0px));   /* 시안 px 고정 + 안전영역 */
+    padding: 0 var(--pad-x) calc(16px + env(safe-area-inset-bottom, 0px));   /* 시안 px 고정 + 안전영역 */
     background: #fff;
   }
   .btn-cta {
@@ -788,7 +815,7 @@
     display: flex;
     align-items: center;
     gap: 8px;                      /* 시안 px */
-    padding: 20px 8px 2px 16px;    /* 시안 px */
+    padding: 20px 8px 2px var(--pad-x);   /* 시안 px — 가로만 버전 연동 */
     background: #fff;
   }
   .sheet .sheet-head .title {
@@ -803,18 +830,18 @@
     min-height: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 0 16px;               /* 시안 contentArea px 16 */
+    padding: 0 var(--pad-x);       /* 시안 contentArea px 16 */
   }
   .sheet .sheet-body .inner {
     display: flex;
     flex-direction: column;
     gap: 20px;                     /* 시안 content gap */
     padding-top: 20px;
-    padding-bottom: var(--mid-12);
+    padding-bottom: var(--v-12);
   }
   .sheet .sheet-foot {
     flex-shrink: 0;
-    padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));   /* 시안 buttonArea + 안전영역 */
+    padding: 12px var(--pad-x) calc(16px + env(safe-area-inset-bottom, 0px));   /* 시안 buttonArea + 안전영역 */
     background: #fff;
   }
   .sheet .button-group { display: flex; align-items: center; gap: var(--mid-8); width: 100%; }
@@ -1082,6 +1109,10 @@
     text-align: right;
     color: #111;
   }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 3px 6px; color: #777; background: #fff; white-space: nowrap; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
   .demo-fields select {
     padding: 2px 4px;
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -1339,20 +1370,18 @@
     </div>
     <div class="inquiry-list" id="inquiryList">
       <article class="inquiry-item">
-        <div class="question">
-          <div class="q-text">
-            <div class="info-area">
-              <div class="option">
-                <span class="sub">미답변</span>
-                <span class="divider-v"></span>
-                <span class="sub">nickname***</span>
-                <span class="divider-v"></span>
-                <span class="sub">2026. 12. 31. 18:30</span>
-              </div>
-              <img src="assets/chevron-up.svg" alt="">
+        <div class="q-text">
+          <div class="info-area">
+            <div class="option">
+              <span class="sub">미답변</span>
+              <span class="divider-v"></span>
+              <span class="sub">nickname***</span>
+              <span class="divider-v"></span>
+              <span class="sub">2026. 12. 31. 18:30</span>
             </div>
-            <p class="q-body">제품 상세페이지에는 전해질 음료로 소개되어 있는데 운동 전과 운동 후 중 어느 시점에 마시는 것이 가장 효과적인지 궁금합니다.</p>
+            <img src="assets/chevron-up.svg" alt="">
           </div>
+          <p class="q-body">제품 상세페이지에는 전해질 음료로 소개되어 있는데 운동 전과 운동 후 중 어느 시점에 마시는 것이 가장 효과적인지 궁금합니다.</p>
         </div>
       </article>
 
@@ -1365,24 +1394,22 @@
             <button type="button" class="btn-text danger">삭제</button>
           </div>
         </div>
-        <div class="question">
-          <div class="q-text">
-            <div class="info-area">
-              <div class="option">
-                <span class="sub">미답변</span>
-                <span class="divider-v"></span>
-                <span class="sub">nickname***</span>
-                <span class="divider-v"></span>
-                <span class="sub">2026. 12. 28. 11:02</span>
-              </div>
-              <img src="assets/chevron-up.svg" alt="">
+        <div class="q-text">
+          <div class="info-area">
+            <div class="option">
+              <span class="sub">미답변</span>
+              <span class="divider-v"></span>
+              <span class="sub">nickname***</span>
+              <span class="divider-v"></span>
+              <span class="sub">2026. 12. 28. 11:02</span>
             </div>
-            <p class="q-body">블러드 오렌지 맛 외에도 다른 맛이 출시될 예정인지 궁금하고, 대용량이나 묶음 구성 상품도 판매 계획이 있는지 알고 싶습니다.</p>
+            <img src="assets/chevron-up.svg" alt="">
           </div>
+          <p class="q-body">블러드 오렌지 맛 외에도 다른 맛이 출시될 예정인지 궁금하고, 대용량이나 묶음 구성 상품도 판매 계획이 있는지 알고 싶습니다.</p>
         </div>
       </article>
 
-      <article class="inquiry-item is-open">
+      <article class="inquiry-item is-answered is-open">
         <div class="question">
           <div class="q-text">
             <div class="info-area">
@@ -1405,15 +1432,15 @@
             <span class="sub">2026. 12. 20. 14:40</span>
           </div>
           <p class="r-body">안녕하세요, 고객님.
-먼저 주문하신 상품과 다른 제품을 받아보시게 된 점 양해 부탁드립니다.
+        먼저 주문하신 상품과 다른 제품을 받아보시게 된 점 양해 부탁드립니다.
 
-번거로우시겠지만 주문 내역과 수령하신 상품 사진을 함께 전달해 주시면 확인 후 신속하게 교환 접수를 도와드리겠습니다.
+        번거로우시겠지만 주문 내역과 수령하신 상품 사진을 함께 전달해 주시면 확인 후 신속하게 교환 접수를 도와드리겠습니다.
 
-감사합니다.</p>
+        감사합니다.</p>
         </div>
       </article>
 
-      <article class="inquiry-item">
+      <article class="inquiry-item is-answered">
         <div class="question">
           <div class="q-text">
             <div class="info-area">
@@ -1432,20 +1459,18 @@
       </article>
 
       <article class="inquiry-item">
-        <div class="question">
-          <div class="q-text">
-            <div class="info-area">
-              <div class="option">
-                <span class="sub">미답변</span>
-                <span class="divider-v"></span>
-                <span class="sub">nickname***</span>
-                <span class="divider-v"></span>
-                <span class="sub">2026. 12. 05. 08:44</span>
-              </div>
-              <img src="assets/chevron-up.svg" alt="">
+        <div class="q-text">
+          <div class="info-area">
+            <div class="option">
+              <span class="sub">미답변</span>
+              <span class="divider-v"></span>
+              <span class="sub">nickname***</span>
+              <span class="divider-v"></span>
+              <span class="sub">2026. 12. 05. 08:44</span>
             </div>
-            <div class="private-row"><img src="assets/lock.svg" alt=""><span>비밀글</span></div>
+            <img src="assets/chevron-up.svg" alt="">
           </div>
+          <div class="private-row"><img src="assets/lock.svg" alt=""><span>비밀글</span></div>
         </div>
       </article>
 
@@ -1517,6 +1542,13 @@
 <!-- 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 -->
 <nav class="demo-nav" id="demoNav">
   <button type="button" class="demo-toggle" id="demoToggle">–</button>
+
+  <strong>spacing</strong>
+  <div class="demo-seg" id="padToggle">
+    <button type="button" data-pad="a">px / mid</button>
+    <button type="button" data-pad="b">px / px</button>
+    <button type="button" data-pad="c">mid / mid</button>
+  </div>
 
   <strong>case</strong>
   <div class="demo-fields" id="caseFields">
@@ -1785,6 +1817,25 @@
     renderCart();
   });
 
+  /* ── 데모 — 여백 버전 (가로 / 세로) ─────────────────────────── */
+  const PAD_KEY = 'fw-e-pdp-m-pad';
+  const PAD = {
+    a: { hpad: 'px',  vpad: 'mid' },   /* 가로 px-16 고정 / 세로 mid 가변 (기본·시안) */
+    b: { hpad: 'px',  vpad: 'px'  },   /* 가로 px-16 고정 / 세로 px 고정 */
+    c: { hpad: 'mid', vpad: 'mid' },   /* 가로 mid 가변 / 세로 mid 가변 */
+  };
+  function setPad(v) {
+    const st = PAD[v] || PAD.a;
+    document.body.dataset.hpad = st.hpad;
+    document.body.dataset.vpad = st.vpad;
+    $$('#padToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.pad === v));
+    try { localStorage.setItem(PAD_KEY, v); } catch (e) {}
+    readout();
+  }
+  $('#padToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-pad]'); if (b) setPad(b.dataset.pad);
+  });
+
   /* ── 데모 — 케이스 토글 ─────────────────────────────────────── */
   const CASE_KEY = 'fw-e-pdp-m-case';
   function applyCase() {
@@ -1850,8 +1901,8 @@
     $('#readout').innerHTML =
       `viewport <b>${innerWidth}px</b> · 타이포 1px <b>${px('--ut').toFixed(3)}</b>` +
       `${innerWidth > 450 ? ' <sup>450 고정</sup>' : ''} · spacing 1px <b>${px('--us').toFixed(3)}</b><br>` +
-      `mid-16 <b>${px('--mid-16').toFixed(2)}</b> · mid-24 <b>${px('--mid-24').toFixed(2)}</b> · ` +
-      `mid-40 <b>${px('--mid-40').toFixed(2)}</b> · px-16 <b>16.00</b><br>${type}`;
+      `가로여백 <b>${px('--pad-x').toFixed(2)}</b> · 세로 v-24 <b>${px('--v-24').toFixed(2)}</b> · ` +
+      `v-40 <b>${px('--v-40').toFixed(2)}</b> · mid-16 <b>${px('--mid-16').toFixed(2)}</b><br>${type}`;
   }
 
   $('#typeFields').addEventListener('input', e => {
@@ -1887,6 +1938,7 @@
       $('#cStock').value = c.stock;   $('#cOption').value = c.option;
     }
   } catch (e) {}
+  try { setPad(localStorage.getItem(PAD_KEY) || 'a'); } catch (e) { setPad('a'); }
   applyCase();
   applyFs();
 })();
