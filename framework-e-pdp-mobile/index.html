@@ -1061,8 +1061,6 @@
   .btn-cta:disabled { background: #ebebeb; color: #c5c5c5; cursor: default; }
 
   /* ── 케이스 토글 ─────────────────────────────────────────────── */
-  body[data-images="one"] .product-image .indicator { display: none; }
-  body[data-images="one"] .product-image .track .slide:not(:first-child) { display: none; }
   body[data-category="off"] .category { display: none; }
 
   /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
@@ -1109,6 +1107,8 @@
     text-align: right;
     color: #111;
   }
+  .demo-check { display: flex; align-items: center; gap: 3px; color: #777; cursor: pointer; white-space: nowrap; }
+  .demo-check input { width: 11px; height: 11px; accent-color: #111; cursor: pointer; }
   .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
   .demo-seg button { padding: 3px 6px; color: #777; background: #fff; white-space: nowrap; }
   .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
@@ -1552,14 +1552,9 @@
 
   <strong>case</strong>
   <div class="demo-fields" id="caseFields">
-    <label>img<select id="cImages"><option value="many">복수</option><option value="one">1장</option></select></label>
-    <label>cat<select id="cCategory"><option value="on">있음</option><option value="off">없음</option></select></label>
-  </div>
-
-  <strong>state</strong>
-  <div class="demo-fields" id="stateFields">
-    <label><select id="cStock"><option value="on">판매중</option><option value="soldout">품절</option><option value="stopped">판매중지</option></select></label>
-    <label>opt<select id="cOption"><option value="on">있음</option><option value="off">없음</option></select></label>
+    <label class="demo-check"><input type="checkbox" id="cCategory" checked>카테고리</label>
+    <label class="demo-check"><input type="checkbox" id="cOption" checked>옵션</label>
+    <label class="demo-check"><input type="checkbox" id="cSoldout">품절</label>
   </div>
 
   <strong>type</strong>
@@ -1840,28 +1835,22 @@
   const CASE_KEY = 'fw-e-pdp-m-case';
   function applyCase() {
     const st = {
-      images:   $('#cImages').value,
-      category: $('#cCategory').value,
-      stock:    $('#cStock').value,
-      option:   $('#cOption').value,
+      category: $('#cCategory').checked,
+      option:   $('#cOption').checked,
+      soldout:  $('#cSoldout').checked,
     };
-    document.body.dataset.images = st.images;
-    document.body.dataset.category = st.category;
-    hasOption = st.option === 'on';
+    document.body.dataset.category = st.category ? 'on' : 'off';
+    hasOption = st.option;
 
     const cta = $('#ctaBtn');
-    cta.disabled = st.stock !== 'on';
-    cta.textContent = st.stock === 'soldout' ? '품절'
-                    : st.stock === 'stopped' ? '판매중지' : '구매하기';
+    cta.disabled = st.soldout;
+    cta.textContent = st.soldout ? '품절' : '구매하기';
     if (cta.disabled) closeSheet();
 
-    imgIndex = 0;
-    track.scrollLeft = 0;
     renderDots();
     try { localStorage.setItem(CASE_KEY, JSON.stringify(st)); } catch (e) {}
   }
   $('#caseFields').addEventListener('change', applyCase);
-  $('#stateFields').addEventListener('change', applyCase);
 
   /* ── 데모 — P1 / P3 / P4 / C1 크기 조절 ─────────────────────── */
   const FS_DEFAULT = { p1: 16, p3: 14, p4: 13, c1: 12 };
@@ -1934,8 +1923,9 @@
   try {
     const c = JSON.parse(localStorage.getItem(CASE_KEY) || 'null');
     if (c) {
-      $('#cImages').value = c.images; $('#cCategory').value = c.category;
-      $('#cStock').value = c.stock;   $('#cOption').value = c.option;
+      $('#cCategory').checked = !!c.category;
+      $('#cOption').checked   = !!c.option;
+      $('#cSoldout').checked  = !!c.soldout;
     }
   } catch (e) {}
   try { setPad(localStorage.getItem(PAD_KEY) || 'a'); } catch (e) { setPad('a'); }
