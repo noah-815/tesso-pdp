@@ -283,14 +283,21 @@
     background: var(--c-text);
     transform: translateY(-50%);
   }
+  /* 시안 정의 — iconArea 는 "상품명 1줄 높이"와 같은 정사각 프레임으로 아이콘 버튼을 감싼다.
+     폰트 사이즈가 바뀌어도 정렬이 틀어지지 않도록 1lh(= P1 line-height)로 잡는다.
+     32px 아이콘 버튼은 이 프레임 가운데에 놓이고 밖으로 조금 넘친다 (시안과 동일). */
   .icon-area {
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;                   /* 토큰 없음 → px */
+    font-size: var(--fs-p1);
+    line-height: var(--lh-p1);
+    width: 1lh;
+    height: 1lh;
   }
   .icon-btn {
+    flex-shrink: 0;                /* iconArea 보다 커도 눌리지 않게 (시안: 27 프레임 안에 32 버튼) */
     display: flex;
     align-items: center;
     justify-content: center;
