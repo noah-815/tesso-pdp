@@ -1224,11 +1224,9 @@
     inset: 0;
     z-index: 600;
     background: rgba(0, 0, 0, .5);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .2s;
+    display: none;                 /* 전환 효과 없이 즉시 노출 */
   }
-  .inq-dim.is-open { opacity: 1; visibility: visible; }
+  .inq-dim.is-open { display: block; }
 
   .inq-dialog {
     position: fixed;
@@ -1243,13 +1241,10 @@
     overflow: hidden;
     background: #fff;
     border-radius: var(--radius-sm);
-    /* 중앙 정렬용 translate 만 — scale 을 쓰면 실측값이 왜곡되므로 페이드만 */
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .2s ease, visibility .2s;
+    transform: translate(-50%, -50%);   /* 중앙 정렬 */
+    display: none;                      /* 전환 효과 없이 즉시 노출 */
   }
-  .inq-dialog.is-open { opacity: 1; visibility: visible; }
+  .inq-dialog.is-open { display: flex; }
 
   .inq-dialog .inq-head {
     flex-shrink: 0;
