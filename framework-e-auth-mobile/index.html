@@ -1,0 +1,876 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Login &amp; Sign Up — Mobile (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E — Login / Sign Up / Change Password · 모바일
+     Figma 8410:241480 · 기준 폭 390 · 1rem = 14px
+
+     1) Typography  font-size = size value × 100vw / 390   (450px 에서 상한)
+        · 데스크탑의 "≤ 1rem 고정" 예외는 모바일에 적용하지 않는다
+        · H5 는 모바일에서 18 (데스크탑 20)
+     2) Spacing (mid-*)  (값 − 8) × 100vw / 390 + 8 · 값 < 8 은 고정
+     3) 가로 여백은 px-20 고정 (뷰포트 무관) · 세로는 mid
+     4) 입력 필드 padding 은 em (@em base P4)
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --tw: min(100vw, 450px);               /* typography 기준 폭 — 450 에서 상한 */
+    --ut: calc(var(--tw) / 390);           /* type 1px */
+    --us: calc(100vw / 390);               /* spacing 1px */
+
+    /* Typography ------------------------------------------------- */
+    --fs-c1:    calc(12 * var(--ut));
+    --fs-p4:    calc(13 * var(--ut));
+    --fs-p3:    calc(14 * var(--ut));
+    --fs-p1:    calc(16 * var(--ut));
+    --fs-btn-l: calc(14 * var(--ut));
+    --fs-btn-s: calc(13 * var(--ut));
+    --fs-h5:    calc(18 * var(--ut));      /* heading-5 — 모바일 18 */
+
+    --lh-h5: 1.55;
+    --lh-p1: 1.5;
+    --lh-p3: 1.6;
+    --lh-p4: 1.6;
+    --lh-c1: 1.2;
+
+    /* Spacing — mid-* -------------------------------------------- */
+    --mid-2:  2px;                         /* 값 < 8 → 고정 */
+    --mid-4:  4px;
+    --mid-6:  6px;
+    --mid-8:  8px;
+    --mid-10: calc(  2 * var(--us) + 8px);
+    --mid-12: calc(  4 * var(--us) + 8px);
+    --mid-20: calc( 12 * var(--us) + 8px);
+    --mid-24: calc( 16 * var(--us) + 8px);
+    --mid-32: calc( 24 * var(--us) + 8px);
+    --mid-36: calc( 28 * var(--us) + 8px);
+    --mid-40: calc( 32 * var(--us) + 8px);
+    --mid-48: calc( 40 * var(--us) + 8px);
+
+    /* px-* — 뷰포트 무관 고정 ------------------------------------ */
+    --px-16: 16px;
+    --px-20: 20px;                         /* 화면 좌우 여백 */
+
+    /* Radius / Font / Color -------------------------------------- */
+    --radius-3xs: 2px;
+    --radius-2xs: 3px;
+    --radius-xs:  4px;
+    --radius-sm:  6px;
+    --font: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    --font-en: "DM Sans", var(--font);
+    --font-header: "Inter", "DM Sans", var(--font);
+    --header-h: 60px;                      /* mobileH_header — 토큰 없음 → px */
+    --c-text: #111;
+    --c-sub: #6a6a6a;
+    --c-placeholder: rgba(17, 17, 17, 0.3);
+    --c-filled: rgba(17, 17, 17, 0.4);
+    --c-line: rgba(0, 0, 0, 0.12);
+    --c-line-soft: rgba(0, 0, 0, 0.1);
+    --c-fill: rgba(0, 0, 0, 0.02);
+    --c-otp-bg: #f4f4f4;
+    --c-btn-off-bg: #ebebeb;
+    --c-btn-off-text: #c5c5c5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;                       /* 1rem = 14px */
+    overflow-x: hidden;                    /* 100vw 기반 계산 시 가로 스크롤 방지 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+  body {
+    min-height: 100vh;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  input  { font: inherit; color: inherit; background: none; border: 0; outline: 0; border-radius: 0; -webkit-appearance: none; }
+  img { display: block; }
+
+  /* ── mobileH_header ──────────────────────────────────────────── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);               /* 60px — 토큰 없음 → px */
+    padding: 0 var(--px-16);
+    background: #fff;
+  }
+  .header .side {
+    display: flex;
+    align-items: center;
+    min-width: 48px;
+    height: 48px;
+    font-family: var(--font-en);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    text-transform: uppercase;
+    color: #372320;
+    white-space: nowrap;
+  }
+  .header .side.right { justify-content: flex-end; }
+  .header .logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-header);
+    font-weight: 600;
+    font-size: 20px;                       /* 로고 — 가변 로직 제외 */
+    line-height: 28px;
+    color: #372320;
+    white-space: nowrap;
+  }
+
+  /* ── 화면 셸 ─────────────────────────────────────────────────
+     시안 login/mobile · signUp/mobile — gap mid-36 · padding mid-40 / px-20 */
+  .screen {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-36);
+    width: 100%;
+    padding: var(--mid-40) var(--px-20);
+  }
+  .screen.is-on { display: flex; }
+
+  .screen > .title {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-h5);
+    line-height: var(--lh-h5);
+    color: #000;
+    text-align: center;
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--mid-32);
+    width: 100%;
+  }
+  .content.gap-24 { gap: var(--mid-24); }
+  .content.gap-32 { gap: var(--mid-32); }
+
+  /* ── singleLine ──────────────────────────────────────────────── */
+  .single-line { display: flex; flex-direction: column; gap: var(--mid-10); width: 100%; }
+  .single-line .label-area {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 var(--mid-2);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+  }
+  .single-line .field { display: flex; flex-direction: column; gap: var(--mid-8); width: 100%; }
+  .text-field {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-12);
+    width: 100%;
+    /* padding = em (@em base : P4) — 시안 13 / 17px */
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    padding: 1em 1.3077em;
+    /* Figma stroke 는 inside — 크기를 밀지 않게 inset box-shadow */
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+  }
+  .text-field.is-filled { background: var(--c-fill); }
+  .text-field input { flex: 1 0 0; min-width: 0; width: 100%; }
+  .text-field input::placeholder { color: var(--c-placeholder); }
+  .text-field.is-filled input { color: var(--c-filled); }
+  .text-field .eye {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5385em;                       /* 20px @ P4 */
+    height: 1.5385em;
+  }
+  .text-field .eye img { width: 100%; height: 100%; }
+  .text-field .eye.is-off { opacity: .45; }
+
+  .supporting {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: var(--mid-8);
+    width: 100%;
+    min-height: 14px;                      /* 시안 — 토큰 없음 → px */
+    padding: 0 var(--mid-2);
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+    color: rgba(17, 17, 17, .6);
+  }
+  .supporting .msg { flex: 1 0 0; min-width: 0; }
+  .supporting .counter {
+    flex-shrink: 0;
+    font-family: var(--font-en);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* ── button ──────────────────────────────────────────────────── */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    /* padding = em (@ button-label-large 14) — 시안 15 / 22px */
+    font-size: var(--fs-btn-l);
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 1.0714em 1.5714em;
+    border-radius: var(--radius-xs);
+    white-space: nowrap;
+  }
+  .btn.filled { background: #111; color: #fff; }
+  .btn:disabled { background: var(--c-btn-off-bg); color: var(--c-btn-off-text); }
+
+  .link-group { display: flex; align-items: center; justify-content: center; gap: var(--mid-8); width: 100%; }
+  .link-group .link {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: var(--fs-btn-s);
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 0.6923em 0;
+    opacity: .6;
+    white-space: nowrap;
+  }
+  .link-group .divider { flex-shrink: 0; width: 1px; height: 20px; background: var(--c-line); }   /* 시안 — 토큰 없음 → px */
+
+  .button-group { display: flex; flex-direction: column; gap: var(--mid-20); width: 100%; }
+
+  /* ── OTPfield ────────────────────────────────────────────────── */
+  .otp-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--mid-24);
+    width: 100%;
+    padding: var(--mid-40) var(--mid-24) var(--mid-32);
+    box-shadow: inset 0 0 0 1px var(--c-line-soft);
+    border-radius: var(--radius-sm);
+  }
+  .otp-box .head { display: flex; flex-direction: column; align-items: center; gap: var(--mid-32); width: 100%; }
+  .otp-box .text-area {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-6);
+    width: 100%;
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    text-align: center;
+    color: #000;
+  }
+  .otp-box .text-area .desc { opacity: .6; }
+  .otp-box .text-area .mail { font-family: var(--font-en); font-weight: 500; }
+  .otp-box .cells { display: flex; align-items: flex-start; justify-content: center; gap: var(--mid-6); width: 100%; }
+  .otp-box .cells input {
+    /* 시안 : 44 × 52 고정 · 6칸을 가운데 정렬 (남는 폭을 채우지 않는다)
+       max 48 은 컴포넌트 상한. 좁은 화면에서만 줄어들도록 flex-shrink 허용 */
+    flex: 0 1 44px;
+    min-width: 0;
+    max-width: 48px;                       /* 시안 — 토큰 없음 → px */
+    height: 52px;
+    background: var(--c-otp-bg);
+    border-radius: var(--radius-2xs);
+    font-family: var(--font-en);
+    font-size: var(--fs-p1);
+    font-weight: 500;
+    text-align: center;
+  }
+  .otp-box .timer {
+    /* 시안 : 텍스트 폭만큼 hug → 부모(align-items:center)에서 가운데 정렬 */
+    font-family: var(--font-en);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    opacity: .6;
+    text-align: right;
+  }
+  .action-area { display: flex; flex-direction: column; align-items: center; gap: var(--mid-24); width: 100%; }
+  .action-area .resend {
+    display: flex;
+    gap: var(--mid-8);
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+    color: var(--c-sub);
+    white-space: nowrap;
+  }
+  .action-area .resend button { text-decoration: underline; text-underline-position: from-font; }
+
+  /* ── fieldGroup / agree ──────────────────────────────────────── */
+  .field-group     { display: flex; flex-direction: column; gap: 16px; width: 100%; }  /* 시안 — 토큰 없음 → px */
+  .field-group.tight { gap: 24px; }
+  .agree { display: flex; flex-direction: column; width: 100%; }
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    width: 100%;
+    padding: var(--mid-6) 0;   /* 시안 모바일 — 행 높이 28 = 박스 16 + 6·6 (데스크탑은 mid-4) */
+  }
+  .check-row input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .check-row .box {
+    position: relative;
+    flex-shrink: 0;
+    width: 16px;                           /* 시안 — 토큰 없음 → px */
+    height: 16px;
+    border: 1px solid #d3d3d3;
+    border-radius: var(--radius-3xs);
+  }
+  .check-row input:checked + .box { background: #111; border-color: #111; }
+  .check-row input:checked + .box::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 2px;
+    width: 5px; height: 8px;
+    border: solid #fff;
+    border-width: 0 1.6px 1.6px 0;
+    transform: rotate(45deg);
+  }
+  .check-row .label { flex: 1 0 0; min-width: 0; font-size: var(--fs-c1); line-height: var(--lh-c1); }
+  .check-row .label u { text-decoration: underline; text-underline-position: from-font; }
+
+  /* ── complete + coupon ───────────────────────────────────────── */
+  .complete-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mid-12);                    /* 시안 모바일 — 12 */
+    width: 100%;
+    text-align: center;
+  }
+  .complete-text .h { width: 100%; font-weight: 500; font-size: var(--fs-h5); line-height: var(--lh-h5); }
+  .complete-text .d { width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); color: var(--c-sub); }
+  .coupon {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-20);
+    width: 100%;
+    padding: var(--mid-24);
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+  }
+  .coupon .summary { display: flex; flex-direction: column; gap: var(--mid-6); width: 100%; }
+  .coupon .name { font-size: var(--fs-c1); line-height: var(--lh-c1); opacity: .6; }
+  .coupon .benefit {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-4);
+    font-weight: 600;
+    font-size: var(--fs-p1);
+    line-height: var(--lh-p1);
+    white-space: nowrap;
+  }
+  .coupon .info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-2);
+    width: 100%;
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+  }
+  .coupon .info p { opacity: .8; }
+
+  /* ── snackBarArea / snackbar/default ─────────────────────────── */
+  .snack-area {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;                                /* 시안 : 헤더 위에 겹쳐서 노출 */
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+    padding: var(--px-16);
+    padding-bottom: 0;
+    pointer-events: none;
+  }
+  .snackbar {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 7px;                              /* 시안 — 토큰 없음 → px */
+    width: 100%;
+    padding: 15px 22px 15px 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: var(--radius-xs);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .08), 0 1px 4px rgba(0, 0, 0, .04), 0 0 1px rgba(0, 0, 0, .04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .snackbar.is-on { opacity: 1; transform: none; }
+  .snackbar img { flex-shrink: 0; width: 24px; height: 24px; }
+  .snackbar p {
+    flex: 1 0 0;
+    min-width: 0;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소 ─────────────────────────── */
+  .demo-nav {
+    position: fixed;
+    right: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    z-index: 500;
+    max-width: calc(100vw - 16px);
+    padding: 7px 8px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .12);
+    font-family: var(--font);
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .demo-nav.is-min .demo-body { display: none; }
+  .demo-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .demo-head strong { font-size: 9px; letter-spacing: .04em; color: #999; text-transform: uppercase; }
+  .demo-head button { width: 18px; height: 18px; border: 1px solid rgba(0, 0, 0, .12); border-radius: 3px; color: #777; line-height: 1; }
+  .demo-body { margin-top: 6px; }
+  .demo-seg { display: flex; flex-wrap: wrap; gap: 3px; }
+  .demo-seg button {
+    padding: 4px 7px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 3px;
+    color: #777;
+    background: #fff;
+    white-space: nowrap;
+  }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; border-color: #111; }
+  .demo-readout {
+    margin-top: 5px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(0, 0, 0, .08);
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+
+<header class="header">
+  <span class="side">Menu</span>
+  <p class="logo">BRAND</p>
+  <span class="side right">Bag [0]</span>
+</header>
+
+<main id="app">
+
+  <!-- login/mobile -->
+  <section class="screen is-on" data-screen="login">
+    <h1 class="title">로그인</h1>
+    <div class="content">
+      <div class="field-group" style="gap: var(--mid-8)">
+        <div class="single-line">
+          <div class="field">
+            <div class="text-field"><input type="email" placeholder="이메일 입력" data-req></div>
+          </div>
+        </div>
+        <div class="single-line">
+          <div class="field">
+            <div class="text-field">
+              <input type="password" placeholder="비밀번호 입력" data-req>
+              <button type="button" class="eye is-off" data-act="eye" aria-label="비밀번호 표시"><img src="assets/eye.svg" alt=""></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="button-group">
+        <button type="button" class="btn filled" data-go="login-done" disabled>로그인</button>
+        <div class="link-group">
+          <button type="button" class="link" data-go="signup-email">회원가입</button>
+          <span class="divider"></span>
+          <button type="button" class="link" data-go="find-email">비밀번호 찾기</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- signUp/mobile · type=default -->
+  <section class="screen" data-screen="signup-email">
+    <h1 class="title">회원가입</h1>
+    <div class="content">
+      <div class="single-line">
+        <div class="label-area">이메일</div>
+        <div class="field">
+          <div class="text-field"><input type="email" placeholder="이메일 입력" data-req></div>
+          <div class="supporting"></div>
+        </div>
+      </div>
+      <button type="button" class="btn filled" data-go="signup-verify" data-snack="이메일로 인증번호를 전송했어요" disabled>인증 요청</button>
+    </div>
+  </section>
+
+  <!-- signUp/mobile · type=verifyCode -->
+  <section class="screen" data-screen="signup-verify">
+    <h1 class="title">회원가입</h1>
+    <div class="content gap-32">
+      <div class="otp-box">
+        <div class="head">
+          <div class="text-area">
+            <p class="desc">아래 이메일로 전송된 인증번호를 입력하세요</p>
+            <p class="mail">example@gmail.com</p>
+          </div>
+          <div class="cells" data-otp>
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 1">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 2">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 3">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 4">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 5">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 6">
+          </div>
+        </div>
+        <p class="timer" data-timer>04:59</p>
+      </div>
+      <div class="action-area">
+        <button type="button" class="btn filled" data-go="signup-form" disabled>이메일 인증</button>
+        <p class="resend">
+          <span>받은 편지함에서 메일을 찾을 수 없나요?</span>
+          <button type="button" data-snack="이메일로 인증번호를 전송했어요">다시 보내기</button>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- signUp/mobile · type=signup -->
+  <section class="screen" data-screen="signup-form">
+    <h1 class="title">회원가입</h1>
+    <div class="content gap-24" style="align-items: flex-start">
+      <div class="field-group">
+        <div class="field-group tight">
+          <div class="single-line">
+            <div class="label-area">이메일</div>
+            <div class="field">
+              <div class="text-field is-filled"><input type="email" value="example@gmail.com" readonly></div>
+              <div class="supporting"><span class="msg">인증 완료된 이메일입니다.</span></div>
+            </div>
+          </div>
+          <div class="single-line">
+            <div class="label-area">비밀번호</div>
+            <div class="field">
+              <div class="text-field">
+                <input type="password" placeholder="비밀번호 입력" data-req>
+                <button type="button" class="eye is-off" data-act="eye" aria-label="비밀번호 표시"><img src="assets/eye.svg" alt=""></button>
+              </div>
+              <div class="supporting"></div>
+            </div>
+          </div>
+          <div class="single-line">
+            <div class="label-area">휴대폰 번호</div>
+            <div class="field">
+              <div class="text-field"><input type="tel" placeholder="휴대폰 번호 입력" data-req></div>
+              <div class="supporting"></div>
+            </div>
+          </div>
+        </div>
+        <div class="single-line">
+          <div class="label-area">이름</div>
+          <div class="field">
+            <div class="text-field"><input type="text" placeholder="이름 입력" maxlength="20" data-req data-count></div>
+            <div class="supporting"><span class="counter">0/20</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="agree">
+        <label class="check-row">
+          <input type="checkbox" data-req-check>
+          <span class="box"></span>
+          <span class="label">[필수] <u>이용약관</u> 및 <u>개인정보 처리방침</u>에 동의합니다.</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox">
+          <span class="box"></span>
+          <span class="label">[선택] 신제품 소식과 할인 혜택을 카카오톡 등으로 받겠습니다.</span>
+        </label>
+      </div>
+    </div>
+    <button type="button" class="btn filled" data-go="signup-complete" disabled>회원가입</button>
+  </section>
+
+  <!-- complete/mobile -->
+  <section class="screen" data-screen="signup-complete" style="gap: var(--mid-48)">
+    <div class="complete-text">
+      <p class="h">가입을 환영합니다!</p>
+      <p class="d">지금 바로 사용할 수 있는 신규 회원 쿠폰이 지급되었어요</p>
+    </div>
+    <div class="coupon">
+      <div class="summary">
+        <p class="name">신규 회원 웰컴 쿠폰</p>
+        <p class="benefit"><span>10%</span><span>할인</span></p>
+      </div>
+      <div class="info">
+        <p>30,000원 이상 구매 시, 최대 20,000원 할인</p>
+        <p>2026. 09. 30. 23:59까지</p>
+      </div>
+    </div>
+    <button type="button" class="btn filled" data-go="login">쇼핑하러 가기</button>
+  </section>
+
+  <!-- changePassword/mobile · type=default -->
+  <section class="screen" data-screen="find-email">
+    <h1 class="title">비밀번호 변경</h1>
+    <div class="content">
+      <div class="single-line">
+        <div class="label-area">이메일</div>
+        <div class="field">
+          <div class="text-field"><input type="email" placeholder="가입 시 등록한 이메일 입력" data-req></div>
+          <div class="supporting"></div>
+        </div>
+      </div>
+      <button type="button" class="btn filled" data-go="find-verify" data-snack="이메일로 인증번호를 전송했어요" disabled>인증 요청</button>
+    </div>
+  </section>
+
+  <!-- changePassword/mobile · type=verifyCode -->
+  <section class="screen" data-screen="find-verify">
+    <h1 class="title">비밀번호 변경</h1>
+    <div class="content gap-32">
+      <div class="otp-box">
+        <div class="head">
+          <div class="text-area">
+            <p class="desc">아래 이메일로 전송된 인증번호를 입력하세요</p>
+            <p class="mail">example@gmail.com</p>
+          </div>
+          <div class="cells" data-otp>
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 1">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 2">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 3">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 4">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 5">
+            <input inputmode="numeric" maxlength="1" aria-label="인증번호 6">
+          </div>
+        </div>
+        <p class="timer" data-timer>04:59</p>
+      </div>
+      <div class="action-area">
+        <button type="button" class="btn filled" data-go="find-password" disabled>이메일 인증</button>
+        <p class="resend">
+          <span>받은 편지함에서 메일을 찾을 수 없나요?</span>
+          <button type="button" data-snack="이메일로 인증번호를 전송했어요">다시 보내기</button>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- changePassword/mobile · type=password -->
+  <section class="screen" data-screen="find-password">
+    <h1 class="title">비밀번호 변경</h1>
+    <div class="content">
+      <div class="single-line">
+        <div class="label-area">새 비밀번호</div>
+        <div class="field">
+          <div class="text-field">
+            <input type="password" placeholder="새 비밀번호 입력" data-req>
+            <button type="button" class="eye is-off" data-act="eye" aria-label="비밀번호 표시"><img src="assets/eye.svg" alt=""></button>
+          </div>
+          <div class="supporting"></div>
+        </div>
+      </div>
+      <button type="button" class="btn filled" data-go="login" data-snack="비밀번호를 변경했어요" disabled>완료</button>
+    </div>
+  </section>
+
+  <!-- 로그인 성공 -->
+  <section class="screen" data-screen="login-done" style="gap: var(--mid-48)">
+    <div class="complete-text">
+      <p class="h">로그인되었어요</p>
+      <p class="d">로그인 상태로 기존에 보던 화면으로 이동합니다</p>
+    </div>
+    <button type="button" class="btn filled" data-go="login">처음으로</button>
+  </section>
+
+</main>
+
+<!-- snackBarArea -->
+<div class="snack-area">
+  <div class="snackbar" id="snackbar" role="status" aria-live="polite">
+    <img src="assets/check-filled.svg" alt="">
+    <p id="snackText">이메일로 인증번호를 전송했어요</p>
+  </div>
+</div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <div class="demo-head">
+    <strong>screen</strong>
+    <button type="button" id="demoToggle" aria-label="패널 접기">–</button>
+  </div>
+  <div class="demo-body">
+    <div class="demo-seg" id="screenToggle">
+      <button type="button" data-screen-go="login">로그인</button>
+      <button type="button" data-screen-go="signup-email">가입1</button>
+      <button type="button" data-screen-go="signup-verify">가입2</button>
+      <button type="button" data-screen-go="signup-form">가입3</button>
+      <button type="button" data-screen-go="signup-complete">완료</button>
+      <button type="button" data-screen-go="find-email">비번찾기</button>
+    </div>
+    <p class="demo-readout" id="readout">–</p>
+  </div>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const UI_KEY = 'fw-e-auth-m-ui';
+
+  function px(k) {
+    const d = document.createElement('div');
+    d.style.width = `var(${k})`;
+    document.body.appendChild(d);
+    const v = parseFloat(getComputedStyle(d).width);
+    d.remove();
+    return v;
+  }
+
+  /* ── 화면 전환 ─────────────────────────────────────────────── */
+  function show(name) {
+    const next = $(`.screen[data-screen="${name}"]`);
+    if (!next) return;
+    $$('.screen').forEach(s => s.classList.toggle('is-on', s === next));
+    $$('#screenToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.screenGo === name));
+    scrollTo(0, 0);
+    syncButtons(next);
+    startTimer(next);
+    readout();
+  }
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (go) {
+      if (go.disabled) return;
+      if (go.dataset.snack) snack(go.dataset.snack);
+      show(go.dataset.go);
+      return;
+    }
+    const jump = e.target.closest('[data-screen-go]');
+    if (jump) { show(jump.dataset.screenGo); return; }
+    const eye = e.target.closest('[data-act="eye"]');
+    if (eye) {
+      const input = $('input', eye.closest('.text-field'));
+      const on = input.type === 'password';
+      input.type = on ? 'text' : 'password';
+      eye.classList.toggle('is-off', !on);
+      return;
+    }
+    const sn = e.target.closest('[data-snack]:not([data-go])');
+    if (sn) snack(sn.dataset.snack);
+  });
+
+  /* ── 버튼 활성화 ──────────────────────────────────────────── */
+  function syncButtons(screen) {
+    const reqs = $$('[data-req]', screen);
+    const checks = $$('[data-req-check]', screen);
+    const otp = $$('[data-otp] input', screen);
+    const ok =
+      reqs.every(i => i.value.trim() !== '') &&
+      checks.every(c => c.checked) &&
+      (otp.length === 0 || otp.every(i => i.value !== ''));
+    $$('.btn.filled[data-go]', screen).forEach(b => { b.disabled = !ok; });
+  }
+  document.addEventListener('input', e => {
+    const screen = e.target.closest('.screen');
+    if (!screen) return;
+    if (e.target.hasAttribute('data-count')) {
+      const c = $('.counter', e.target.closest('.field'));
+      if (c) c.textContent = `${e.target.value.length}/${e.target.maxLength}`;
+    }
+    syncButtons(screen);
+  });
+  document.addEventListener('change', e => {
+    const screen = e.target.closest('.screen');
+    if (screen) syncButtons(screen);
+  });
+
+  /* OTP */
+  $$('[data-otp]').forEach(box => {
+    const cells = $$('input', box);
+    box.addEventListener('input', e => {
+      const i = cells.indexOf(e.target);
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 1);
+      if (e.target.value && i < cells.length - 1) cells[i + 1].focus();
+    });
+    box.addEventListener('keydown', e => {
+      const i = cells.indexOf(e.target);
+      if (e.key === 'Backspace' && !e.target.value && i > 0) cells[i - 1].focus();
+    });
+  });
+
+  /* 타이머 */
+  let timerId = null;
+  function startTimer(screen) {
+    const el = $('[data-timer]', screen);
+    clearInterval(timerId);
+    if (!el) return;
+    let left = 299;
+    const tick = () => {
+      el.textContent = `${String(Math.floor(left / 60)).padStart(2, '0')}:${String(left % 60).padStart(2, '0')}`;
+      if (left-- <= 0) clearInterval(timerId);
+    };
+    tick();
+    timerId = setInterval(tick, 1000);
+  }
+
+  /* ── 스낵바 — 3초 후 사라짐 ───────────────────────────────── */
+  const sb = $('#snackbar');
+  let sbTimer = null;
+  function snack(msg) {
+    $('#snackText').textContent = msg;
+    sb.classList.add('is-on');
+    clearTimeout(sbTimer);
+    sbTimer = setTimeout(() => sb.classList.remove('is-on'), 3000);
+  }
+
+  /* ── 데모 ─────────────────────────────────────────────────── */
+  function readout() {
+    $('#readout').innerHTML =
+      `viewport <b>${innerWidth}px</b> · 좌우 <b>${px('--px-20').toFixed(2)}</b> · ` +
+      `mid-36 <b>${px('--mid-36').toFixed(2)}</b><br>` +
+      `H5 <b>${px('--fs-h5').toFixed(2)}</b> · P4 <b>${px('--fs-p4').toFixed(2)}</b> · ` +
+      `C1 <b>${px('--fs-c1').toFixed(2)}</b>`;
+  }
+  window.addEventListener('resize', readout);
+  $('#demoToggle').addEventListener('click', () => {
+    const min = !$('#demoNav').classList.contains('is-min');
+    $('#demoNav').classList.toggle('is-min', min);
+    $('#demoToggle').textContent = min ? '+' : '–';
+    try { localStorage.setItem(UI_KEY, min ? 'min' : 'open'); } catch (e) {}
+  });
+  try {
+    if (localStorage.getItem(UI_KEY) === 'min') { $('#demoNav').classList.add('is-min'); $('#demoToggle').textContent = '+'; }
+  } catch (e) {}
+
+  show('login');
+})();
+</script>

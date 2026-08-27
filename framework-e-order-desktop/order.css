@@ -1,0 +1,575 @@
+/* ─────────────────────────────────────────────────────────────
+   Framework E — 주문 플로우 (데스크탑)
+   cart · checkout · paySuccess  /  Figma 10127:91606
+   기준 폭 1920 · 1rem = 14px
+
+   1) Typography
+      font-size = (size value − 1) × 0.0083 × screen width + 1rem
+      · size value ≤ 1rem 이면 뷰포트와 무관하게 고정
+      · 이 화면들에서 가변인 건 P1(18) · P2(16) 뿐
+   2) Spacing (mid-*)
+      (값 − 8) × 100vw / 1920 + 8   ·   값 < 8 은 값 그대로 고정
+   3) px-* / 그 외 = 고정
+   4) em — 버튼류 padding + 컴포넌트 어노테이션이 em 이라고 한 곳
+   5) 그리드 — margin 19vw/1920 · gutter 16px · 12컬럼
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* 기준 단위 -------------------------------------------------- */
+  --us: calc(100vw / 1920);                 /* spacing 1px */
+  --grid-margin: calc(19 * 100vw / 1920);   /* global/desktop-margin-vw = 19 */
+  --grid-gutter: 16px;                      /* global/desktop-gutter-px = 16 */
+
+  /* Typography ------------------------------------------------- */
+  --fs-c1:    12px;   /* caption-1           ≤ 1rem → 고정 */
+  --fs-p4:    13px;   /* paragraph-4         ≤ 1rem → 고정 */
+  --fs-p3:    14px;   /* paragraph-3          = 1rem → 고정 */
+  --fs-p2:    calc((1.1429 - 1) * 0.83vw + 1rem);   /* 16px @1920 — 가변 */
+  --fs-p1:    calc((1.2857 - 1) * 0.83vw + 1rem);   /* 18px @1920 — 가변 */
+  --fs-btn-l: 14px;
+  --fs-btn-s: 13px;
+  --fs-logo:  20px;   /* BRAND 로고 — 고정 */
+
+  --lh-c1: 1.2;
+  --lh-p4: 1.6;
+  --lh-p3: 1.6;
+  --lh-p2: 1.5;
+  --lh-p1: 1.5;
+
+  /* Spacing — mid-* : (값 − 8) × 100vw / 1920 + 8 --------------- */
+  --mid-1:   1px;
+  --mid-2:   2px;
+  --mid-4:   4px;
+  --mid-6:   6px;
+  --mid-8:   8px;
+  --mid-10:  calc( 2 * var(--us) + 8px);
+  --mid-12:  calc( 4 * var(--us) + 8px);
+  --mid-16:  calc( 8 * var(--us) + 8px);
+  --mid-20:  calc(12 * var(--us) + 8px);
+  --mid-24:  calc(16 * var(--us) + 8px);
+  --mid-32:  calc( 24 * var(--us) + 8px);
+  --mid-56:  calc( 48 * var(--us) + 8px);
+  --mid-80:  calc( 72 * var(--us) + 8px);
+  --mid-120: calc(112 * var(--us) + 8px);
+  --mid-144: calc(136 * var(--us) + 8px);   /* cart 썸네일 */
+
+  /* radius ----------------------------------------------------- */
+  --radius-3xs: 2px;
+  --radius-2xs: 3px;
+  --radius-xs:  4px;
+
+  /* Font / Color ----------------------------------------------- */
+  --font: "DM Sans", "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+  --font-header: "Inter", "Pretendard Variable", Pretendard, sans-serif;
+  --c-text: #111;
+  --c-sub: #6a6a6a;
+  --c-line: rgba(0, 0, 0, 0.12);
+  --c-line-soft: rgba(0, 0, 0, 0.1);
+  --c-line-faint: rgba(0, 0, 0, 0.08);
+  --c-line-hair: rgba(0, 0, 0, 0.06);
+  --c-disabled: #c5c5c5;
+
+  --header-h: 54px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html {
+  -webkit-text-size-adjust: 100%;
+  font-size: 14px;                 /* 1rem = 14px */
+  /* 브라우저 스크롤바 숨김 — 스크롤은 그대로 동작.
+     세로 스크롤바가 없어야 100vw 와 실제 콘텐츠 폭이 같아져
+     19vw 마진 · 12컬럼 계산이 시안과 정확히 일치한다. */
+  scrollbar-width: none;           /* Firefox */
+  -ms-overflow-style: none;        /* 구 Edge/IE */
+}
+html::-webkit-scrollbar { display: none; }   /* Chrome · Safari */
+body {
+  font-family: var(--font);
+  color: var(--c-text);
+  background: #fff;
+  word-break: keep-all;
+}
+img { display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+/* Figma 의 stroke 는 크기를 밀지 않는다(inside).
+   높이가 padding 으로 결정되는 박스에 CSS border 를 쓰면 2px 커지므로
+   inset box-shadow 로 옮겨 시안 크기를 그대로 재현한다. */
+.stroke     { box-shadow: inset 0 0 0 1px var(--c-line-soft); }
+
+/* ── set06_header ────────────────────────────────────────────── */
+.header {
+  position: relative;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);          /* 시안 54px — 토큰 없음 → px */
+  padding: 0 var(--grid-margin);
+  background: #fff;
+  font-family: var(--font-header);
+  font-size: 12px;                  /* 헤더 — 토큰 없음 → px */
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.header nav { display: flex; gap: 24px; }
+.header .logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--fs-logo);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.header .utils { display: flex; gap: 24px; }
+
+/* ── contentArea — 12컬럼 그리드 ─────────────────────────────── */
+.content-area {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+  row-gap: var(--mid-20);
+  padding: var(--mid-80) var(--grid-margin) var(--mid-120);
+  align-items: start;
+}
+.page-title {
+  grid-column: 2 / span 11;
+  font-weight: 600;
+  font-size: var(--fs-p1);
+  line-height: var(--lh-p1);
+}
+.title-area { grid-column: 2 / span 11; display: flex; flex-direction: column; gap: var(--mid-6); }
+.title-area .order-number {
+  display: flex;
+  align-items: center;
+  gap: var(--mid-8);
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+}
+.title-area .order-number .k { color: var(--c-sub); }
+.title-area .order-number .v { font-variation-settings: "opsz" 14; }
+
+.col-main    { grid-column: 2 / span 5; }
+.col-summary { grid-column: 8 / span 4; }
+/* annotation(orderSummary) — 우측 정보 영역은 스크롤 시 고정하지 않는다
+   (장바구니 · 주문/결제 · 주문완료 모두 동일) */
+
+/* ── 좌측 블록 공통 ──────────────────────────────────────────── */
+.blocks { display: flex; flex-direction: column; width: 100%; }
+.block { display: flex; flex-direction: column; gap: var(--mid-20); width: 100%; padding: var(--mid-32) 0; }
+.block:first-child { padding-top: var(--mid-20); }   /* 시안 첫 블록 높이 178 에 맞춤 */
+/* .head 로 감싼 경우에도 적용되도록 자식 선택자(>)를 쓰지 않는다 */
+.block .b-title {
+  font-weight: 500;
+  font-size: var(--fs-p2);
+  line-height: var(--lh-p2);
+}
+.block .head { display: flex; align-items: center; gap: var(--mid-24); width: 100%; }
+.block .head .b-title { flex: 1 0 0; min-width: 0; }
+
+/* underline 텍스트 버튼 (변경 / 배송지 등록 / 보기) */
+.btn-underline {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 0;
+  border-bottom: 1px solid var(--c-text);
+  font-weight: 500;
+  font-size: var(--fs-btn-s);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* ── shippingAddress ─────────────────────────────────────────── */
+.shipping .content { display: flex; flex-direction: column; gap: var(--mid-8); width: 100%; }
+.shipping .addr { width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+.shipping .empty { width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); color: var(--c-sub); }
+.shipping .info,
+.shipping .request {
+  display: flex;
+  align-items: center;
+  gap: var(--mid-8);
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+  color: var(--c-sub);
+  white-space: nowrap;
+}
+.shipping .request .v { color: var(--c-text); }
+.divider-v { flex-shrink: 0; width: 1px; height: 12px; background: var(--c-line); }
+
+/* ── productList/checkbox (cart) ─────────────────────────────── */
+.cart-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mid-20);
+  width: 100%;
+  padding: var(--mid-20) 0;
+  border-bottom: 1px solid var(--c-line-faint);
+}
+.cart-item .image-area {
+  flex-shrink: 0;
+  position: relative;
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+}
+.cart-item .thumb { width: var(--mid-144); height: var(--mid-144); background: #ddd; }
+.cart-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
+.cart-item .checkbox-area { position: absolute; left: 0; top: 0; padding: var(--mid-6); }
+.check-box {
+  position: relative;
+  display: block;
+  width: 16px;                      /* checkBox — 토큰 없음 → px */
+  height: 16px;
+  background: #fff;
+  border: 1px solid #d3d3d3;
+  border-radius: var(--radius-3xs);
+  cursor: pointer;
+}
+.check-box input { position: absolute; opacity: 0; width: 0; height: 0; }
+.check-box input:checked + .box { position: absolute; inset: -1px; background: #111; border-radius: var(--radius-3xs); }
+.check-box input:checked + .box::after {
+  content: "";
+  position: absolute;
+  left: 5px; top: 3px;
+  width: 5px; height: 8px;
+  border: solid #fff;
+  border-width: 0 1.6px 1.6px 0;
+  transform: rotate(45deg);
+}
+.cart-item .content {
+  flex: 1 0 0;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cart-item .top { display: flex; align-items: flex-start; gap: var(--mid-24); width: 100%; }
+.cart-item .text-area { flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; gap: var(--mid-4); }
+.cart-item .name {
+  width: 100%;
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: var(--mid-2);
+  font-size: var(--fs-p4);
+  line-height: var(--lh-p4);
+  white-space: nowrap;
+}
+.option-row span { opacity: 0.5; }
+.cart-item .close { flex-shrink: 0; display: flex; width: 20px; height: 20px; }
+.cart-item .close img { width: 100%; height: 100%; }
+.cart-item .qty-price { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.cart-item .price {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  line-height: var(--lh-p3);
+  white-space: nowrap;
+}
+.cart-item .price .num { font-weight: 500; font-size: var(--fs-p4); font-variation-settings: "opsz" 14; }
+.cart-item .price .won { font-weight: 500; font-size: var(--fs-p3); }
+
+/* numberInput (size = large) */
+.number-input {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 1px;
+  box-shadow: inset 0 0 0 1px var(--c-line-faint);   /* 시안 stroke — 크기에 영향 없음 */
+  border-radius: var(--radius-xs);
+}
+/* numberInputItem large — 시안 조정됨: 36 → 34, 내부 padding mid-6 → mid-4,
+   아이콘은 고정 24 (컨테이너에 꽉 차지 않고 가운데 정렬) */
+.number-input button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: var(--mid-4);
+}
+.number-input button img { width: 24px; height: 24px; }
+.number-input button:disabled { opacity: 0.3; cursor: default; }
+/* 컴포넌트 문서 — 숫자 영역 기본 width = 3ch, min-width = 32px (fixed) */
+.number-input .value {
+  width: 3ch;
+  min-width: 32px;
+  font-weight: 500;
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+  text-align: center;
+  font-variation-settings: "opsz" 14;
+}
+
+/* ── productList/default (checkout · paySuccess) ─────────────── */
+.order-item { display: flex; gap: var(--mid-20); align-items: flex-start; width: 100%; }
+.order-item .thumb {
+  flex-shrink: 0;
+  width: var(--mid-120);
+  height: var(--mid-120);
+  background: #ddd;
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+}
+.order-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
+.order-item .text-area { flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; gap: var(--mid-4); }
+.order-item .name {
+  width: 100%;
+  font-weight: 500;
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.order-item .info { display: flex; align-items: center; gap: var(--mid-6); }
+.order-item .info .divider-v { height: 10px; }
+.order-item .qty {
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-p4);
+  line-height: var(--lh-p4);
+  opacity: 0.5;
+  white-space: nowrap;
+}
+.order-item .qty .n { font-variation-settings: "opsz" 14; }
+.order-item .price {
+  display: flex;
+  align-items: baseline;
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+  white-space: nowrap;
+}
+.order-item .price .num { font-variation-settings: "opsz" 14; }
+.product-group { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
+
+/* ── couponDiscount ──────────────────────────────────────────── */
+.coupon .head .count-area {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--mid-4);
+  font-size: var(--fs-p4);
+  line-height: var(--lh-p4);
+  color: var(--c-sub);
+  white-space: nowrap;
+}
+.coupon .head .count { display: flex; align-items: center; gap: var(--mid-1); }
+.coupon .head .count .n { font-variation-settings: "opsz" 14; }
+.coupon-selector { display: flex; align-items: stretch; gap: var(--mid-8); width: 100%; }
+/* annotation(textField) — padding : em (@em base : field text = P4)
+   annotation — 필드의 높이는 버튼 높이와 동일한 값을 적용 */
+.coupon-field {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--mid-8);
+  font-size: var(--fs-p4);
+  line-height: var(--lh-p4);
+  padding: 0.8462em 1.3077em;       /* 시안 11 / 17px */
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  border-radius: var(--radius-xs);
+  color: var(--c-sub);
+}
+.coupon-field .label { flex: 1 0 0; min-width: 0; }
+.coupon-field.is-selected { color: var(--c-text); }
+.coupon-field.is-selected .label { flex: 0 0 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.coupon-field .off { flex: 1 0 0; min-width: 0; color: var(--c-text); opacity: 0.3; }
+.coupon-field .discount { flex-shrink: 0; color: var(--c-sub); font-variation-settings: "opsz" 14; }
+/* couponSelectorButton — 버튼류 padding = em (@ P4) */
+.coupon-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-p4);
+  line-height: var(--lh-p4);
+  padding: 0.8462em 1.3077em;       /* 시안 11 / 17px */
+  box-shadow: inset 0 0 0 1px var(--c-line);
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+}
+.coupon-btn:disabled { color: var(--c-disabled); cursor: default; }
+
+/* ── payment ─────────────────────────────────────────────────── */
+.pay-options { display: flex; align-items: stretch; gap: var(--mid-8); width: 100%; }
+/* annotation(paymentOption) — padding : em (@em base : option label = P3) */
+.pay-option {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+  padding: 0.7857em 1.5em;          /* 시안 11 / 21px */
+  box-shadow: inset 0 0 0 1px var(--c-line-soft);
+  border-radius: var(--radius-xs);
+  color: rgba(17, 17, 17, 0.4);
+  white-space: nowrap;
+}
+.pay-option.is-on { box-shadow: inset 0 0 0 1px #000; color: var(--c-text); }
+
+/* ── paymentInfo (우측) ──────────────────────────────────────── */
+.order-summary { display: flex; flex-direction: column; width: 100%; }
+/* 시안 — paymentInfo 는 자체 상하 여백 mid-20 을 가진다
+   (타이틀이 y=20 에서 시작하고 블록 하단에도 20 이 남음) */
+.payment-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mid-20);
+  width: 100%;
+  padding: var(--mid-20) 0;
+}
+.payment-info > .b-title { font-weight: 500; font-size: var(--fs-p2); line-height: var(--lh-p2); }
+.payment-info .rows { display: flex; flex-direction: column; width: 100%; }
+.payment-info .top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mid-6);
+  width: 100%;
+  padding-bottom: var(--mid-20);
+  border-bottom: 1px solid var(--c-line-hair);
+}
+.payment-info .row[hidden] { display: none; }
+.payment-info .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+  white-space: nowrap;
+}
+.payment-info .row .k { color: var(--c-sub); }
+.payment-info .row .v { display: flex; align-items: center; text-align: right; }
+.payment-info .row .v .num { font-variation-settings: "opsz" 14; }
+.payment-info .note {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  font-size: var(--fs-p3);
+  line-height: var(--lh-p3);
+  color: var(--c-sub);
+  white-space: nowrap;
+}
+.payment-info .note .num { font-variation-settings: "opsz" 14; }
+.payment-info .bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mid-8);
+  width: 100%;
+  padding-top: var(--mid-20);
+  white-space: nowrap;
+}
+.payment-info .total { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.payment-info .total .k { font-size: var(--fs-p3); line-height: var(--lh-p3); }
+.payment-info .total .v {
+  display: flex;
+  align-items: baseline;
+  font-weight: 600;
+  font-size: var(--fs-p2);
+  line-height: var(--lh-p2);
+  text-align: right;
+}
+.payment-info .total .v .num { font-variation-settings: "opsz" 14; }
+
+/* ── buttonArea ──────────────────────────────────────────────── */
+.button-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mid-20);
+  width: 100%;
+  padding: var(--mid-16) 0 var(--mid-56);
+}
+.btn {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  /* 버튼류 padding = em (@ button-label-large 14px) — 시안 15 / 22px */
+  font-size: var(--fs-btn-l);
+  padding: 1.0714em 1.5714em;
+  border-radius: var(--radius-xs);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.btn.filled   { background: #111; color: #fff; }
+.btn.outlined { box-shadow: inset 0 0 0 1px #000; color: var(--c-text); }
+.btn.is-disabled { background: #ebebeb; box-shadow: none; color: var(--c-disabled); cursor: default; }
+.button-group { display: flex; align-items: stretch; gap: var(--mid-8); width: 100%; }
+.button-group .btn { flex: 1 0 0; width: auto; }
+.agree {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 var(--mid-8);
+  font-size: var(--fs-p4);
+  line-height: var(--lh-p4);
+  color: var(--c-sub);
+}
+
+/* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+.demo-nav {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 500;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 6px 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  font-family: var(--font);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+.demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+.demo-seg a, .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
+.demo-seg a + a, .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+.demo-seg .is-on { background: #111; color: #fff; font-weight: 600; }
+.demo-fields { display: flex; align-items: center; gap: 6px; }
+.demo-fields label { display: flex; align-items: center; gap: 3px; color: #777; }
+.demo-fields input[type="number"] {
+  width: 42px;
+  padding: 3px 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: #111;
+}
+.demo-reset { padding: 3px 7px; border: 1px solid rgba(0,0,0,0.1); border-radius: 3px; color: #777; background: #fff; }
+.demo-readout {
+  grid-column: 1 / -1;
+  padding-top: 2px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: 2px;
+  color: #999;
+  font-variant-numeric: tabular-nums;
+}
+.demo-readout b { color: #111; font-weight: 600; }

@@ -1,0 +1,149 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link rel="stylesheet" href="order.css">
+<title>장바구니 — Desktop (Framework E)</title>
+
+<header class="header">
+  <nav>
+    <a href="#">Shop</a><a href="#">About</a><a href="#">Journal</a><a href="#">Info</a><a href="#">The Story</a>
+  </nav>
+  <div class="logo">BRAND</div>
+  <div class="utils"><a href="#">Search</a><a href="#">Sign in</a><a href="#">Bag (0)</a></div>
+</header>
+
+<main class="content-area">
+  <h1 class="page-title">장바구니</h1>
+
+  <div class="col-main">
+    <div class="cart-list" id="cartList">
+      <article class="cart-item" data-price="40000">
+        <div class="image-area">
+          <div class="thumb"><img src="assets/product-1.png" alt=""></div>
+          <div class="checkbox-area">
+            <label class="check-box"><input type="checkbox" checked><span class="box"></span></label>
+          </div>
+        </div>
+        <div class="content">
+          <div class="top">
+            <div class="text-area">
+              <p class="name">전해질 보충 음료 블러드 오렌지</p>
+              <div class="option-row"><span>250ml</span><span>/</span><span>오렌지</span><span>/</span><span>텀블러</span></div>
+            </div>
+            <button type="button" class="close" data-act="remove" aria-label="삭제"><img src="assets/close.svg" alt=""></button>
+          </div>
+          <div class="qty-price">
+            <div class="number-input">
+              <button type="button" data-act="minus" aria-label="수량 감소"><img src="assets/minus.svg" alt=""></button>
+              <span class="value">1</span>
+              <button type="button" data-act="plus" aria-label="수량 증가"><img src="assets/plus.svg" alt=""></button>
+            </div>
+            <span class="price"><span class="num">40,000</span><span class="won">원</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="cart-item" data-price="40000">
+        <div class="image-area">
+          <div class="thumb"><img src="assets/product-2.png" alt=""></div>
+          <div class="checkbox-area">
+            <label class="check-box"><input type="checkbox" checked><span class="box"></span></label>
+          </div>
+        </div>
+        <div class="content">
+          <div class="top">
+            <div class="text-area">
+              <p class="name">전해질 보충 음료 블러드 오렌지</p>
+              <div class="option-row"><span>250ml</span><span>/</span><span>레몬</span><span>/</span><span>텀블러</span></div>
+            </div>
+            <button type="button" class="close" data-act="remove" aria-label="삭제"><img src="assets/close.svg" alt=""></button>
+          </div>
+          <div class="qty-price">
+            <div class="number-input">
+              <button type="button" data-act="minus" aria-label="수량 감소"><img src="assets/minus.svg" alt=""></button>
+              <span class="value">1</span>
+              <button type="button" data-act="plus" aria-label="수량 증가"><img src="assets/plus.svg" alt=""></button>
+            </div>
+            <span class="price"><span class="num">40,000</span><span class="won">원</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="cart-item" data-price="80000">
+        <div class="image-area">
+          <div class="thumb"><img src="assets/product-3.png" alt=""></div>
+          <div class="checkbox-area">
+            <label class="check-box"><input type="checkbox" checked><span class="box"></span></label>
+          </div>
+        </div>
+        <div class="content">
+          <div class="top">
+            <div class="text-area">
+              <p class="name">전해질 보충 음료 세트</p>
+              <div class="option-row"></div>
+            </div>
+            <button type="button" class="close" data-act="remove" aria-label="삭제"><img src="assets/close.svg" alt=""></button>
+          </div>
+          <div class="qty-price">
+            <div class="number-input">
+              <button type="button" data-act="minus" aria-label="수량 감소"><img src="assets/minus.svg" alt=""></button>
+              <span class="value">1</span>
+              <button type="button" data-act="plus" aria-label="수량 증가"><img src="assets/plus.svg" alt=""></button>
+            </div>
+            <span class="price"><span class="num">80,000</span><span class="won">원</span></span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <div class="col-summary">
+    <div class="order-summary">
+      <section class="payment-info">
+        <p class="b-title">결제 정보</p>
+        <div class="rows">
+          <div class="top">
+            <div class="row"><span class="k">상품 금액</span><span class="v"><span class="num" id="sumAmount">160,000</span>원</span></div>
+            <div class="row"><span class="k">배송비</span><span class="v"><span class="num" id="sumShip">3,000</span>원</span></div>
+            <p class="note"><span class="num">200,000</span>원 이상 무료</p>
+          </div>
+          <div class="bottom">
+            <div class="total"><span class="k">총 결제 금액</span><span class="v"><span class="num" id="sumTotal">163,000</span>원</span></div>
+          </div>
+        </div>
+      </section>
+      <div class="button-area">
+        <a class="btn filled" id="cta" href="checkout.html">주문하기</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 -->
+<nav class="demo-nav">
+  <strong>screen</strong>
+  <div class="demo-seg" id="screenNav">
+    <a href="cart.html" data-s="cart">장바구니</a>
+    <a href="checkout.html" data-s="checkout">주문/결제</a>
+    <a href="paysuccess.html" data-s="paysuccess">주문완료</a>
+  </div>
+
+  <strong>type</strong>
+  <div class="demo-fields" id="typeFields">
+    <label>P1<input type="number" id="fsP1" min="8" max="48" step="1" value="18"></label>
+    <label>P2<input type="number" id="fsP2" min="8" max="48" step="1" value="16"></label>
+    <label>P3<input type="number" id="fsP3" min="8" max="48" step="1" value="14"></label>
+    <label>P4<input type="number" id="fsP4" min="8" max="48" step="1" value="13"></label>
+    <button type="button" class="demo-reset" id="fsReset">reset</button>
+  </div>
+
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+<script src="order.js"></script>
+<script>
+  (() => {
+    const cur = location.pathname.split('/').pop().replace('.html', '') || 'cart';
+    document.querySelectorAll('#screenNav a').forEach(a => a.classList.toggle('is-on', a.dataset.s === cur));
+  })();
+</script>

@@ -1,0 +1,139 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link rel="stylesheet" href="order.css">
+<title>주문/결제 — Desktop (Framework E)</title>
+
+<header class="header">
+  <nav>
+    <a href="#">Shop</a><a href="#">About</a><a href="#">Journal</a><a href="#">Info</a><a href="#">The Story</a>
+  </nav>
+  <div class="logo">BRAND</div>
+  <div class="utils"><a href="#">Search</a><a href="#">Sign in</a><a href="#">Bag (0)</a></div>
+</header>
+
+<main class="content-area">
+  <h1 class="page-title">주문/결제</h1>
+
+  <div class="col-main">
+    <div class="blocks" id="checkoutForm">
+    <section class="block shipping">
+      <div class="head">
+        <p class="b-title">배송지 정보</p>
+        <button type="button" class="btn-underline">변경</button>
+      </div>
+      <div class="content">
+        <p class="addr">[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+        <div class="info"><span>이강민</span><span class="divider-v"></span><span class="num">010-1234-1234</span></div>
+        <div class="request"><span>배송 요청사항</span><span class="v">경비실에 맡겨주세요.</span></div>
+      </div>
+    </section>
+
+      <section class="block">
+        <p class="b-title">주문 상품</p>
+        <div class="product-group">
+          <article class="order-item">
+            <div class="thumb"><img src="assets/product-1.png" alt=""></div>
+            <div class="text-area">
+              <p class="name">전해질 보충 음료 블러드 오렌지</p>
+              <div class="info">
+                <div class="option-row"><span>250ml</span><span>/</span><span>오렌지</span><span>/</span><span>텀블러</span></div>
+                <span class="divider-v"></span>
+                <span class="qty"><span class="n">1</span>개</span>
+              </div>
+              <p class="price"><span class="num">40,000</span>원</p>
+            </div>
+          </article>
+          <article class="order-item">
+            <div class="thumb"><img src="assets/product-2.png" alt=""></div>
+            <div class="text-area">
+              <p class="name">전해질 보충 음료 블러드 오렌지</p>
+              <div class="info">
+                <div class="option-row"><span>250ml</span><span>/</span><span>레몬</span><span>/</span><span>텀블러</span></div>
+                <span class="divider-v"></span>
+                <span class="qty"><span class="n">1</span>개</span>
+              </div>
+              <p class="price"><span class="num">40,000</span>원</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="block coupon">
+        <div class="head">
+          <p class="b-title">할인</p>
+          <div class="count-area">사용 가능 쿠폰<span class="count"><span class="n">2</span>장</span></div>
+        </div>
+        <div class="coupon-selector">
+          <div class="coupon-field" id="couponField"><span class="label">선택 안 함</span></div>
+          <button type="button" class="coupon-btn" id="couponBtn">쿠폰 선택</button>
+        </div>
+      </section>
+
+      <section class="block">
+        <p class="b-title">결제 수단</p>
+        <div class="pay-options" id="payOptions">
+          <button type="button" class="pay-option is-on">신용카드/간편결제</button>
+          <button type="button" class="pay-option">실시간 계좌이체</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="col-summary">
+    <div class="order-summary">
+      <section class="payment-info">
+        <p class="b-title">결제 정보</p>
+        <div class="rows">
+          <div class="top">
+            <div class="row"><span class="k">상품 금액</span><span class="v"><span class="num">80,000</span>원</span></div>
+            <div class="row"><span class="k">배송비</span><span class="v"><span class="num">3,000</span>원</span></div>
+            <p class="note"><span class="num">200,000</span>원 이상 무료</p>
+            <div class="row" id="couponRow" hidden><span class="k">쿠폰 할인</span><span class="v"><span class="num" id="sumCoupon">-5,000</span>원</span></div>
+          </div>
+          <div class="bottom">
+            <div class="total"><span class="k">총 결제 금액</span><span class="v"><span class="num" id="sumTotal">83,000</span>원</span></div>
+          </div>
+        </div>
+      </section>
+      <div class="button-area">
+        <a class="btn filled" id="cta" href="paysuccess.html">83,000원 결제하기</a>
+        <div class="agree">
+          <span>개인정보 수집/이용 및 처리 동의</span>
+          <button type="button" class="btn-underline">보기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 -->
+<nav class="demo-nav">
+  <strong>screen</strong>
+  <div class="demo-seg" id="screenNav">
+    <a href="cart.html" data-s="cart">장바구니</a>
+    <a href="checkout.html" data-s="checkout">주문/결제</a>
+    <a href="paysuccess.html" data-s="paysuccess">주문완료</a>
+  </div>
+
+  <strong>type</strong>
+  <div class="demo-fields" id="typeFields">
+    <label>P1<input type="number" id="fsP1" min="8" max="48" step="1" value="18"></label>
+    <label>P2<input type="number" id="fsP2" min="8" max="48" step="1" value="16"></label>
+    <label>P3<input type="number" id="fsP3" min="8" max="48" step="1" value="14"></label>
+    <label>P4<input type="number" id="fsP4" min="8" max="48" step="1" value="13"></label>
+    <button type="button" class="demo-reset" id="fsReset">reset</button>
+  </div>
+
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+<script src="order.js"></script>
+<script>
+  (() => {
+    const cur = location.pathname.split('/').pop().replace('.html', '') || 'cart';
+    document.querySelectorAll('#screenNav a').forEach(a => a.classList.toggle('is-on', a.dataset.s === cur));
+  })();
+</script>
