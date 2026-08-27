@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Detail — Desktop (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E — Product Detail (desktop, 뷰포트 ≥ 768)
+     디자인 기준 폭: 1920 · 1rem = 14px
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value = rem (1rem = 14px), 0.0083 × screen width = 0.83vw
+        · size value ≤ 1rem(14px) 은 뷰포트와 무관하게 px 고정
+        → 이 페이지에서 가변인 것은 paragraph-1(18px) 하나뿐
+     2) Spacing
+        · mid/mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
+     3) Grid  (토큰 global/desktop-margin-vw = 19, global/desktop-gutter-px = 16)
+        · 좌우 마진 = vw 가변 (19px @1920)
+        · 거터      = 16px 고정
+        · col = (100vw − 2×margin − 11×gutter) / 12
+     4) 버튼·필드 padding = em (해당 요소의 label 사이즈 기준)
+     5) 그 외 = px
+     6) Font — 영문 DM Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+                헤더는 시안대로 Inter
+     ※ 우하단 패널에서 paragraph-1~4 의 사이즈 값을 직접 바꿔볼 수 있다.
+       값이 1rem(14px) 이하면 px 고정, 초과하면 위 1)번 공식이 적용된다.
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* ── 기준 단위 ─────────────────────────────────────────────── */
+    --us: calc(100vw / 1920);              /* spacing 1px (mid-* 계산용) */
+
+    /* ── Grid ─────────────────────────────────────────────────── */
+    --grid-margin: calc(19 * 100vw / 1920);   /* 19px @1920 — vw 가변 */
+    --grid-gutter: 16px;                      /* px 고정 */
+    --grid-col: calc(
+      (100vw - (2 * var(--grid-margin)) - (11 * var(--grid-gutter))) / 12
+    );
+    --span5: calc(5 * var(--grid-col) + 4 * var(--grid-gutter));   /* 774.83 @1920 */
+    --span6: calc(6 * var(--grid-col) + 5 * var(--grid-gutter));   /* 933    @1920 */
+
+    /* ── Typography ───────────────────────────────────────────── */
+    --fs-c1:    12px;   /* caption-1           0.857rem → 고정 */
+    --fs-p4:    13px;   /* paragraph-4         0.929rem → 고정 */
+    --fs-p2:    16px;   /* paragraph-2         1.1429rem → 가변 (이 화면 미사용) */
+    --fs-p3:    14px;   /* paragraph-3         1rem     → 고정 */
+    --fs-btn-s: 13px;   /* button-label-small  0.929rem → 고정 */
+    --fs-btn-m: 13px;   /* button-label-medium 0.929rem → 고정 */
+    --fs-btn-l: 14px;   /* button-label-large  1rem     → 고정 */
+    --fs-p1:    calc((1.2857 - 1) * 0.83vw + 1rem);   /* paragraph-1 18px @1920 — 가변 */
+
+    /* line-height — 옵션 항목 높이 공식(1lh + 1.4em)의 lh 를 만드는 변수 */
+    --lh-c1: 1.2;
+    --lh-p4: 1.6;
+    --lh-p3: 1.6;
+    --lh-p2: 1.5;
+    --lh-p1: 1.5;
+
+    /* ── Spacing — mid-* : (값 − 8) × 100vw / 1920 + 8 ─────────── */
+    --mid-1:   1px;                        /* 값 < 8 → 값 그대로 고정 */
+    --mid-2:   2px;
+    --mid-4:   4px;
+    --mid-6:   6px;
+    --mid-8:   8px;                        /* 공식 결과도 8px (증감 없음) */
+    --mid-10:  calc(  2 * var(--us) + 8px);
+    --mid-12:  calc(  4 * var(--us) + 8px);
+    --mid-16:  calc(  8 * var(--us) + 8px);
+    --mid-20:  calc( 12 * var(--us) + 8px);
+    --mid-24:  calc( 16 * var(--us) + 8px);
+    --mid-28:  calc( 20 * var(--us) + 8px);
+    --mid-32:  calc( 24 * var(--us) + 8px);
+    --mid-40:  calc( 32 * var(--us) + 8px);
+    --mid-48:  calc( 40 * var(--us) + 8px);
+    --mid-56:  calc( 48 * var(--us) + 8px);
+    --mid-64:  calc( 56 * var(--us) + 8px);
+    --mid-100: calc( 92 * var(--us) + 8px);
+    --mid-120: calc(112 * var(--us) + 8px);
+
+    /* ── Radius ───────────────────────────────────────────────── */
+    --radius-3xs: 2px;
+    --radius-2xs: 3px;
+    --radius-xs:  4px;
+    --radius-sm:  6px;
+    --radius-md:  8px;
+
+    /* ── Font / Color ─────────────────────────────────────────── */
+    /* 영문 = DM Sans, 국문 = Pretendard.
+       DM Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백된다. */
+    --font: "DM Sans", "Pretendard Variable", Pretendard, sans-serif;
+    --font-header: "Inter", "Pretendard Variable", Pretendard, sans-serif;
+    --c-text: #111;
+    --c-line: rgba(0, 0, 0, 0.12);
+    --c-line-soft: rgba(0, 0, 0, 0.08);
+    --c-disabled-bg: rgba(0, 0, 0, 0.02);
+    --c-disabled-text: rgba(17, 17, 17, 0.2);
+    --c-fill: #f5f5f5;
+
+    /* 상품 패널 폭 — 가변 28.5vw (1920 에서 547.2px ≈ 시안 548)
+       min/max 는 데모 패널에서 on/off + 값 조정 가능.
+       off 일 때는 각각 0 / 100vw 로 두어 사실상 무제한 */
+    --panel-w-raw: 28.5vw;
+    --panel-w-min: 400px;
+    --panel-w-max: 100vw;
+
+    /* 캐러셀 간격 — x: 리스트 ↔ 메인 (거터 성격) / y: 썸네일 사이 (리듬 성격)
+       시안 productImageCarousel 은 두 곳 모두 mid-16 바인딩.
+       데모 패널에서 16px · mid-16 · split 세 가지를 비교할 수 있다 */
+    --carousel-gap-x: var(--mid-16);
+    --carousel-gap-y: var(--mid-16);
+    --header-h: 54px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; font-size: 14px; }   /* 1rem = 14px */
+  /* 데모 — 캐러셀 간격 비교 */
+  body[data-cgap="px"]    { --carousel-gap-x: 16px; --carousel-gap-y: 16px; }
+  /* split — 가로는 페이지 거터와 같은 16px 고정, 세로는 가변 mid-16 */
+  body[data-cgap="split"] { --carousel-gap-x: 16px; --carousel-gap-y: var(--mid-16); }
+
+  /* 브라우저 스크롤바 미노출 (시안에 없는 요소) */
+  html { scrollbar-width: none; -ms-overflow-style: none; }
+  html::-webkit-scrollbar { display: none; }
+
+  body {
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── set06_header ────────────────────────────────────────────── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--header-h);       /* 54px — 토큰 없음 → px */
+    padding: 0 30px;
+    background: #fff;
+    font-family: var(--font-header);
+  }
+  .header .container {
+    position: relative;
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+  .header .nav,
+  .header .utilities { display: flex; gap: 12px; height: 100%; align-items: stretch; }
+  .header .depth1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 8px;
+    font-size: 13px;               /* 0.929rem ≤ 1rem → 고정 */
+    line-height: normal;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  .header .logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    font-size: 20px;               /* 헤더 로고 — px */
+    line-height: 28px;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+
+  /* ── contentArea — 12컬럼 그리드 ─────────────────────────────── */
+  .content-area {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
+    padding: 0 var(--grid-margin);
+  }
+
+  /* 템플릿 A — 좌 6컬럼(미디어 + 섹션) / 우 6컬럼(상품 패널) */
+  body[data-template="a"] .col-media    { grid-column: 1 / span 6; grid-row: 1; }
+  body[data-template="a"] .col-sections { grid-column: 1 / span 6; grid-row: 2; }
+  body[data-template="a"] .col-panel    { grid-column: 7 / span 6; grid-row: 1 / span 2; align-self: start; }
+  /* 패널 sticky — 데모 토글은 뺐고, body 의 data-sticky="on" 으로 수동 전환 */
+  body[data-template="a"][data-sticky="on"] .col-panel { position: sticky; top: var(--header-h); }
+
+  /* 템플릿 B — 상단 6+6, 하단 중앙 6컬럼 */
+  body[data-template="b"] .col-media    { grid-column: 1 / span 6; grid-row: 1; }
+  body[data-template="b"] .col-panel    { grid-column: 7 / span 6; grid-row: 1; }
+  /* 4~9 컬럼 = 중앙 6컬럼 (1920 에서 x 493.5 · w 933) */
+  body[data-template="b"] .col-sections { grid-column: 4 / span 6; grid-row: 2; }
+  body[data-template="a"] .tab-bar { display: none; }
+
+  /* ── productImageCarousel ────────────────────────────────────── */
+  /* 컬럼 폭은 100vw 가 아니라 부모 컨테이너에서 나눈다 —
+     세로 스크롤바가 생겨도 그리드가 어긋나지 않게 */
+  .carousel {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: var(--carousel-gap-x);   /* 썸네일 리스트 ↔ 메인 이미지 */
+    align-items: stretch;
+    padding-top: var(--mid-28);
+  }
+  /* 썸네일 열은 in-flow 콘텐츠가 없어 행 높이를 밀지 않는다
+     → 행 높이는 메인 이미지(aspect-ratio 1:1)가 결정하고 열은 거기에 stretch */
+  .carousel .thumb-col { grid-column: 1; position: relative; }
+  .carousel .thumb-list {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--carousel-gap-y);        /* 썸네일 사이 row gap */
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .carousel .thumb-list::-webkit-scrollbar { display: none; }
+  .carousel .thumb-list .thumb {
+    flex-shrink: 0;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .carousel .thumb-list .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .carousel .thumb-list .thumb:not(.is-active) { opacity: 0.4; }
+  .carousel .thumb-list .thumb.is-empty { background: #ddd; opacity: 0.6; }
+  /* 위/아래에 이미지가 더 있을 때만 해당 그라디언트 노출 */
+  .carousel .gradient {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 120px;                 /* 토큰 없음 → px */
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .carousel .gradient.top    { top: 0;    background: linear-gradient(to top,    rgba(255,255,255,0) 0%, #fff 80%); }
+  .carousel .gradient.bottom { bottom: 0; background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #fff 80%); }
+  .carousel .thumb-col.at-top .gradient.bottom,
+  .carousel .thumb-col.at-bottom .gradient.top,
+  .carousel .thumb-col.scrolling .gradient { opacity: 1; }
+  .carousel .thumb-col.at-top .gradient.top,
+  .carousel .thumb-col.at-bottom .gradient.bottom { opacity: 0; }
+  .carousel .main {
+    grid-column: 2 / span 5;       /* 5컬럼 + 4거터 = 774.83 @1920 */
+    align-self: start;             /* stretch 방지 — 1:1 유지 */
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .carousel .main img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* 데모 — 카테고리 노출 여부 */
+  body[data-category="off"] .category { display: none; }
+
+  /* ── productInfo ─────────────────────────────────────────────── */
+  .product-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--mid-120) 0;
+  }
+  .product-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-100);
+    /* min(raw, max) 로 상한 → max(min, …) 로 하한 → min(…, 100%) 로 칼럼 밖 방지 */
+    width: min(
+      max(var(--panel-w-min), min(var(--panel-w-raw), var(--panel-w-max))),
+      100%
+    );
+  }
+  .main-area { display: flex; flex-direction: column; gap: var(--mid-64); width: 100%; }
+  .overview  { display: flex; flex-direction: column; gap: var(--mid-32); width: 100%; }
+
+  .title-area { display: flex; align-items: flex-start; gap: var(--mid-24); width: 100%; }
+  .title-text { flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; gap: var(--mid-12); }
+  .category {
+    width: 100%;
+    font-size: var(--fs-c1);       /* 12px — 고정 */
+    line-height: 1.2;
+    opacity: 0.6;
+  }
+  .name-block { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
+  .product-name {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p1);       /* 18px @1920 — 가변 */
+    line-height: 1.5;
+  }
+  .price-area { display: flex; align-items: baseline; gap: var(--mid-6); }
+  .price {
+    display: flex;
+    align-items: flex-start;
+    font-size: var(--fs-p3);       /* 14px — 고정 */
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+  .price .num { font-variation-settings: "opsz" 14; }
+  .original-price {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+  }
+  .original-price .line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(50% - 0.5px);
+    height: 1px;
+    background: var(--c-text);
+    transform: translateY(-50%);
+  }
+  /* 시안 정의 — iconArea 는 "상품명 1줄 높이"와 같은 정사각 프레임으로 아이콘 버튼을 감싼다.
+     폰트 사이즈가 바뀌어도 정렬이 틀어지지 않도록 1lh(= P1 line-height)로 잡는다.
+     32px 아이콘 버튼은 이 프레임 가운데에 놓이고 밖으로 조금 넘친다 (시안과 동일). */
+  .icon-area {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-p1);
+    line-height: var(--lh-p1);
+    width: 1lh;
+    height: 1lh;
+  }
+  .icon-btn {
+    flex-shrink: 0;                /* iconArea 보다 커도 눌리지 않게 (시안: 27 프레임 안에 32 버튼) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;                   /* 토큰 없음 → px */
+    height: 32px;
+    border-radius: var(--radius-xs);
+  }
+  .icon-btn img { width: 24px; height: 24px; }
+  /* 위시리스트 담김 — wishlist_filled 로 교체 (기본 아이콘은 opacity .6) */
+  .icon-btn .on  { display: none; }
+  .icon-btn[aria-pressed="true"] .off { display: none; }
+  .icon-btn[aria-pressed="true"] .on  { display: block; }
+  .description {
+    width: 100%;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    opacity: 0.6;
+  }
+
+  .option-area  { display: flex; flex-direction: column; gap: var(--mid-56); width: 100%; }
+  .option-area .option-stack { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
+  .option-group { display: flex; flex-direction: column; gap: var(--mid-10); width: 100%; }
+  .select-field {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mid-12);
+    width: 100%;
+    /* padding = em (@ paragraph-4 13px) — 시안 10 / 17 / 13px */
+    font-size: var(--fs-p4);
+    padding: 0.7692em 1em 0.7692em 1.3077em;
+    box-shadow: inset 0 0 0 1px var(--c-line);   /* stroke — 크기 영향 없음 */
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+  }
+  .select-field .label { flex: 1 0 0; min-width: 0; line-height: var(--lh-p4); text-align: left; }
+  /* annotation(select/Field) — padding · 아이콘 크기 = em, @em base : p4 (option name) */
+  .select-field img { flex-shrink: 0; width: 1.5385em; height: 1.5385em; }   /* 20px @ p4 */
+  .select-field.is-disabled { background: var(--c-disabled-bg); cursor: default; }
+  .select-field.is-disabled .label { color: var(--c-disabled-text); }
+
+  .button-group { display: flex; align-items: center; gap: var(--mid-8); width: 100%; }
+  .btn {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    /* padding = em (@ button-label-large 14px) — 시안 15 / 22px */
+    font-size: var(--fs-btn-l);
+    padding: 1.0714em 1.5714em;
+    border-radius: var(--radius-xs);
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .btn.outlined { box-shadow: inset 0 0 0 1px #000; color: var(--c-text); }
+  .btn.filled   { background: #111; color: #fff; }
+
+  /* ── snackBarArea / snackbar/product ──────────────────────────
+     시안 : contentArea 우측 상단 · pr / pt = mid-28 · 스낵바 sticky top-0
+     → 실제 구현은 헤더 아래에 고정(fixed)해서 스크롤과 무관하게 유지 */
+  .snackbar-area {
+    position: fixed;
+    top: var(--header-h);          /* contentArea 상단 = 헤더 바로 아래 */
+    right: 0;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--mid-28) var(--mid-28) 0 0;
+    pointer-events: none;
+  }
+  .snackbar {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--mid-16);
+    width: 336px;                  /* 시안 — 토큰 없음 → px */
+    padding: 12px 16px;            /* 시안 — 토큰 없음 → px */
+    overflow: hidden;
+    background: #201d1d;
+    border-radius: var(--radius-xs);
+    /* 등장/퇴장 — 시안에 모션 정의 없음. 최소한의 페이드 + 슬라이드 */
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .snackbar.is-on { opacity: 1; transform: none; }
+  .snackbar .text-area {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--mid-2);
+  }
+  .snackbar .text-area p {
+    width: 100%;
+    line-height: 1.6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .snackbar .desc  { font-size: var(--fs-p3); font-weight: 500; color: #fff; }
+  .snackbar .pname { font-size: var(--fs-p4); color: rgba(255, 255, 255, .6); }
+  .snackbar .view {
+    flex-shrink: 0;
+    font-size: var(--fs-p4);
+    line-height: 1.6;
+    color: #fff;
+    text-decoration: underline;
+    text-underline-position: from-font;
+    white-space: nowrap;
+  }
+
+  /* ── productDetailInfo (아코디언 탭) ─────────────────────────── */
+  .detail-info { display: flex; flex-direction: column; width: 100%; }
+  .detail-info .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    row-gap: var(--mid-16);
+    column-gap: var(--mid-20);
+    width: 100%;
+  }
+  .detail-info .tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mid-8);
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+  /* annotation(productDetailInfoItem) — 아이콘 버튼 컨테이너 크기 = em
+     @em base : p4 (title) 13px → 20px */
+  .detail-info .tab .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.5385em;               /* 20px @ p4 */
+    height: 1.5385em;
+    padding: var(--mid-1);
+    background: var(--c-fill);
+    border-radius: var(--radius-3xs);
+  }
+  .detail-info .tab .icon img { width: 100%; height: 100%; }
+  /* annotation(productDetailInfo > content) — padding = em
+     @em base : p4 (description) 13px → 24px */
+  .detail-info .text-area {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    font-size: var(--fs-p4);       /* em base */
+    padding: 1.8462em 0;           /* 24px */
+  }
+  .detail-info .text-area p {
+    flex: 1 0 0;
+    min-width: 0;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  /* ── tab/productDetail (템플릿 B 하단 탭바) ──────────────────── */
+  .tab-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 150;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mid-100);           /* 시안 tab/productDetail — gap mid-100 */
+    padding: 0 var(--grid-margin);
+    border-top: 1px solid var(--c-line-soft);
+    background: #fff;
+  }
+  /* productDetailTabItem — 어노테이션 없음 → 시안 px 그대로.
+     높이는 hug (폰트가 커지면 같이 커짐) */
+  .tab-bar button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 17px;
+    padding-bottom: 16px;
+    font-size: var(--fs-p3);       /* 14px — 고정 (시안 paragraph-3) */
+    line-height: 1.6;
+    color: var(--c-text);
+  }
+  .tab-bar button .txt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-bottom: 2px solid transparent;
+  }
+  .tab-bar button:not(.is-active) { opacity: 0.4; }
+  .tab-bar button.is-active { font-weight: 500; }
+  .tab-bar button.is-active .txt { border-bottom-color: var(--c-text); }
+
+  /* ── 하위 섹션 자리 (다음 단계에서 구현) ─────────────────────── */
+  .section-stub {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--mid-64) 0;
+    border-top: 1px solid var(--c-line-soft);
+    font-size: var(--fs-p4);
+    line-height: 1.6;
+    color: rgba(17, 17, 17, 0.35);
+  }
+
+
+
+  /* ── select/Field · expanded (8394:59460) ────────────────────
+     펼침 시 필드 자체가 컨테이너가 된다 — border #111 · padding 1px.
+     옵션 항목 높이는 상수로 두지 않고 폰트/라인하이트에서 파생시킨다.
+       항목 높이 = 1lh + 1.4em   (상하 padding 0.7em × 2)
+       리스트    = calc((1lh + 1.4em) × 5.5)  → 어떤 조합에서도 5.5개 노출   */
+  .select-wrap { position: relative; width: 100%; }
+  .select-wrap.is-open {
+    box-shadow: inset 0 0 0 1px #111;
+    border-radius: var(--radius-xs);
+    padding: 1px;                  /* 토큰 없음 → px */
+    background: #fff;
+    overflow: hidden;              /* 시안 overflow-clip — 라운드 모서리로 잘림 */
+  }
+  .select-wrap.is-open .select-field {
+    /* 펼침 상태의 테두리는 .select-wrap 이 그린다.
+       시안에는 필드와 옵션 목록 사이에 선이 없으므로 필드 자체의 선은 완전히 제거 */
+    border: 0;
+    box-shadow: none;
+    /* 펼침 헤더 — 시안 9 / 12 / 16px (@ paragraph-4 13px) */
+    padding: 0.6923em 0.9231em 0.6923em 1.2308em;
+  }
+  .select-wrap.is-open .select-field img { transform: rotate(180deg); }
+
+  .option-list {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    /* 항목과 동일한 기준이어야 lh · em 이 같은 값으로 풀린다 */
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    max-height: calc((1lh + 1.4em) * 5.5);
+    overflow-y: auto;
+    background: #fff;
+    scrollbar-width: thin;
+    scrollbar-color: #d4d4d4 transparent;
+  }
+  .select-wrap.is-open .option-list { display: flex; }
+  .option-list::-webkit-scrollbar { width: 8px; }
+  .option-list::-webkit-scrollbar-track { background: transparent; }
+  .option-list::-webkit-scrollbar-thumb {
+    background-color: #d4d4d4;
+    border-radius: 16px;
+    border-right: var(--mid-4) solid transparent;   /* 실제 두께 4px */
+    background-clip: content-box;
+  }
+  .option-list button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mid-12);
+    width: 100%;
+    flex-shrink: 0;
+    font-size: var(--fs-p4);       /* --font-size-p4 */
+    line-height: var(--lh-p4);     /* --line-height-p4 */
+    padding: 0.7em 0.9231em 0.7em 1.2308em;   /* 상하 0.7em → 항목 높이 = 1lh + 1.4em */
+    text-align: left;
+    color: var(--c-text);
+  }
+  .option-list button:hover:not(:disabled) { background: rgba(0, 0, 0, 0.02); }
+  .option-list button.is-selected { font-weight: 500; background: var(--c-fill); }
+  .option-list button:disabled { color: var(--c-disabled-text); cursor: default; }
+  .option-list button .extra { flex-shrink: 0; color: #6a6a6a; }
+  .option-list button:disabled .extra { color: inherit; }
+
+  /* ── selectedOption ──────────────────────────────────────────── */
+  .selected-option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 1px;                  /* 토큰 없음 → px */
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-sm);
+  }
+  .selected-option:empty,
+  .selected-option.is-empty { display: none; }
+  /* annotation(selectedOptionItem) — padding · 옵션명↔가격 gap · 아이콘 버튼 크기 = em
+     @em base : p3 (option name) 14px → 24 / 20 / 25px, gap 24px, 아이콘 20px */
+  .so-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    font-size: var(--fs-p3);       /* em base */
+    gap: 1.7143em;                 /* 24px */
+    padding: 1.7143em 1.4286em 1.7857em;   /* 24 / 20 / 25px */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .so-item .name-area { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
+  .so-item .name-area .name {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p3);       /* 14px — 고정 */
+    line-height: 1.6;
+  }
+  .so-item .name-area .close {
+    flex-shrink: 0;
+    display: flex;
+    width: 1.4286em;               /* 20px @ p3 — annotation: 아이콘 버튼 크기 em */
+    height: 1.4286em;
+  }
+  .so-item .name-area .close img { width: 100%; height: 100%; }
+  .so-item .qty-price { display: flex; align-items: center; gap: 12px; width: 100%; }
+  .so-item .item-price {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-weight: 500;
+    font-size: var(--fs-p3);       /* 14px — 고정 */
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  /* numberInput (size = medium) */
+  .number-input {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 1px;                  /* 토큰 없음 → px */
+    /* Figma stroke 는 크기를 밀지 않는다 → inset box-shadow (시안 medium 90×30) */
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-xs);
+  }
+  .number-input .step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;                   /* 토큰 없음 → px */
+    height: 28px;
+    padding: var(--mid-2);
+  }
+  .number-input .step img { width: 24px; height: 24px; }   /* 시안 아이콘 고정 24 */
+  .number-input .step:disabled { opacity: 0.3; cursor: default; }
+  /* 컴포넌트 정의: 숫자 영역 기본 width = 3ch, min-width = 32px (fixed) */
+  .number-input .value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    width: 3ch;
+    min-width: 32px;
+    font-weight: 500;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* annotation(summary) — padding = em, @em base : p3 (option name) */
+  .so-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-24);
+    width: 100%;
+    font-size: var(--fs-p3);       /* em base */
+    padding: 1.4286em;             /* 20px */
+  }
+  .so-summary .label {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+  .so-summary .label .kr { opacity: 0.8; }
+  .so-summary .label .count { font-weight: 600; }
+  .so-summary .total {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    font-weight: 600;
+    font-size: var(--fs-p2);       /* paragraph-2 16px @1920 — 가변 */
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  /* ── productDetail ───────────────────────────────────────────── */
+  .product-detail { width: 100%; padding-top: var(--mid-40); }
+  .product-detail .pd-content { position: relative; width: 100%; max-height: 2000px; overflow: hidden; }
+  .product-detail .pd-body { display: flex; flex-direction: column; gap: var(--mid-48); width: 100%; }
+  .product-detail .pd-img { width: 100%; aspect-ratio: 1 / 1; }
+  .product-detail .pd-img img { width: 100%; height: 100%; object-fit: cover; }
+  .product-detail .pd-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-24);
+    width: 100%;
+    padding: 0 var(--mid-48);
+    font-size: var(--fs-p3);       /* 14px — 고정 */
+    line-height: 1.6;
+  }
+  .product-detail .pd-text .t { font-weight: 600; }
+  .product-detail .more-area {
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 360px;                 /* 토큰 없음 → px */
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #fff 80%);
+  }
+  .product-detail .more-btn {
+    position: absolute;
+    left: 50%;
+    bottom: 1px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 286px;                  /* 토큰 없음 → px */
+    /* padding = em (@ button-label-medium 13px) — 시안 14 / 16px */
+    font-size: var(--fs-btn-m);
+    padding: 1.0769em 1.2308em;
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+    font-weight: 500;
+    line-height: 1.2;
+    background: #fff;
+  }
+  .product-detail.is-expanded .pd-content { max-height: none; }
+  .product-detail.is-expanded .more-area { display: none; }
+
+  /* ── 섹션 공통 (review / inquiry) ────────────────────────────── */
+  .section { width: 100%; padding-top: var(--mid-40); }
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-24);
+    width: 100%;
+    padding: var(--mid-24) 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);   /* 시안 titleArea 하단 선 */
+  }
+  .section-head .title {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: var(--mid-4);
+    font-weight: 600;
+    font-size: var(--fs-p1);       /* 18px @1920 — 가변 */
+    line-height: 1.5;
+  }
+  .section-head .rating-area { flex-shrink: 0; display: flex; align-items: center; gap: var(--mid-6); }
+  .section-head .rating-area .score { font-size: var(--fs-p1); line-height: 1.5; }
+
+  .rating { display: flex; align-items: center; }
+  .rating img { width: 20px; height: 20px; }   /* ratingItem — 토큰 없음 → px */
+
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--mid-20) 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);   /* 시안 filterBar 하단 선 */
+  }
+  /* 시안 — 리뷰 filterBar 라벨은 P4, 문의 filterBar 라벨은 P3 */
+  #inquiry .check-box .label { font-size: var(--fs-p3); }
+  .check-box { display: flex; align-items: center; gap: var(--mid-10); }
+  .check-box .box {
+    flex-shrink: 0;
+    position: relative;
+    width: 16px;                   /* 토큰 없음 → px */
+    height: 16px;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-3xs);
+  }
+  .check-box input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .check-box input:checked + .box { background: #111; border-color: #111; }
+  .check-box input:checked + .box::after {
+    content: "";
+    position: absolute;
+    left: 4px; top: 1px;
+    width: 5px; height: 9px;
+    border: solid #fff;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+  .check-box .label { font-size: var(--fs-p4); line-height: 1.6; }   /* 13px — 고정 */
+  .select-text {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-4);
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+  }
+  /* 시안 select/text 의 chevron 은 h-full + aspect 1:1 → 라인박스 높이를 따라간다 */
+  .select-text img { width: 1lh; height: 1lh; }
+
+  /* ── reviewItem ──────────────────────────────────────────────── */
+  .review-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-24);
+    width: 100%;
+    padding: var(--mid-28) 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+  .review-item .ri-top { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
+  .review-item .ri-meta { display: flex; flex-direction: column; gap: var(--mid-6); width: 100%; }
+  .review-item .ri-line { display: flex; align-items: center; gap: var(--mid-24); width: 100%; }
+  .review-item .nickname {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p3);       /* 14px — 고정 */
+    line-height: 1.6;
+  }
+  /* annotation(reviewItem > option) — gap : em / divider height : em
+     @em base : p4 (option name) → 시안 gap 6px, divider 12px */
+  .review-item .option {
+    display: flex;
+    align-items: center;
+    font-size: var(--fs-p4);       /* em base */
+    gap: 0.4615em;
+  }
+  .review-item .option .divider-v { height: 0.9231em; }
+  .review-item .option span {
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    color: #6a6a6a;
+    white-space: nowrap;
+  }
+  .divider-v { flex-shrink: 0; width: 1px; height: 12px; background: rgba(0, 0, 0, 0.12); }
+
+  /* ── badge / 수정·삭제 / 비밀글 ─────────────────────────────── */
+  .item-head { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .badge {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding = em (@ caption-1 12px) — 시안 9 / 7px */
+    font-size: var(--fs-c1);
+    padding: 0.5833em 0.75em;
+    line-height: 1.2;
+    box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.1);
+    border-radius: var(--radius-2xs);
+    white-space: nowrap;
+  }
+  /* annotation(buttonGroup) — gap : em / divider height : em
+     @em base : button label (small 13px) → 시안 gap 12px, divider 10px */
+  .text-btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: var(--fs-btn-s);    /* em base */
+    gap: 0.9231em;
+  }
+  .text-btn-group .divider-v { height: 0.7692em; }
+  .btn-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    /* padding = em (@ button-label-small 13px) — 시안 상하 9px, 좌우 없음 */
+    font-size: var(--fs-btn-s);
+    padding: 0.6923em 0;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  .btn-text.danger { color: #ef0000; }
+  .private-row { display: flex; align-items: center; gap: var(--mid-4); width: 100%; }
+  .private-row img { flex-shrink: 0; width: 20px; height: 20px; }
+  .private-row span {
+    flex: 1 0 0;
+    min-width: 0;
+    font-size: var(--fs-p3);       /* 14px — 고정 */
+    line-height: 1.6;
+    color: #6a6a6a;
+  }
+  .review-item .ri-body {
+    width: 100%;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+  }
+  /* 시안 imageArea 는 항상 9칸(빈 칸은 투명) — 칸 크기가 장수와 무관해야 한다 */
+  .review-item .ri-images {
+    display: grid;
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--mid-8);
+    width: 100%;
+  }
+  .review-item .ri-images .cell {
+    position: relative;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-xs);
+    overflow: hidden;
+  }
+  .review-item .ri-images .cell img { width: 100%; height: 100%; object-fit: cover; }
+  .review-item .ri-images .cell.more { background: #ddd; }
+  .review-item .ri-images .cell.more .dim {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    font-weight: 600;
+    font-size: var(--fs-p3);       /* 14px — 고정 */
+    line-height: 1.6;
+    color: #fff;
+  }
+  .review-item .ri-date {
+    width: 100%;
+    font-size: var(--fs-c1);       /* 12px — 고정 */
+    line-height: 1.2;
+    color: #6a6a6a;
+  }
+
+  /* ── pagination ──────────────────────────────────────────────── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--mid-48) var(--mid-8);
+  }
+  .pagination .inner { display: flex; align-items: center; gap: var(--mid-8); }
+  .pagination .page-list { display: flex; align-items: center; gap: var(--mid-2); }
+  /* paginationItem — 컨테이너 padding 은 mid-2,
+     숫자 영역은 annotation(number min width & height : 3ch) */
+  .pagination .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--mid-2);
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    color: var(--c-text);
+    opacity: 0.8;
+  }
+  .pagination .item .num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3ch;
+    min-height: 3ch;
+  }
+  .pagination .item:not(.is-on) { opacity: 0.48; }
+  .pagination .item.is-on { font-weight: 500; }
+  /* iconButton/contained (outlined subtle, small) — 어노테이션 없음 → px */
+  .pagination .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--c-line-soft);
+    border-radius: var(--radius-xs);
+  }
+  .pagination .nav-btn span {
+    display: block;
+    width: 16px;
+    height: 16px;
+    font-size: 13px;
+    line-height: 16px;
+    text-align: center;
+    color: var(--c-text);
+  }
+
+
+  /* ── inquiry ─────────────────────────────────────────────────── */
+  .section-head.with-btn .title { font-weight: 600; }
+  .btn-small {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    /* padding = em (@ button-label-small 13px) — 시안 13 / 9px */
+    font-size: var(--fs-btn-s);
+    padding: 0.6923em 1em;
+    border-radius: var(--radius-xs);
+    background: #111;
+    color: #fff;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .inquiry-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-16);
+    width: 100%;
+    padding: var(--mid-28) 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+  /* 시안 — 답변완료 항목은 gap mid-24, 구분선 rgba(0,0,0,.1) */
+  .inquiry-item.is-answered {
+    gap: var(--mid-24);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+  }
+  /* 시안 — question 래퍼는 답변완료 항목에만 존재 (titleArea + textArea, gap mid-16) */
+  .inquiry-item .question { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
+  .inquiry-item .q-text   { display: flex; flex-direction: column; gap: var(--mid-12); width: 100%; }
+  .inquiry-item .info-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    cursor: pointer;
+  }
+  /* annotation(inquiryItem > meta) — gap : em / divider height : em
+     @em base : p4 (meta) → 시안 gap 6px, divider 12px */
+  .inquiry-item .option {
+    display: flex;
+    align-items: center;
+    font-size: var(--fs-p4);       /* em base */
+    gap: 0.4615em;
+  }
+  .inquiry-item .option .divider-v { height: 0.9231em; }
+  .inquiry-item .option span {
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+  .inquiry-item .option .status { color: var(--c-text); }
+  .inquiry-item .option .sub    { color: #6a6a6a; }
+  .inquiry-item .info-area img { flex-shrink: 0; width: 20px; height: 20px; }
+  .inquiry-item .q-body {
+    width: 100%;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+  }
+  .inquiry-item .reply {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-16);
+    width: 100%;
+    padding: var(--mid-24) var(--mid-28);
+    background: #f9f9f9;
+    border-radius: var(--radius-xs);
+  }
+  /* annotation(reply > infoArea) — gap : em / divider height : em
+     @em base : p4 → 시안 gap 8px, divider 10px */
+  .inquiry-item .reply .r-info {
+    display: flex;
+    align-items: center;
+    font-size: var(--fs-p4);       /* em base */
+    gap: 0.6154em;
+  }
+  .inquiry-item .reply .r-info span { font-size: var(--fs-p4); line-height: 1.6; white-space: nowrap; }
+  .inquiry-item .reply .r-info .sub { color: #6a6a6a; }
+  .inquiry-item .reply .divider-v { height: 0.7692em; }
+  .inquiry-item .reply .r-body {
+    width: 100%;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .inquiry-item:not(.is-open) .q-body,
+  .inquiry-item:not(.is-open) .reply { display: none; }
+  .inquiry-item:not(.is-open) .info-area img { transform: rotate(180deg); }
+
+  /* ── orderInfo ───────────────────────────────────────────────── */
+  .order-info { width: 100%; padding-top: var(--mid-40); }
+  .order-info .oi-head {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--mid-24) 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .order-info .oi-head h2 {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 600;
+    font-size: var(--fs-p1);       /* 18px @1920 — 가변 */
+    line-height: 1.5;
+  }
+  .order-info .oi-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-40);
+    width: 100%;
+    min-height: 600px;             /* 토큰 없음 → px */
+    padding: var(--mid-40) 0;
+  }
+  .order-info .oi-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-24);
+    width: 100%;
+    font-size: var(--fs-p3);       /* 14px — 고정 */
+    line-height: 1.6;
+  }
+  .order-info .oi-text .t { font-weight: 600; }
+  .order-info .oi-text .body { white-space: pre-wrap; }
+  .order-info .oi-img { width: 100%; aspect-ratio: 1 / 1; }
+  .order-info .oi-img img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-family: var(--font);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-fields { display: flex; align-items: center; gap: 6px; }
+  .demo-fields label { display: flex; align-items: center; gap: 3px; color: #777; }
+  .demo-fields input[type="number"] {
+    width: 42px;
+    padding: 3px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: #111;
+  }
+  .demo-fields input[type="number"]:disabled { opacity: 0.35; }
+  .demo-fields label.is-off { opacity: 0.5; }
+  .demo-check { display: flex; align-items: center; gap: 3px; color: #777; cursor: pointer; }
+  .demo-check input { width: 11px; height: 11px; accent-color: #111; cursor: pointer; }
+  .demo-unit { color: #bbb; }
+  .demo-reset { padding: 3px 7px; border: 1px solid rgba(0,0,0,0.1); border-radius: 3px; color: #777; background: #fff; }
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin-top: 2px;
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+</head>
+<body data-template="a" data-sticky="off">
+
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <a class="depth1" href="#">Shop</a>
+      <a class="depth1" href="#">About</a>
+      <a class="depth1" href="#">Journal</a>
+      <a class="depth1" href="#">Info</a>
+      <a class="depth1" href="#">The Story</a>
+    </nav>
+    <div class="logo">BRAND</div>
+    <div class="utilities">
+      <a class="depth1" href="#">Search</a>
+      <a class="depth1" href="#">Sign in</a>
+      <a class="depth1" href="#">Bag (0)</a>
+    </div>
+  </div>
+</header>
+
+<main class="content-area">
+
+  <!-- productImageCarousel — 썸네일 1컬럼 + 메인 5컬럼 -->
+  <section class="col-media">
+    <div class="carousel">
+      <div class="thumb-col at-top" id="thumbCol">
+      <div class="thumb-list" id="thumbList">
+        <button type="button" class="thumb is-active" data-src="assets/product-1.png"><img src="assets/product-1.png" alt=""></button>
+        <button type="button" class="thumb" data-src="assets/product-2.png"><img src="assets/product-2.png" alt=""></button>
+        <button type="button" class="thumb" data-src="assets/product-3.png"><img src="assets/product-3.png" alt=""></button>
+        <button type="button" class="thumb" data-src="assets/product-1.png"><img src="assets/product-1.png" alt=""></button>
+        <button type="button" class="thumb" data-src="assets/product-4.png"><img src="assets/product-4.png" alt=""></button>
+        <div class="thumb is-empty"></div>
+      </div>
+      <div class="gradient top"></div>
+      <div class="gradient bottom"></div>
+      </div>
+      <div class="main"><img id="mainImage" src="assets/product-1.png" alt="전해질 보충 음료 블러드 오렌지"></div>
+    </div>
+  </section>
+
+  <!-- productInfo -->
+  <aside class="col-panel">
+    <div class="product-info">
+      <div class="product-panel">
+
+        <div class="main-area">
+          <div class="overview">
+            <div class="title-area">
+              <div class="title-text">
+                <p class="category">DRINK</p>
+                <div class="name-block">
+                  <h1 class="product-name">전해질 보충 음료 블러드 오렌지</h1>
+                  <div class="price-area">
+                    <p class="price"><span class="num">40,000</span><span>원</span></p>
+                    <div class="original-price">
+                      <p class="price"><span class="num">50,000</span><span>원</span></p>
+                      <span class="line"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="icon-area">
+                <button type="button" class="icon-btn" aria-label="위시리스트" aria-pressed="false">
+                  <img class="off" src="assets/wishlist.svg" alt="">
+                  <img class="on" src="assets/wishlist-filled.svg" alt="">
+                </button>
+              </div>
+            </div>
+            <p class="description">설탕이 전혀 들어가지 않은 탄산 전해질 음료로, 300mg의 나트륨, 75mg의 칼륨, 25mg의 마그네슘을 함유하여 수분 보충을 돕도록 제조되었습니다.</p>
+          </div>
+
+          <div class="option-area">
+            <div class="option-stack">
+              <div class="option-group" id="optionGroup"></div>
+              <div class="selected-option is-empty" id="selectedOption"></div>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn outlined">장바구니 담기</button>
+              <button type="button" class="btn filled">바로 구매하기</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-info">
+          <div class="tabs">
+            <button type="button" class="tab is-open">
+              <span>배송 및 반품</span>
+              <span class="icon"><img src="assets/minus-small.svg" alt=""></span>
+            </button>
+            <button type="button" class="tab">
+              <span>사용 방법</span>
+              <span class="icon"><img src="assets/plus-small.svg" alt=""></span>
+            </button>
+            <button type="button" class="tab">
+              <span>주의사항</span>
+              <span class="icon"><img src="assets/plus-small.svg" alt=""></span>
+            </button>
+            <button type="button" class="tab">
+              <span>세부정보</span>
+              <span class="icon"><img src="assets/plus-small.svg" alt=""></span>
+            </button>
+          </div>
+          <div class="text-area">
+            <p>100,000원 이상 구매 시 무료 배송<br>도서산간 지역 및 부피가 큰 상품은 추가 배송비가 발생할 수 있습니다.<br>공휴일 택배사 휴무 및 파업으로 인해 출고 또는 배송이 지연될 수 있습니다.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </aside>
+
+  <!-- productDetail / review / inquiry / orderInfo -->
+  <div class="col-sections">
+    <section class="product-detail" id="productDetail">
+      <div class="pd-content">
+        <div class="pd-body">
+          <div class="pd-img"><img src="assets/detail-1.png" alt=""></div>
+          <div class="pd-text">
+            <p class="t">Zero Sugar</p>
+            <p>설탕이 전혀 들어가지 않은 탄산 전해질 음료로, 300mg의 나트륨, 75mg의 칼륨, 25mg의 마그네슘을 함유하여 수분 보충을 돕도록 제조되었습니다.</p>
+          </div>
+          <div class="pd-img"><img src="assets/detail-2.png" alt=""></div>
+        </div>
+        <div class="more-area">
+          <button type="button" class="more-btn" id="moreBtn">더보기</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="review">
+      <div class="section-head">
+        <h2 class="title"><span>리뷰</span><span>(1,423)</span></h2>
+        <div class="rating-area">
+          <div class="rating"><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-off.svg" alt=""></div>
+          <span class="score">4.2</span>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <label class="check-box">
+          <input type="checkbox">
+          <span class="box"></span>
+          <span class="label">포토리뷰만 보기</span>
+        </label>
+        <button type="button" class="select-text">최신순<img src="assets/chevron-down.svg" alt=""></button>
+      </div>
+      <div class="review-list">
+        <article class="review-item">
+          <div class="ri-top">
+            <div class="ri-meta">
+              <div class="ri-line">
+                <p class="nickname">nickname***</p>
+                <div class="rating"><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-off.svg" alt=""></div>
+              </div>
+              <div class="option"><span>250ml</span><span class="divider-v"></span><span>오렌지</span><span class="divider-v"></span><span>텀블러</span></div>
+            </div>
+            <p class="ri-body">운동 전후에 마시면 확실히 갈증이 빨리 해소되는 느낌이라 만족스럽습니다. 블러드 오렌지 향이 상큼하면서도 너무 달지 않아 부담 없이 마실 수 있었고, 인공적인 맛이 강하지 않아 데일리 음료처럼 즐기기 좋았습니다. 운동할 때뿐만 아니라 더운 날 외출 후에도 자주 찾게 되는 제품입니다.</p>
+          </div>
+          <div class="ri-images">
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell more"><span class="dim">+3</span></div>
+          </div>
+          <p class="ri-date">2026. 12. 31.</p>
+        </article>
+        <article class="review-item">
+          <div class="ri-top">
+            <div class="item-head">
+              <span class="badge">내 리뷰</span>
+              <div class="text-btn-group">
+                <button type="button" class="btn-text">수정</button>
+                <span class="divider-v"></span>
+                <button type="button" class="btn-text danger">삭제</button>
+              </div>
+            </div>
+            <div class="ri-meta">
+              <div class="ri-line">
+                <p class="nickname">nickname***</p>
+                <div class="rating"><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-off.svg" alt=""></div>
+              </div>
+              <div class="option"><span>250ml</span><span class="divider-v"></span><span>오렌지</span></div>
+            </div>
+            <p class="ri-body">맛은 깔끔하고 탄산 강도도 적당해서 물처럼 편하게 마실 수 있습니다. 다만 개인적으로는 단맛이 조금 더 있어도 좋았을 것 같다는 생각이 들었습니다. 전해질 음료 특유의 짠맛이 거의 느껴지지 않는 점은 확실히 장점입니다. 캔 디자인도 깔끔해서 냉장고에 넣어두면 보기 좋고, 가족들도 부담 없이 잘 마시고 있어요.</p>
+          </div>
+          <div class="ri-images">
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+            <div class="cell more"><span class="dim">+4</span></div>
+          </div>
+          <p class="ri-date">2026. 12. 21.</p>
+        </article>
+        <article class="review-item">
+          <div class="ri-top">
+            <div class="ri-meta">
+              <div class="ri-line">
+                <p class="nickname">nickname***</p>
+                <div class="rating"><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-off.svg" alt=""></div>
+              </div>
+              <div class="option"><span>250ml</span><span class="divider-v"></span><span>오렌지</span></div>
+            </div>
+            <p class="ri-body">땀을 많이 흘리는 여름철에 수분 보충용으로 두고 마시기 좋습니다. 무겁지 않고 뒷맛이 깔끔해서 계속 손이 가네요.</p>
+          </div>
+          <p class="ri-date">2026. 12. 11.</p>
+        </article>
+        <article class="review-item">
+          <div class="ri-top">
+            <div class="ri-meta">
+              <div class="ri-line">
+                <p class="nickname">nickname***</p>
+                <div class="rating"><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-off.svg" alt=""></div>
+              </div>
+              <div class="option"><span>250ml</span><span class="divider-v"></span><span>오렌지</span></div>
+            </div>
+            <p class="ri-body">처음 마셔봤는데 생각보다 훨씬 괜찮았습니다. 향은 은은하고 목 넘김이 부드러워서 운동 직후에도 부담이 없었어요.</p>
+          </div>
+          <div class="ri-images">
+            <div class="cell"><img src="assets/review-thumb.png" alt=""></div>
+          </div>
+          <p class="ri-date">2026. 12. 01.</p>
+        </article>
+        <article class="review-item">
+          <div class="ri-top">
+            <div class="ri-meta">
+              <div class="ri-line">
+                <p class="nickname">nickname***</p>
+                <div class="rating"><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-on.svg" alt=""><img src="assets/star-off.svg" alt=""></div>
+              </div>
+              <div class="option"><span>250ml</span><span class="divider-v"></span><span>오렌지</span></div>
+            </div>
+            <p class="ri-body">재구매 의사 있습니다. 가격 대비 만족스럽고, 무엇보다 설탕이 없다는 점이 마음에 들어요.</p>
+          </div>
+          <p class="ri-date">2026. 11. 21.</p>
+        </article>
+        <nav class="pagination">
+          <div class="inner">
+            <button type="button" class="nav-btn" aria-label="이전"><span>‹</span></button>
+            <div class="page-list">
+              <button type="button" class="item is-on"><span class="num">1</span></button>
+              <button type="button" class="item"><span class="num">2</span></button>
+              <button type="button" class="item"><span class="num">3</span></button>
+              <button type="button" class="item"><span class="num">4</span></button>
+              <button type="button" class="item"><span class="num">5</span></button>
+              <button type="button" class="item"><span class="num">6</span></button>
+              <button type="button" class="item"><span class="num">7</span></button>
+              <button type="button" class="item"><span class="num">8</span></button>
+              <button type="button" class="item"><span class="num">9</span></button>
+              <button type="button" class="item"><span class="num">10</span></button>
+            </div>
+            <button type="button" class="nav-btn" aria-label="다음"><span>›</span></button>
+          </div>
+        </nav>
+      </div>
+    </section>
+    <section class="section" id="inquiry">
+      <div class="section-head with-btn">
+        <h2 class="title"><span>상품 문의</span></h2>
+        <button type="button" class="btn-small">문의하기</button>
+      </div>
+      <div class="filter-bar">
+        <label class="check-box">
+          <input type="checkbox">
+          <span class="box"></span>
+          <span class="label">내 문의만 보기</span>
+        </label>
+        <button type="button" class="select-text">전체<img src="assets/chevron-down.svg" alt=""></button>
+      </div>
+      <div class="inquiry-list" id="inquiryList">
+        <article class="inquiry-item">
+          <div class="q-text">
+            <div class="info-area">
+              <div class="option">
+                <span class="status">답변대기</span>
+                <span class="divider-v"></span>
+                <span class="sub">nickname***</span>
+                <span class="divider-v"></span>
+                <span class="sub">2026. 12. 31. 18:30</span>
+              </div>
+              <img src="assets/chevron-up.svg" alt="">
+            </div>
+            <p class="q-body">상품 재입고 일정이 궁금합니다. 알림 신청을 해두면 입고 시 안내를 받을 수 있을까요?</p>
+          </div>
+        </article>
+        <article class="inquiry-item is-answered">
+          <div class="question">
+            <div class="item-head">
+              <span class="badge">내 문의</span>
+              <div class="text-btn-group">
+                <button type="button" class="btn-text">수정</button>
+                <span class="divider-v"></span>
+                <button type="button" class="btn-text danger">삭제</button>
+              </div>
+            </div>
+            <div class="q-text">
+              <div class="info-area">
+                <div class="option">
+                  <span class="status">답변완료</span>
+                  <span class="divider-v"></span>
+                  <span class="sub">nickname***</span>
+                  <span class="divider-v"></span>
+                  <span class="sub">2026. 12. 31. 18:30</span>
+                </div>
+                <img src="assets/chevron-up.svg" alt="">
+              </div>
+              <p class="q-body">배송 관련 문의드립니다. 주문 후 언제쯤 출고되는지 궁금하고, 배송지 변경이 가능한지도 알려주세요.</p>
+            </div>
+          </div>
+          <div class="reply">
+            <div class="r-info">
+              <span>판매자 답변</span>
+              <span class="divider-v"></span>
+              <span class="sub">2026. 12. 31. 18:30</span>
+            </div>
+            <p class="r-body">안녕하세요, 고객님.
+          결제 완료 후 영업일 기준 1~2일 내 출고되며, 출고 전까지는 배송지 변경이 가능합니다.
+
+          감사합니다.</p>
+          </div>
+        </article>
+        <article class="inquiry-item is-answered is-open">
+          <div class="question">
+            <div class="q-text">
+              <div class="info-area">
+                <div class="option">
+                  <span class="status">답변완료</span>
+                  <span class="divider-v"></span>
+                  <span class="sub">nickname***</span>
+                  <span class="divider-v"></span>
+                  <span class="sub">2026. 12. 31. 18:30</span>
+                </div>
+                <img src="assets/chevron-up.svg" alt="">
+              </div>
+              <p class="q-body">안녕하세요. 오늘 제품을 받아 개봉했는데 주문한 상품과 다른 제품이 배송된 것 같아 문의드립니다. 포장 상태는 이상이 없었지만 제가 주문한 옵션과 실제로 받은 상품이 달라 확인을 부탁드립니다. 교환을 진행하려면 어떤 절차로 접수하면 되는지, 회수는 택배 기사님이 방문하시는 방식인지도 함께 안내해 주시면 감사하겠습니다. 가능한 한 빠르게 교환받고 싶습니다. 확인 후 답변 부탁드립니다.</p>
+            </div>
+          </div>
+          <div class="reply">
+            <div class="r-info">
+              <span>판매자 답변</span>
+              <span class="divider-v"></span>
+              <span class="sub">2026. 12. 31. 18:30</span>
+            </div>
+            <p class="r-body">안녕하세요, 고객님.
+          먼저 주문하신 상품과 다른 제품을 받아보시게 된 점 양해 부탁드립니다.
+
+          번거로우시겠지만 주문 내역과 수령하신 상품 사진을 함께 전달해 주시면 확인 후 신속하게 교환 접수를 도와드리겠습니다.
+          회수 접수는 저희가 진행해 드리며, 택배 기사님이 방문하여 상품을 수거할 예정입니다.
+
+          회수 확인 후 주문하신 상품으로 빠르게 재발송해 드리겠습니다.
+          이용에 불편을 드린 점 양해 부탁드리며, 빠르게 도움드릴 수 있도록 하겠습니다.
+
+          감사합니다.</p>
+          </div>
+        </article>
+        <article class="inquiry-item is-answered">
+          <div class="question">
+            <div class="q-text">
+              <div class="info-area">
+                <div class="option">
+                  <span class="status">답변완료</span>
+                  <span class="divider-v"></span>
+                  <span class="sub">nickname***</span>
+                  <span class="divider-v"></span>
+                  <span class="sub">2026. 12. 31. 18:30</span>
+                </div>
+                <img src="assets/chevron-up.svg" alt="">
+              </div>
+              <p class="q-body">제품 성분 관련해서 알레르기 유발 성분이 포함되어 있는지 확인 부탁드립니다.</p>
+            </div>
+          </div>
+          <div class="reply">
+            <div class="r-info">
+              <span>판매자 답변</span>
+              <span class="divider-v"></span>
+              <span class="sub">2026. 12. 31. 18:30</span>
+            </div>
+            <p class="r-body">안녕하세요, 고객님.
+          해당 제품에는 별도의 알레르기 유발 성분이 포함되어 있지 않습니다.
+
+          감사합니다.</p>
+          </div>
+        </article>
+        <article class="inquiry-item">
+          <div class="q-text">
+            <div class="info-area">
+              <div class="option">
+                <span class="status">답변대기</span>
+                <span class="divider-v"></span>
+                <span class="sub">nickname***</span>
+                <span class="divider-v"></span>
+                <span class="sub">2026. 12. 31. 18:30</span>
+              </div>
+              <img src="assets/chevron-up.svg" alt="">
+            </div>
+            <p class="q-body">선물 포장 옵션도 함께 신청할 수 있나요?</p>
+            <div class="private-row"><img src="assets/lock.svg" alt=""><span>비밀글</span></div>
+          </div>
+        </article>
+        <nav class="pagination">
+          <div class="inner">
+            <button type="button" class="nav-btn" aria-label="이전"><span>‹</span></button>
+            <div class="page-list">
+              <button type="button" class="item is-on"><span class="num">1</span></button>
+              <button type="button" class="item"><span class="num">2</span></button>
+              <button type="button" class="item"><span class="num">3</span></button>
+              <button type="button" class="item"><span class="num">4</span></button>
+              <button type="button" class="item"><span class="num">5</span></button>
+              <button type="button" class="item"><span class="num">6</span></button>
+              <button type="button" class="item"><span class="num">7</span></button>
+              <button type="button" class="item"><span class="num">8</span></button>
+              <button type="button" class="item"><span class="num">9</span></button>
+              <button type="button" class="item"><span class="num">10</span></button>
+            </div>
+            <button type="button" class="nav-btn" aria-label="다음"><span>›</span></button>
+          </div>
+        </nav>
+      </div>
+    </section>
+
+    <section class="order-info" id="orderInfo">
+      <div class="oi-head"><h2>주문 정보</h2></div>
+      <div class="oi-content">
+        <div class="oi-text">
+          <p class="t">배송정보</p>
+          <p class="body">배송 업체 ㅣ CJ 대한통운 (1588-1255)
+배송 지역 ㅣ 대한민국 전 지역 배송
+배송 비용 ㅣ 3,500원 / 구매 금액 50,000원 이상 시 무료배송
+/ 제주 및 도서 산간 지역 별도 추가 금액 발생
+배송 기간 ㅣ 주말·공휴일 제외 2일 ~ 5일
+
+유의 사항
+- 주문 폭주 및 공급 사정으로 인하여 지연 및 품절이 발생할 수 있습니다.
+- 기본 배송기간 이상 소요되는 상품이거나, 품절 상품은 개별 연락을 드립니다.</p>
+        </div>
+        <div class="oi-img"><img src="assets/orderinfo.png" alt=""></div>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<!-- snackBarArea — 위시리스트 / 장바구니 담기 결과 안내 -->
+<div class="snackbar-area">
+  <div class="snackbar" id="snackbar" role="status" aria-live="polite">
+    <div class="text-area">
+      <p class="desc" id="snackDesc">장바구니에 담았어요</p>
+      <p class="pname" id="snackName">전해질 보충 음료 블러드 오렌지</p>
+    </div>
+    <button type="button" class="view">보기</button>
+  </div>
+</div>
+
+<nav class="tab-bar">
+  <button type="button" class="is-active"><span class="txt">상품 정보</span></button>
+  <button type="button"><span class="txt">리뷰</span></button>
+  <button type="button"><span class="txt">상품 문의</span></button>
+  <button type="button"><span class="txt">주문 정보</span></button>
+</nav>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <strong>template</strong>
+  <div class="demo-seg" id="tplToggle">
+    <button type="button" data-tpl="a">A</button>
+    <button type="button" data-tpl="b">B</button>
+  </div>
+
+  <strong>carousel</strong>
+  <div class="demo-seg" id="cgapToggle">
+    <button type="button" data-cgap="px">16px</button>
+    <button type="button" data-cgap="mid">mid-16</button>
+    <button type="button" data-cgap="split">split</button>
+  </div>
+
+  <strong>case</strong>
+  <div class="demo-fields" id="caseFields">
+    <label class="demo-check"><input type="checkbox" id="cCategory" checked>카테고리</label>
+  </div>
+
+  <strong>panel w</strong>
+  <div class="demo-fields" id="panelFields">
+    <label>vw<input type="number" id="pwRaw" min="5" max="100" step="0.5" value="28.5"></label>
+    <label class="demo-check"><input type="checkbox" id="pwMinOn" checked>min</label>
+    <label><input type="number" id="pwMin" min="0" max="2000" step="10" value="400"><span class="demo-unit">px</span></label>
+    <label class="demo-check"><input type="checkbox" id="pwMaxOn">max</label>
+    <label class="is-off"><input type="number" id="pwMax" min="0" max="4000" step="10" value="640" disabled><span class="demo-unit">px</span></label>
+    <button type="button" class="demo-reset" id="pwReset">reset</button>
+  </div>
+
+  <strong>type</strong>
+  <div class="demo-fields" id="typeFields">
+    <label>P1<input type="number" id="fsP1" min="8" max="48" step="1" value="18"></label>
+    <label>P2<input type="number" id="fsP2" min="8" max="48" step="1" value="16"></label>
+    <label>P3<input type="number" id="fsP3" min="8" max="48" step="1" value="14"></label>
+    <label>P4<input type="number" id="fsP4" min="8" max="48" step="1" value="13"></label>
+    <button type="button" class="demo-reset" id="fsReset">reset</button>
+  </div>
+
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const TPL_KEY = 'fw-e-pdp-template';
+  const PW_KEY  = 'fw-e-pdp-panelw';
+  const CG_KEY  = 'fw-e-pdp-cgap';
+  const CASE_KEY = 'fw-e-pdp-case';
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+
+  /* 캐러셀 — 썸네일 클릭 시 메인 이미지 교체 (전환 효과 없이 즉시) */
+  $('#thumbList').addEventListener('click', e => {
+    const t = e.target.closest('.thumb[data-src]');
+    if (!t) return;
+    $$('#thumbList .thumb').forEach(b => b.classList.remove('is-active'));
+    t.classList.add('is-active');
+    $('#mainImage').src = t.dataset.src;
+    t.scrollIntoView({ block: 'nearest' });
+  });
+
+  $('#moreBtn').addEventListener('click', () => {
+    $('#productDetail').classList.add('is-expanded');
+  });
+
+  $('#inquiryList').addEventListener('click', e => {
+    const head = e.target.closest('.info-area');
+    if (head) head.closest('.inquiry-item').classList.toggle('is-open');
+  });
+
+  function setTpl(t) {
+    document.body.dataset.template = t;
+    $$('#tplToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.tpl === t));
+    store(TPL_KEY, t);
+    readout();
+  }
+  function applyCase() {
+    const on = $('#cCategory').checked;
+    document.body.dataset.category = on ? 'on' : 'off';
+    store(CASE_KEY, on ? 'on' : 'off');
+  }
+
+  function setCgap(v) {
+    document.body.dataset.cgap = v;
+    $$('#cgapToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cgap === v));
+    store(CG_KEY, v);
+    readout();
+  }
+
+  /* ── 패널 폭 — vw 값 + min/max on·off ──────────────────────── */
+  const PW_DEFAULT = { raw: 28.5, min: 400, minOn: true, max: 640, maxOn: false };
+
+  function pwState() {
+    const num = (el, d) => { const v = parseFloat(el.value); return Number.isFinite(v) ? v : d; };
+    return {
+      raw:   num($('#pwRaw'), PW_DEFAULT.raw),
+      min:   num($('#pwMin'), PW_DEFAULT.min),
+      max:   num($('#pwMax'), PW_DEFAULT.max),
+      minOn: $('#pwMinOn').checked,
+      maxOn: $('#pwMaxOn').checked,
+    };
+  }
+
+  function applyPw() {
+    const st = pwState();
+    const b = document.body.style;
+    b.setProperty('--panel-w-raw', `${st.raw}vw`);
+    b.setProperty('--panel-w-min', st.minOn ? `${st.min}px` : '0px');
+    b.setProperty('--panel-w-max', st.maxOn ? `${st.max}px` : '100vw');
+
+    $('#pwMin').disabled = !st.minOn;
+    $('#pwMax').disabled = !st.maxOn;
+    $('#pwMin').closest('label').classList.toggle('is-off', !st.minOn);
+    $('#pwMax').closest('label').classList.toggle('is-off', !st.maxOn);
+
+    try { localStorage.setItem(PW_KEY, JSON.stringify(st)); } catch (e) {}
+    readout();
+  }
+
+  /* 썸네일 리스트 — 위/아래 남은 이미지에 따라 그라디언트 노출 */
+  const thumbList = $('#thumbList'), thumbCol = $('#thumbCol');
+  function syncThumbGradient() {
+    const atTop = thumbList.scrollTop <= 1;
+    const atBottom = thumbList.scrollTop + thumbList.clientHeight >= thumbList.scrollHeight - 1;
+    thumbCol.classList.toggle('at-top', atTop && !atBottom);
+    thumbCol.classList.toggle('at-bottom', atBottom && !atTop);
+    thumbCol.classList.toggle('scrolling', !atTop && !atBottom);
+  }
+  thumbList.addEventListener('scroll', syncThumbGradient);
+  window.addEventListener('resize', syncThumbGradient);
+  syncThumbGradient();
+
+  /* ── 옵션 선택 · 추가 ────────────────────────────────────────
+     용량 → 맛 → 추가옵션 순으로 활성화되고, 세 값이 모두 정해지면
+     selectedOption 목록에 한 줄 추가된다. 같은 조합은 수량만 +1.     */
+  const BASE_PRICE = 40000;
+  const OPTION_GROUPS = [
+    { key: 'size', label: '용량', items: [
+      { label: '250ml',       add: 0 },
+      { label: '250ml x 3',   add: 72000,  soldout: true },
+      { label: '250ml x 6',   add: 156000 },
+      { label: '250ml x 12',  add: 300000 },
+      { label: '250ml x 24',  add: 580000 },
+      { label: '250ml x 36',  add: 850000 },
+      { label: '500ml',       add: 15000 },
+      { label: '500ml x 6',   add: 240000 },
+      { label: '500ml x 12',  add: 460000, soldout: true },
+      { label: '1L',          add: 32000 },
+    ] },
+    { key: 'flavor', label: '맛', items: [
+      { label: '오렌지', add: 0 }, { label: '블러드 오렌지', add: 0 }, { label: '레몬', add: 0 },
+      { label: '라임', add: 0 },   { label: '자몽', add: 2000 },      { label: '청포도', add: 2000 },
+      { label: '수박', add: 2000, soldout: true }, { label: '복숭아', add: 2000 },
+      { label: '무맛(플레인)', add: 0 }, { label: '믹스', add: 3000 },
+    ] },
+    { key: 'extra', label: '추가옵션', items: [
+      { label: '선택 안 함', add: 0 },
+      { label: '텀블러', add: 8000 },   { label: '보틀', add: 12000 },
+      { label: '아이스팩', add: 1500 }, { label: '보냉백', add: 9000 },
+      { label: '스티커 팩', add: 2000 },{ label: '전용 컵', add: 6000 },
+      { label: '선물 포장', add: 3000 },{ label: '메시지 카드', add: 1000, soldout: true },
+      { label: '세트 구성', add: 15000 },
+    ] },
+  ];
+  const LAST_KEY = OPTION_GROUPS[OPTION_GROUPS.length - 1].key;   /* + 금액은 이 그룹에만 노출 */
+
+  const picked = {};        /* key → item */
+  let cart = [];            /* { id, name, price, qty } */
+
+  const won = n => n.toLocaleString('ko-KR');
+
+  function groupEnabled(i) {
+    return i === 0 || OPTION_GROUPS.slice(0, i).every(g => picked[g.key]);
+  }
+
+  function renderSelects() {
+    $('#optionGroup').innerHTML = OPTION_GROUPS.map((g, i) => {
+      const on = groupEnabled(i);
+      const sel = picked[g.key];
+      return `
+      <div class="select-wrap" data-key="${g.key}">
+        <button type="button" class="select-field${on ? '' : ' is-disabled'}"${on ? '' : ' disabled'}>
+          <span class="label">${sel ? sel.label : g.label}</span>
+          <img src="assets/chevron-down${on ? '' : '-disabled'}.svg" alt="">
+        </button>
+        <div class="option-list">
+          ${g.items.map(it => `
+            <button type="button" data-label="${it.label}" data-add="${it.add}"${it.soldout ? ' disabled' : ''}${sel && sel.label === it.label ? ' class="is-selected"' : ''}>
+              <span>${it.soldout ? '(품절) ' : ''}${it.label}</span>${g.key === LAST_KEY && it.add ? `<span class="extra">+${won(it.add)}원</span>` : ''}
+            </button>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderCart() {
+    const box = $('#selectedOption');
+    box.classList.toggle('is-empty', cart.length === 0);
+    if (!cart.length) { box.innerHTML = ''; return; }
+    const count = cart.reduce((a, c) => a + c.qty, 0);
+    const total = cart.reduce((a, c) => a + c.price * c.qty, 0);
+    box.innerHTML = cart.map(c => `
+      <div class="so-item" data-id="${c.id}">
+        <div class="name-area">
+          <p class="name">${c.name}</p>
+          <button type="button" class="close" data-act="remove" aria-label="옵션 삭제">
+            <img src="assets/close.svg" alt="">
+          </button>
+        </div>
+        <div class="qty-price">
+          <div class="number-input">
+            <button type="button" class="step" data-act="minus" ${c.qty <= 1 ? 'disabled' : ''} aria-label="수량 감소">
+              <img src="assets/minus.svg" alt="">
+            </button>
+            <span class="value">${c.qty}</span>
+            <button type="button" class="step" data-act="plus" aria-label="수량 증가">
+              <img src="assets/plus.svg" alt="">
+            </button>
+          </div>
+          <p class="item-price"><span>${won(c.price * c.qty)}</span><span>원</span></p>
+        </div>
+      </div>`).join('') + `
+      <div class="so-summary">
+        <p class="label"><span class="kr">총</span><span class="count">${count}</span><span class="kr">개 상품 금액</span></p>
+        <p class="total"><span>${won(total)}</span><span>원</span></p>
+      </div>`;
+  }
+
+  function addToCart() {
+    const name = OPTION_GROUPS.map(g => picked[g.key].label).join(' / ');
+    const price = BASE_PRICE + OPTION_GROUPS.reduce((a, g) => a + picked[g.key].add, 0);
+    const hit = cart.find(c => c.name === name);
+    if (hit) hit.qty += 1;
+    else cart.push({ id: String(Date.now()) + cart.length, name, price, qty: 1 });
+    OPTION_GROUPS.forEach(g => delete picked[g.key]);
+    renderSelects();
+    renderCart();
+  }
+
+  $('#optionGroup').addEventListener('click', e => {
+    const field = e.target.closest('.select-field:not(.is-disabled)');
+    if (field) {
+      const wrap = field.closest('.select-wrap');
+      const open = wrap.classList.contains('is-open');
+      $$('.select-wrap').forEach(w => w.classList.remove('is-open'));
+      wrap.classList.toggle('is-open', !open);
+      field.classList.toggle('is-open', !open);
+      return;
+    }
+    const opt = e.target.closest('.option-list button');
+    if (!opt) return;
+    const key = opt.closest('.select-wrap').dataset.key;
+    picked[key] = { label: opt.dataset.label, add: Number(opt.dataset.add) };
+    if (OPTION_GROUPS.every(g => picked[g.key])) addToCart();
+    else {
+      renderSelects();
+      /* 다음 그룹 자동 열기 */
+      const next = OPTION_GROUPS.findIndex(g => !picked[g.key]);
+      const wrap = $$('.select-wrap')[next];
+      if (wrap) { wrap.classList.add('is-open'); $('.select-field', wrap).classList.add('is-open'); }
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#optionGroup')) {
+      $$('.select-wrap').forEach(w => w.classList.remove('is-open'));
+      $$('.select-field').forEach(f => f.classList.remove('is-open'));
+    }
+  });
+
+  $('#selectedOption').addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    const id = btn.closest('.so-item').dataset.id;
+    const item = cart.find(c => c.id === id);
+    if (!item) return;
+    if (btn.dataset.act === 'remove') cart = cart.filter(c => c.id !== id);
+    if (btn.dataset.act === 'plus')  item.qty += 1;
+    if (btn.dataset.act === 'minus') item.qty = Math.max(1, item.qty - 1);
+    renderCart();
+  });
+
+  renderSelects();
+  renderCart();
+
+  /* ── paragraph-1~4 사이즈 조절 (데모) ───────────────────────
+     size value ≤ 1rem(14px) → px 고정
+     size value > 1rem       → (size/14 − 1) × 0.83vw + 1rem                */
+  const FS_DEFAULT = { p1: 18, p2: 16, p3: 14, p4: 13 };
+  const FS_KEY = 'fw-e-pdp-fs';
+  const ROOT = 14;   /* 1rem = 14px */
+
+  const fsExpr = v =>
+    v <= ROOT ? `${v}px` : `calc((${(v / ROOT).toFixed(4)} - 1) * 0.83vw + 1rem)`;
+
+  const fsVal = k => {
+    const raw = parseFloat($(`#fs${k.toUpperCase()}`).value);
+    return Number.isFinite(raw) ? Math.min(48, Math.max(8, raw)) : FS_DEFAULT[k];
+  };
+
+  function applyFs() {
+    const vals = {};
+    ['p1', 'p2', 'p3', 'p4'].forEach(k => {
+      const v = fsVal(k);
+      vals[k] = v;
+      document.body.style.setProperty(`--fs-${k}`, fsExpr(v));
+    });
+    try { localStorage.setItem(FS_KEY, JSON.stringify(vals)); } catch (e) {}
+    readout();
+  }
+
+  function px(k) {
+    const d = document.createElement('div');
+    d.style.width = `var(${k})`;
+    document.body.appendChild(d);
+    const v = parseFloat(getComputedStyle(d).width);
+    d.remove();
+    return v;
+  }
+
+  function readout() {
+    const type = ['p1', 'p2', 'p3', 'p4'].map(k => {
+      const v = fsVal(k);
+      const fixed = v <= ROOT;
+      return `${k.toUpperCase()} <b>${px('--fs-' + k).toFixed(2)}</b>${fixed ? '<sup>고정</sup>' : '<sup>가변</sup>'}`;
+    }).join(' · ');
+    $('#readout').innerHTML =
+      `col <b>${px('--grid-col').toFixed(2)}px</b> · margin <b>${px('--grid-margin').toFixed(2)}px</b> · ` +
+      `gutter <b>16px</b> · viewport ${innerWidth}px · ` +
+      `panel <b>${($('.product-panel')?.getBoundingClientRect().width || 0).toFixed(2)}px</b><br>` +
+      `carousel ↔ <b>${px('--carousel-gap-x').toFixed(2)}px</b> / ` +
+      `↕ <b>${px('--carousel-gap-y').toFixed(2)}px</b> · ` +
+      `thumb col <b>${($('#thumbCol')?.getBoundingClientRect().width || 0).toFixed(2)}px</b> ` +
+      `(grid col ${px('--grid-col').toFixed(2)})<br>${type}`;
+  }
+
+  $('#typeFields').addEventListener('input', e => {
+    if (e.target.matches('input[type="number"]')) applyFs();
+  });
+  $('#typeFields').addEventListener('change', e => {
+    if (!e.target.matches('input[type="number"]')) return;
+    const k = e.target.id.slice(2).toLowerCase();
+    e.target.value = fsVal(k);      /* 범위 밖 입력은 확정 시 보정 */
+    applyFs();
+  });
+  $('#fsReset').addEventListener('click', () => {
+    Object.entries(FS_DEFAULT).forEach(([k, v]) => { $(`#fs${k.toUpperCase()}`).value = v; });
+    applyFs();
+  });
+
+  $('#tplToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-tpl]'); if (b) setTpl(b.dataset.tpl);
+  });
+  $('#caseFields').addEventListener('change', applyCase);
+  $('#cgapToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cgap]'); if (b) setCgap(b.dataset.cgap);
+  });
+  $('#panelFields').addEventListener('input', applyPw);
+  $('#pwReset').addEventListener('click', () => {
+    $('#pwRaw').value   = PW_DEFAULT.raw;
+    $('#pwMin').value   = PW_DEFAULT.min;
+    $('#pwMax').value   = PW_DEFAULT.max;
+    $('#pwMinOn').checked = PW_DEFAULT.minOn;
+    $('#pwMaxOn').checked = PW_DEFAULT.maxOn;
+    applyPw();
+  });
+  window.addEventListener('resize', readout);
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(FS_KEY) || 'null');
+    if (saved) Object.entries(saved).forEach(([k, v]) => { const el = $(`#fs${k.toUpperCase()}`); if (el) el.value = v; });
+  } catch (e) {}
+  applyFs();
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(PW_KEY) || 'null');
+    if (saved) {
+      $('#pwRaw').value = saved.raw;
+      $('#pwMin').value = saved.min;
+      $('#pwMax').value = saved.max;
+      $('#pwMinOn').checked = !!saved.minOn;
+      $('#pwMaxOn').checked = !!saved.maxOn;
+    }
+  } catch (e) {}
+  applyPw();
+
+  /* ── 스낵바 — 뜨고 3초 후 사라짐 (annotation) ─────────────── */
+  const snack = $('#snackbar');
+  let snackTimer = null;
+  function showSnack(desc) {
+    $('#snackDesc').textContent = desc;
+    $('#snackName').textContent = $('.product-name').textContent.trim();
+    snack.classList.add('is-on');
+    clearTimeout(snackTimer);
+    snackTimer = setTimeout(() => snack.classList.remove('is-on'), 3000);
+  }
+  snack.classList.remove('is-on');
+
+  /* 위시리스트 — 토글. 담을 때만 스낵바 */
+  const wish = $('.icon-area .icon-btn');
+  wish.addEventListener('click', () => {
+    const on = wish.getAttribute('aria-pressed') !== 'true';
+    wish.setAttribute('aria-pressed', String(on));
+    if (on) showSnack('위시리스트에 담았어요');
+  });
+
+  /* 장바구니 담기 */
+  $('.button-group .btn.outlined').addEventListener('click', () => showSnack('장바구니에 담았어요'));
+
+  $('#cCategory').checked = load(CASE_KEY, 'on') === 'on';
+  applyCase();
+  setCgap(load(CG_KEY, 'mid'));
+  setTpl(load(TPL_KEY, 'a'));
+})();
+</script>
+
+</body>
+</html>
