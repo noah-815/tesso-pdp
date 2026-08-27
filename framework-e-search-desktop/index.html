@@ -318,8 +318,9 @@
     font-family: var(--font-en);
     font-variation-settings: "opsz" 14;
   }
-  .pagination .item:not(.is-on) { opacity: .48; }
-  .pagination .item.is-on { font-weight: 500; }
+  /* 현재 페이지 외 — 숫자만 opacity .6 (컨테이너 .8 과 곱해져 .48).
+     시안은 현재 페이지도 굵기가 regular 라 font-weight 는 건드리지 않는다 */
+  .pagination .item:not(.is-on) .num { opacity: .6; }
   /* iconButton/contained — 어노테이션 없음 → px */
   .pagination .nav-btn {
     display: flex;
