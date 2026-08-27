@@ -49,6 +49,11 @@
     /* 화면 좌우 마진 — global/desktop-margin-vw = 1vw (19px @1920) */
     --margin: calc(19 * 100vw / 1920);
 
+    /* search 상하 padding 2안 (데모 토글) — 시안은 28px, 바인딩 없음
+       em  : @em base P1 → 28 / 18 = 1.5556em · 폰트가 커지면 함께 커짐
+       mid : mid-28      → 뷰포트에 따라 증감 */
+    --search-pad-y: 1.5556em;
+
     /* productCard 가로 간격 — 컴포넌트 정의는 mid-16 (데모에서 전환)
        vw 안 : 1920 에서 16px 이 되는 순수 vw. mid 와 달리 8px 하한이 없어
        화면이 좁아질수록 비례해서 그대로 줄어든다. */
@@ -72,6 +77,9 @@
 
   /* 카드 간격 2안 — mid-16 (하한 8px) ↔ 16px 을 vw 로 환산 (하한 없음) */
   body[data-cardgap="vw"] { --card-gap: var(--card-gap-vw); }
+
+  /* search 상하 padding — em(기본) ↔ mid-28 */
+  body[data-searchpad="mid"] { --search-pad-y: var(--mid-28); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html {
@@ -162,7 +170,9 @@
     align-items: center;
     gap: var(--mid-24);
     width: 100%;
-    padding: 28px var(--margin);
+    /* em 안이 P1 기준으로 풀리도록 컨테이너 font-size 를 P1 로 둔다 */
+    font-size: var(--fs-p1);
+    padding: var(--search-pad-y) var(--margin);
     background: #fff;
   }
   .search-bar .field { flex: 1 0 0; min-width: 0; display: flex; align-items: center; overflow: hidden; }
@@ -356,6 +366,24 @@
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
   .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, .1); }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-fields { display: flex; align-items: center; gap: 6px; }
+  .demo-fields label { display: flex; align-items: center; gap: 3px; color: #777; }
+  .demo-fields input[type="number"] {
+    width: 42px;
+    padding: 3px 4px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 3px;
+    font-size: 11px;
+    text-align: right;
+    background: #fff;
+  }
+  .demo-reset {
+    padding: 3px 7px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 3px;
+    color: #777;
+    background: #fff;
+  }
   .demo-readout {
     grid-column: 1 / -1;
     padding-top: 2px;
@@ -419,16 +447,25 @@
 
 <!-- 데모 컨트롤 — 시안에 없는 요소 -->
 <nav class="demo-nav">
-  <strong>result</strong>
-  <div class="demo-seg" id="rowsToggle">
-    <button type="button" data-rows="2">2행 (8개)</button>
-    <button type="button" data-rows="3">3행 + 페이지네이션</button>
-  </div>
-
   <strong>card gap</strong>
   <div class="demo-seg" id="gapToggle">
     <button type="button" data-cardgap="mid">mid-16</button>
     <button type="button" data-cardgap="vw">16 → vw</button>
+  </div>
+
+  <strong>search pad</strong>
+  <div class="demo-seg" id="padToggle">
+    <button type="button" data-searchpad="em">em (P1)</button>
+    <button type="button" data-searchpad="mid">mid-28</button>
+  </div>
+
+  <strong>type</strong>
+  <div class="demo-fields" id="typeFields">
+    <label>P1<input type="number" id="fsP1" min="8" max="48" step="1" value="18"></label>
+    <label>P3<input type="number" id="fsP3" min="8" max="48" step="1" value="14"></label>
+    <label>P4<input type="number" id="fsP4" min="8" max="48" step="1" value="13"></label>
+    <label>C2<input type="number" id="fsC2" min="8" max="48" step="1" value="11"></label>
+    <button type="button" class="demo-reset" id="fsReset">reset</button>
   </div>
 
   <p class="demo-readout" id="readout">–</p>
@@ -438,7 +475,6 @@
 (() => {
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const ROWS_KEY = 'fw-e-search-rows';
   const GAP_KEY  = 'fw-e-search-gap';
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
@@ -482,31 +518,68 @@
       </a>`;
   }
 
-  function render(rows) {
-    $('#grid').innerHTML = Array.from({ length: rows }, (_, r) =>
+  const ROWS = 3;                          /* 한 행 4개 */
+  function render() {
+    $('#grid').innerHTML = Array.from({ length: ROWS }, (_, r) =>
       `<div class="row">${Array.from({ length: 4 }, (_, c) => card(r * 4 + c)).join('')}</div>`
     ).join('');
-    $('#total').textContent = rows * 4;
-    $('#pagination').hidden = rows < 3;
+    $('#total').textContent = ROWS * 4;
   }
 
-  function setRows(n) {
-    render(+n);
-    $$('#rowsToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.rows === String(n)));
-    store(ROWS_KEY, n);
-    readout();
-  }
   function setGap(mode) {
     document.body.dataset.cardgap = mode;
     $$('#gapToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cardgap === mode));
     store(GAP_KEY, mode);
     readout();
   }
-  $('#rowsToggle').addEventListener('click', e => {
-    const b = e.target.closest('[data-rows]'); if (b) setRows(b.dataset.rows);
-  });
   $('#gapToggle').addEventListener('click', e => {
     const b = e.target.closest('[data-cardgap]'); if (b) setGap(b.dataset.cardgap);
+  });
+
+  /* ── 데모 — search 상하 padding (em ↔ mid) ────────────────── */
+  const PAD_KEY = 'fw-e-search-pad';
+  function setPad(mode) {
+    document.body.dataset.searchpad = mode;
+    $$('#padToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.searchpad === mode));
+    store(PAD_KEY, mode);
+    readout();
+  }
+  $('#padToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-searchpad]'); if (b) setPad(b.dataset.searchpad);
+  });
+
+  /* ── 데모 — 폰트 크기 ─────────────────────────────────────── */
+  const FS_KEY = 'fw-e-search-fs';
+  const ROOT = 14;                         /* 1rem = 14px */
+  const FS_DEFAULT = { p1: 18, p3: 14, p4: 13, c2: 11 };
+  const FS_KEYS = Object.keys(FS_DEFAULT);
+  /* 데스크탑 수식 : (size/14 − 1) × 0.83vw + 1rem, ≤ 1rem 은 고정 */
+  const fsExpr = v => (v <= ROOT ? `${v}px` : `calc((${(v / ROOT).toFixed(4)} - 1) * 0.83vw + 1rem)`);
+  const fsVal = k => {
+    const v = parseInt($(`#fs${k.toUpperCase()}`).value, 10);
+    return Number.isFinite(v) ? Math.min(48, Math.max(8, v)) : FS_DEFAULT[k];
+  };
+  function applyFs() {
+    const vals = {};
+    FS_KEYS.forEach(k => {
+      const v = fsVal(k);
+      vals[k] = v;
+      document.body.style.setProperty(`--fs-${k}`, fsExpr(v));
+    });
+    store(FS_KEY, JSON.stringify(vals));
+    readout();
+  }
+  $('#typeFields').addEventListener('input', e => {
+    if (e.target.matches('input[type="number"]')) applyFs();
+  });
+  $('#typeFields').addEventListener('change', e => {
+    if (!e.target.matches('input[type="number"]')) return;
+    e.target.value = fsVal(e.target.id.slice(2).toLowerCase());
+    applyFs();
+  });
+  $('#fsReset').addEventListener('click', () => {
+    Object.entries(FS_DEFAULT).forEach(([k, v]) => { $(`#fs${k.toUpperCase()}`).value = v; });
+    applyFs();
   });
 
   function readout() {
@@ -515,11 +588,22 @@
       `viewport <b>${innerWidth}px</b> · margin <b>${px('--margin').toFixed(2)}</b> · ` +
       `card gap <b>${px('--card-gap').toFixed(2)}</b><br>` +
       `카드 <b>${c ? c.getBoundingClientRect().width.toFixed(2) : '–'}px</b> · ` +
-      `행 간격 <b>${px('--mid-56').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b>`;
+      `행 간격 <b>${px('--mid-56').toFixed(2)}</b><br>` +
+      `search 상하 <b>${document.body.dataset.searchpad || 'em'}</b> ` +
+      `<b>${parseFloat(getComputedStyle($('.search-bar')).paddingTop).toFixed(2)}</b> · ` +
+      `바 높이 <b>${$('.search-bar').getBoundingClientRect().height.toFixed(2)}</b> · ` +
+      FS_KEYS.map(k => `${k.toUpperCase()} <b>${px('--fs-' + k).toFixed(2)}</b>`).join(' · ');
   }
   window.addEventListener('resize', readout);
 
+  try {
+    const saved = JSON.parse(localStorage.getItem(FS_KEY) || 'null');
+    if (saved) Object.entries(saved).forEach(([k, v]) => { const el = $(`#fs${k.toUpperCase()}`); if (el) el.value = v; });
+  } catch (e) {}
+  applyFs();
+  setPad(load(PAD_KEY, 'em'));
   setGap(load(GAP_KEY, 'mid'));
-  setRows(load(ROWS_KEY, '3'));
+  render();
+  readout();
 })();
 </script>

@@ -39,11 +39,17 @@
     --mid-6:  6px;
     --mid-8:  8px;
     --mid-12: calc(  4 * var(--us) + 8px);
+    --mid-24: calc( 16 * var(--us) + 8px);
     --mid-32: calc( 24 * var(--us) + 8px);
     --mid-40: calc( 32 * var(--us) + 8px);
 
     /* px-* — 뷰포트 무관 고정 ------------------------------------ */
     --px-16: 16px;                            /* 화면 좌우 여백 */
+
+    /* search 상하 padding 2안 (데모 토글) — 시안은 24px, 바인딩 없음
+       em  : @em base P2 → 24 / 15 = 1.6em · 폰트가 커지면 함께 커짐
+       mid : mid-24      → 뷰포트에 따라 증감 */
+    --search-pad-y: 1.6em;
 
     /* Radius / Font / Color -------------------------------------- */
     --radius-2xs: 3px;
@@ -58,6 +64,9 @@
     --c-line-soft: rgba(0, 0, 0, 0.1);
     --c-thumb-bg: #f4f4f4;
   }
+
+  /* search 상하 padding — em(기본) ↔ mid-24 */
+  body[data-searchpad="mid"] { --search-pad-y: var(--mid-24); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html {
@@ -136,7 +145,9 @@
     align-items: center;
     gap: var(--mid-12);
     width: 100%;
-    padding: 24px var(--px-16);
+    /* em 안이 P2 기준으로 풀리도록 컨테이너 font-size 를 P2 로 둔다 */
+    font-size: var(--fs-p2);
+    padding: var(--search-pad-y) var(--px-16);
     background: #fff;
   }
   .search-bar .field { flex: 1 0 0; min-width: 0; display: flex; align-items: center; overflow: hidden; }
@@ -324,6 +335,30 @@
     white-space: nowrap;
   }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; border-color: #111; }
+  .demo-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .demo-fields label { display: flex; align-items: center; gap: 2px; color: #777; }
+  .demo-fields input[type="number"] {
+    width: 34px;
+    padding: 3px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 3px;
+    font-size: 10px;
+    text-align: right;
+    background: #fff;
+  }
+  .demo-reset {
+    padding: 3px 6px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 3px;
+    color: #777;
+    background: #fff;
+  }
   .demo-readout {
     margin-top: 5px;
     padding-top: 4px;
@@ -364,13 +399,21 @@
 <!-- 데모 컨트롤 — 시안에 없는 요소 -->
 <nav class="demo-nav" id="demoNav">
   <div class="demo-head">
-    <strong>result</strong>
+    <strong>search</strong>
     <button type="button" id="demoToggle" aria-label="패널 접기">–</button>
   </div>
   <div class="demo-body">
-    <div class="demo-seg" id="rowsToggle">
-      <button type="button" data-rows="4">4행 (8개)</button>
-      <button type="button" data-rows="6">6행 + 페이지네이션</button>
+    <div class="demo-seg" id="padToggle">
+      <button type="button" data-searchpad="em">em (P2)</button>
+      <button type="button" data-searchpad="mid">mid-24</button>
+    </div>
+    <div class="demo-fields" id="typeFields">
+      <label>P2<input type="number" id="fsP2" min="8" max="48" step="1" value="15"></label>
+      <label>P3<input type="number" id="fsP3" min="8" max="48" step="1" value="14"></label>
+      <label>P4<input type="number" id="fsP4" min="8" max="48" step="1" value="13"></label>
+      <label>C1<input type="number" id="fsC1" min="8" max="48" step="1" value="12"></label>
+      <label>C2<input type="number" id="fsC2" min="8" max="48" step="1" value="11"></label>
+      <button type="button" class="demo-reset" id="fsReset">reset</button>
     </div>
     <p class="demo-readout" id="readout">–</p>
   </div>
@@ -380,7 +423,6 @@
 (() => {
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const ROWS_KEY = 'fw-e-search-m-rows';
   const UI_KEY = 'fw-e-search-m-ui';
 
   function px(k) {
@@ -421,22 +463,57 @@
       </a>`;
   }
 
-  function render(rows) {
-    $('#grid').innerHTML = Array.from({ length: rows }, (_, r) =>
+  const ROWS = 6;                          /* 한 행 2개 */
+  function render() {
+    $('#grid').innerHTML = Array.from({ length: ROWS }, (_, r) =>
       `<div class="row">${Array.from({ length: 2 }, (_, c) => card(r * 2 + c)).join('')}</div>`
     ).join('');
-    $('#total').textContent = rows * 2;
-    $('#pagination').hidden = rows < 6;
+    $('#total').textContent = ROWS * 2;
   }
 
-  function setRows(n) {
-    render(+n);
-    $$('#rowsToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.rows === String(n)));
-    try { localStorage.setItem(ROWS_KEY, n); } catch (e) {}
+  /* ── 데모 — search 상하 padding (em ↔ mid) ────────────────── */
+  const PAD_KEY = 'fw-e-search-m-pad';
+  function setPad(mode) {
+    document.body.dataset.searchpad = mode;
+    $$('#padToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.searchpad === mode));
+    try { localStorage.setItem(PAD_KEY, mode); } catch (e) {}
     readout();
   }
-  $('#rowsToggle').addEventListener('click', e => {
-    const b = e.target.closest('[data-rows]'); if (b) setRows(b.dataset.rows);
+  $('#padToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-searchpad]'); if (b) setPad(b.dataset.searchpad);
+  });
+
+  /* ── 데모 — 폰트 크기 ─────────────────────────────────────── */
+  const FS_KEY = 'fw-e-search-m-fs';
+  const FS_DEFAULT = { p2: 15, p3: 14, p4: 13, c1: 12, c2: 11 };
+  const FS_KEYS = Object.keys(FS_DEFAULT);
+  /* 모바일 수식 : size × 100vw / 390 (450px 에서 상한) */
+  const fsExpr = v => `calc(${v} * var(--ut))`;
+  const fsVal = k => {
+    const v = parseInt($(`#fs${k.toUpperCase()}`).value, 10);
+    return Number.isFinite(v) ? Math.min(48, Math.max(8, v)) : FS_DEFAULT[k];
+  };
+  function applyFs() {
+    const vals = {};
+    FS_KEYS.forEach(k => {
+      const v = fsVal(k);
+      vals[k] = v;
+      document.body.style.setProperty(`--fs-${k}`, fsExpr(v));
+    });
+    try { localStorage.setItem(FS_KEY, JSON.stringify(vals)); } catch (e) {}
+    readout();
+  }
+  $('#typeFields').addEventListener('input', e => {
+    if (e.target.matches('input[type="number"]')) applyFs();
+  });
+  $('#typeFields').addEventListener('change', e => {
+    if (!e.target.matches('input[type="number"]')) return;
+    e.target.value = fsVal(e.target.id.slice(2).toLowerCase());
+    applyFs();
+  });
+  $('#fsReset').addEventListener('click', () => {
+    Object.entries(FS_DEFAULT).forEach(([k, v]) => { $(`#fs${k.toUpperCase()}`).value = v; });
+    applyFs();
   });
 
   function readout() {
@@ -445,7 +522,11 @@
       `viewport <b>${innerWidth}px</b> · 좌우 <b>${px('--px-16').toFixed(2)}</b> · ` +
       `카드 간격 <b>${px('--mid-12').toFixed(2)}</b><br>` +
       `카드 <b>${c ? c.getBoundingClientRect().width.toFixed(2) : '–'}px</b> · ` +
-      `행 간격 <b>${px('--mid-40').toFixed(2)}</b> · P3 <b>${px('--fs-p3').toFixed(2)}</b>`;
+      `행 간격 <b>${px('--mid-40').toFixed(2)}</b><br>` +
+      `search 상하 <b>${document.body.dataset.searchpad || 'em'}</b> ` +
+      `<b>${parseFloat(getComputedStyle($('.search-bar')).paddingTop).toFixed(2)}</b> · ` +
+      `바 높이 <b>${$('.search-bar').getBoundingClientRect().height.toFixed(2)}</b><br>` +
+      FS_KEYS.map(k => `${k.toUpperCase()} <b>${px('--fs-' + k).toFixed(2)}</b>`).join(' · ');
   }
   window.addEventListener('resize', readout);
 
@@ -459,8 +540,15 @@
     if (localStorage.getItem(UI_KEY) === 'min') { $('#demoNav').classList.add('is-min'); $('#demoToggle').textContent = '+'; }
   } catch (e) {}
 
-  let saved = '6';
-  try { saved = localStorage.getItem(ROWS_KEY) || '6'; } catch (e) {}
-  setRows(saved);
+  try {
+    const saved = JSON.parse(localStorage.getItem(FS_KEY) || 'null');
+    if (saved) Object.entries(saved).forEach(([k, v]) => { const el = $(`#fs${k.toUpperCase()}`); if (el) el.value = v; });
+  } catch (e) {}
+  applyFs();
+  let pad = 'em';
+  try { pad = localStorage.getItem(PAD_KEY) || 'em'; } catch (e) {}
+  setPad(pad);
+  render();
+  readout();
 })();
 </script>
