@@ -611,12 +611,15 @@
     line-height: 1.6;
     color: var(--c-text);
   }
+  /* labelArea — padding em (@em base : p3 14px) → 4/14 · 10/14 */
   .tab-bar button .txt {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px 10px;
+    padding: 0.2857em 0.7143em;
   }
+  /* 데모 — 탭 3개 안 (주문 정보 미노출) */
+  body[data-tabcount="3"] .tab-bar button[data-target="orderInfo"] { display: none; }
   .tab-bar button:not(.is-active) { opacity: 0.4; }
   .tab-bar button.is-active { font-weight: 500; }
 
@@ -1455,6 +1458,10 @@
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
   .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  /* tab count 옵션은 하단 탭이 있는 템플릿 B 에서만 */
+  #tabCountLabel, #tabCountToggle { display: none; }
+  body[data-template="b"] #tabCountLabel  { display: block; }
+  body[data-template="b"] #tabCountToggle { display: flex; }
   .demo-fields { display: flex; align-items: center; gap: 6px; }
   .demo-fields label { display: flex; align-items: center; gap: 3px; color: #777; }
   .demo-fields input[type="number"] {
@@ -2020,6 +2027,12 @@
     <button type="button" data-tpl="b">B</button>
   </div>
 
+  <strong id="tabCountLabel">tab count</strong>
+  <div class="demo-seg" id="tabCountToggle">
+    <button type="button" data-tabcount="4">4개</button>
+    <button type="button" data-tabcount="3">3개</button>
+  </div>
+
   <strong>carousel</strong>
   <div class="demo-seg" id="cgapToggle">
     <button type="button" data-cgap="px">16px</button>
@@ -2135,6 +2148,23 @@
       if (p < 1) requestAnimationFrame(step);
     })(t0);
   }
+  /* 데모 — 탭 개수 (4개 ↔ 3개). 3개 안에서 주문 정보 탭이 빠진다 */
+  const TC_KEY = 'fw-e-pdp-tabcount';
+  function setTabCount(n) {
+    document.body.dataset.tabcount = n;
+    $$('#tabCountToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.tabcount === n));
+    /* 숨긴 탭이 선택돼 있었다면 첫 번째 탭으로 되돌린다 */
+    const on = $('#tabBar button.is-active');
+    if (on && getComputedStyle(on).display === 'none') {
+      $$('#tabBar button').forEach((x, i) => x.classList.toggle('is-active', i === 0));
+    }
+    store(TC_KEY, n);
+    readout();
+  }
+  $('#tabCountToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-tabcount]'); if (b) setTabCount(b.dataset.tabcount);
+  });
+
   $('#tabBar').addEventListener('click', e => {
     const b = e.target.closest('button[data-target]');
     if (!b) return;
@@ -2419,6 +2449,10 @@
       `↕ <b>${px('--carousel-gap-y').toFixed(2)}px</b> · ` +
       `thumb col <b>${($('#thumbCol')?.getBoundingClientRect().width || 0).toFixed(2)}px</b> ` +
       `(grid col ${px('--grid-col').toFixed(2)})<br>` +
+      `tab ${document.body.dataset.tabcount || '4'}개 · 아이템 ` +
+      `<b>${($('#tabBar button')?.getBoundingClientRect().width || 0).toFixed(2)}px</b> · ` +
+      `label pad <b>${parseFloat(getComputedStyle($('#tabBar .txt')).paddingTop).toFixed(2)}` +
+      ` / ${parseFloat(getComputedStyle($('#tabBar .txt')).paddingLeft).toFixed(2)}</b><br>` +
       `option pad <b>${document.body.dataset.sopad || 'em'}</b> — ` +
       `상 <b>${px('--so-pt').toFixed(2)}</b> / 좌우 <b>${px('--so-px').toFixed(2)}</b> / ` +
       `하 <b>${px('--so-pb').toFixed(2)}</b> · gap <b>${px('--so-gap').toFixed(2)}</b><br>${type}`;
@@ -2564,6 +2598,7 @@
   $('#cCategory').checked = load(CASE_KEY, 'on') === 'on';
   applyCase();
   setSoPad(load(SOP_KEY, 'em'));
+  setTabCount(load(TC_KEY, '4'));
   setCgap(load(CG_KEY, 'mid'));
   setTpl(load(TPL_KEY, 'a'));
 })();
