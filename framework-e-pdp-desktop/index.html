@@ -2172,6 +2172,9 @@
     <button type="button" data-cfdesc="p4">P4</button>
   </div>
 
+  <strong>reset</strong>
+  <button type="button" class="demo-reset" id="cfFsReset">폰트 기본값 (P2 / P4)</button>
+
   <p class="demo-readout" id="cfReadout">–</p>
 </nav>
 
@@ -2846,6 +2849,8 @@
   $('#cfDescToggle').addEventListener('click', e => {
     const b = e.target.closest('[data-cfdesc]'); if (b) setCfDesc(b.dataset.cfdesc);
   });
+  /* 폰트 크기 초기화 — 시안 기본값(타이틀 P2 · 디스크립션 P4)으로 되돌린다 */
+  $('#cfFsReset').addEventListener('click', () => { setCfTitle('p2'); setCfDesc('p4'); });
   setCfBox(load(CF_BOX_KEY, 'fixed-px'));
   setCfTitle(load(CF_T_KEY, 'p2'));
   setCfDesc(load(CF_D_KEY, 'p4'));
