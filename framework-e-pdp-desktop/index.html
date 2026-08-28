@@ -591,7 +591,13 @@
     column-gap: var(--grid-gutter);
     padding: 0 var(--grid-margin);
     background: #fff;
+    /* 상단 영역(이미지 + 정보 패널)을 벗어나기 전까지는 감춘다 */
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .2s ease, opacity .2s ease;
   }
+  .tab-bar.is-visible { transform: none; opacity: 1; pointer-events: auto; }
   .tab-bar .tabs-content {
     grid-column: 4 / span 6;
     display: flex;
@@ -2166,9 +2172,19 @@
     return Math.min(idx, last);
   }
 
+  /* 상단 영역(그리드 1행 = 이미지 캐러셀 + 정보 패널)의 아래 끝이
+     헤더 밑으로 지나가는 순간부터 하단 탭이 올라온다 */
+  function syncTabBar() {
+    const sections = $('.col-sections');
+    if (!sections) return;
+    const topAreaBottom = sections.getBoundingClientRect().top + scrollY;
+    $('#tabBar').classList.toggle('is-visible', scrollY + headerPx() >= topAreaBottom);
+  }
+
   function syncTab() {
     if (document.body.dataset.template !== 'b') return;
     activate(currentTab());
+    syncTabBar();
   }
   addEventListener('scroll', syncTab, { passive: true });
   addEventListener('resize', syncTab);
