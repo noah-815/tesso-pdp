@@ -1479,7 +1479,7 @@
   .demo-check { display: flex; align-items: center; gap: 3px; color: #777; cursor: pointer; }
   .demo-check input { width: 11px; height: 11px; accent-color: #111; cursor: pointer; }
   .demo-unit { color: #bbb; }
-  .demo-reset { padding: 3px 7px; border: 1px solid rgba(0,0,0,0.1); border-radius: 3px; color: #777; background: #fff; }
+  .demo-reset { padding: 3px 7px; border: 1px solid rgba(0,0,0,0.1); border-radius: 3px; color: #1a6dff; font-weight: 600; background: #fff; }
   .demo-readout {
     grid-column: 1 / -1;
     padding-top: 2px;
@@ -2015,12 +2015,6 @@
 </nav>
 
 <nav class="demo-nav" id="demoNav">
-  <strong>option pad</strong>
-  <div class="demo-seg" id="soPadToggle">
-    <button type="button" data-sopad="em">em (시안)</button>
-    <button type="button" data-sopad="mid">mid</button>
-  </div>
-
   <strong>template</strong>
   <div class="demo-seg" id="tplToggle">
     <button type="button" data-tpl="a">A</button>
@@ -2038,6 +2032,12 @@
     <button type="button" data-cgap="px">16px</button>
     <button type="button" data-cgap="mid">mid-16</button>
     <button type="button" data-cgap="split">split</button>
+  </div>
+
+  <strong>option pad</strong>
+  <div class="demo-seg" id="soPadToggle">
+    <button type="button" data-sopad="em">em (시안)</button>
+    <button type="button" data-sopad="mid">mid</button>
   </div>
 
   <strong>case</strong>
