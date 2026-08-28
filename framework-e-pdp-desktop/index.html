@@ -926,8 +926,16 @@
   .section-head .rating-area { flex-shrink: 0; display: flex; align-items: center; gap: var(--mid-6); }
   .section-head .rating-area .score { font-size: var(--fs-p1); line-height: 1.5; }
 
+  /* rating 높이 2안 (데모 토글)
+     px : 시안 그대로 20px 고정
+     em : @em base = 바로 옆 점수 텍스트(score, P1) → 20 / 18 = 1.1111em
+          점수 폰트를 키우면 별도 같이 커진다 */
   .rating { display: flex; align-items: center; }
-  .rating img { width: 20px; height: 20px; }   /* ratingItem — 토큰 없음 → px */
+  .rating img { width: var(--rating-size, 20px); height: var(--rating-size, 20px); }
+  body[data-rating="em"] .rating-area .rating {
+    font-size: var(--fs-p1);
+    --rating-size: 1.1111em;
+  }
 
   .filter-bar {
     display: flex;
@@ -2073,6 +2081,12 @@
     <button type="button" data-cgap="split">split</button>
   </div>
 
+  <strong>rating</strong>
+  <div class="demo-seg" id="ratingToggle">
+    <button type="button" data-rating="px">20px (시안)</button>
+    <button type="button" data-rating="em">em</button>
+  </div>
+
   <strong>option pad</strong>
   <div class="demo-seg" id="soPadToggle">
     <button type="button" data-sopad="em">em (시안)</button>
@@ -2632,6 +2646,19 @@
   syncInqCount();
   setInqBox(load(INQ_KEY, 'fixed-px'));
 
+  /* ── 데모 — 리뷰 rating 높이 (20px ↔ em) ───────────────────
+     em 안의 base 는 바로 옆 점수 텍스트(P1). 점수를 키우면 별도 커진다 */
+  const RT_KEY = 'fw-e-pdp-rating';
+  function setRating(mode) {
+    document.body.dataset.rating = mode;
+    $$('#ratingToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.rating === mode));
+    store(RT_KEY, mode);
+    readout();
+  }
+  $('#ratingToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-rating]'); if (b) setRating(b.dataset.rating);
+  });
+
   /* ── 데모 — selectedOption 내부 여백 (em ↔ mid) ───────────── */
   const SOP_KEY = 'fw-e-pdp-sopad';
   function setSoPad(mode) {
@@ -2684,6 +2711,7 @@
     $('#demoToggle').setAttribute('aria-label', '패널 펼치기');
   }
 
+  setRating(load(RT_KEY, 'px'));
   setSoPad(load(SOP_KEY, 'em'));
   setTabCount(load(TC_KEY, '4'));
   setCgap(load(CG_KEY, 'mid'));

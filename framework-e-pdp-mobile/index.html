@@ -447,8 +447,16 @@
     line-height: var(--lh-p1);
   }
 
+  /* rating 높이 2안 (데모 토글)
+     px : 시안 그대로 20px 고정
+     em : @em base = 바로 옆 점수 텍스트(score, P1 16) → 20 / 16 = 1.25em
+          점수 폰트를 키우면 별도 같이 커진다 */
   .rating { display: flex; align-items: center; }
-  .rating img { width: 20px; height: 20px; }   /* ratingItem — 토큰 없음 → px */
+  .rating img { width: var(--rating-size, 20px); height: var(--rating-size, 20px); }
+  body[data-rating="em"] .rating-area .rating {
+    font-size: var(--fs-p1);
+    --rating-size: 1.25em;
+  }
 
   .filter-bar {
     display: flex;
@@ -1691,6 +1699,12 @@
     <button type="button" data-pad="c">mid / mid</button>
   </div>
 
+  <strong>rating</strong>
+  <div class="demo-seg" id="ratingToggle">
+    <button type="button" data-rating="px">20px</button>
+    <button type="button" data-rating="em">em</button>
+  </div>
+
   <strong>case</strong>
   <div class="demo-fields" id="caseFields">
     <label class="demo-check"><input type="checkbox" id="cCategory" checked>카테고리</label>
@@ -2053,6 +2067,19 @@
   });
 
   /* ── 데모 — 여백 버전 (가로 / 세로) ─────────────────────────── */
+  /* ── 데모 — 리뷰 rating 높이 (20px ↔ em) ───────────────────
+     em 안의 base 는 바로 옆 점수 텍스트(P1). 점수를 키우면 별도 커진다 */
+  const RT_KEY = 'fw-e-pdp-m-rating';
+  function setRating(mode) {
+    document.body.dataset.rating = mode;
+    $$('#ratingToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.rating === mode));
+    try { localStorage.setItem(RT_KEY, mode); } catch (e) {}
+    readout();
+  }
+  $('#ratingToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-rating]'); if (b) setRating(b.dataset.rating);
+  });
+
   const PAD_KEY = 'fw-e-pdp-m-pad';
   const PAD = {
     a: { hpad: 'px',  vpad: 'mid' },   /* 가로 px-16 고정 / 세로 mid 가변 (기본·시안) */
@@ -2212,6 +2239,7 @@
       $('#cSoldout').checked  = !!c.soldout;
     }
   } catch (e) {}
+  try { setRating(localStorage.getItem(RT_KEY) || 'px'); } catch (e) { setRating('px'); }
   try { setPad(localStorage.getItem(PAD_KEY) || 'a'); } catch (e) { setPad('a'); }
   applyCase();
   applyFs();
