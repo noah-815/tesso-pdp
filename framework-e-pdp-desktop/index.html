@@ -2141,6 +2141,8 @@
 </div>
 
 <nav class="demo-nav" id="cfNav">
+  <button type="button" class="demo-toggle" id="cfToggle" aria-label="패널 접기">–</button>
+
   <strong>dialog</strong>
   <div class="demo-seg" id="cfBoxToggle">
     <button type="button" data-cfbox="fixed-px">400 + px</button>
@@ -2204,6 +2206,8 @@
 
 <!-- 데모 — 다이얼로그가 열려 있는 동안에만 노출 -->
 <nav class="demo-nav" id="inqNav">
+  <button type="button" class="demo-toggle" id="inqToggle" aria-label="패널 접기">–</button>
+
   <strong>dialog</strong>
   <div class="demo-seg" id="inqBoxToggle">
     <button type="button" data-inqbox="fixed-px">560 + px</button>
@@ -2749,6 +2753,27 @@
     }
   } catch (e) {}
   applyPw();
+
+
+  /* ── 다이얼로그 패널 접기/펼치기 ─────────────────────────────
+     각 패널이 자기 상태를 따로 기억한다 (메인 패널과 독립). */
+  [['#cfNav', 'fw-e-pdp-cfnav-ui'], ['#inqNav', 'fw-e-pdp-inqnav-ui']].forEach(([navId, key]) => {
+    const nav = $(navId), btn = nav && nav.querySelector('.demo-toggle');
+    if (!nav || !btn) return;
+    const apply = min => {
+      nav.classList.toggle('is-min', min);
+      btn.textContent = min ? '+' : '–';
+      btn.setAttribute('aria-label', min ? '패널 펼치기' : '패널 접기');
+    };
+    btn.addEventListener('click', () => {
+      const min = !nav.classList.contains('is-min');
+      apply(min);
+      try { localStorage.setItem(key, min ? 'min' : 'open'); } catch (e) {}
+    });
+    let saved = 'open';
+    try { saved = localStorage.getItem(key) || 'open'; } catch (e) {}
+    apply(saved === 'min');
+  });
 
   /* ── 바로 구매하기 confirm 다이얼로그 ─────────────────────── */
   const CF_BOX_KEY = 'fw-e-pdp-cfbox';
