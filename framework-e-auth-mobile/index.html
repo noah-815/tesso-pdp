@@ -504,6 +504,30 @@
   /* box pad 토글 — OTP 박스 · 쿠폰이 있는 화면에서만 노출 */
   #bpToggle { display: none; }
   body[data-boxpad-on] #bpToggle { display: flex; }
+  .demo-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .demo-fields label { display: flex; align-items: center; gap: 2px; color: #777; }
+  .demo-fields input[type="number"] {
+    width: 34px;
+    padding: 3px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 3px;
+    font-size: 10px;
+    text-align: right;
+    background: #fff;
+  }
+  .demo-reset {
+    padding: 3px 6px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 3px;
+    color: #777;
+    background: #fff;
+  }
   .demo-readout {
     margin-top: 5px;
     padding-top: 4px;
@@ -774,6 +798,15 @@
       <button type="button" data-bp="mid">mid (시안)</button>
       <button type="button" data-bp="px">px 고정</button>
     </div>
+    <div class="demo-fields" id="typeFields">
+      <label>H5<input type="number" id="fsH5" min="8" max="48" step="1" value="18"></label>
+      <label>P1<input type="number" id="fsP1" min="8" max="48" step="1" value="16"></label>
+      <label>P2<input type="number" id="fsP2" min="8" max="48" step="1" value="15"></label>
+      <label>P3<input type="number" id="fsP3" min="8" max="48" step="1" value="14"></label>
+      <label>P4<input type="number" id="fsP4" min="8" max="48" step="1" value="13"></label>
+      <label>C1<input type="number" id="fsC1" min="8" max="48" step="1" value="12"></label>
+      <button type="button" class="demo-reset" id="fsReset">reset</button>
+    </div>
     <p class="demo-readout" id="readout">–</p>
   </div>
 </nav>
@@ -900,7 +933,8 @@
       `H5 <b>${px('--fs-h5').toFixed(2)}</b> · P4 <b>${px('--fs-p4').toFixed(2)}</b><br>` +
       `box pad <b>${document.body.dataset.boxpad || 'mid'}</b> — ` +
       `40 <b>${px('--b-40').toFixed(2)}</b> · 32 <b>${px('--b-32').toFixed(2)}</b> · ` +
-      `24 <b>${px('--b-24').toFixed(2)}</b> · 20 <b>${px('--b-20').toFixed(2)}</b>`;
+      `24 <b>${px('--b-24').toFixed(2)}</b> · 20 <b>${px('--b-20').toFixed(2)}</b><br>` +
+      FS_KEYS.map(k => `${k.toUpperCase()} <b>${px('--fs-' + k).toFixed(2)}</b>`).join(' · ');
   }
 
   /* OTP 박스 · 쿠폰 내부 여백 (mid ↔ px) */
@@ -927,6 +961,43 @@
     if (localStorage.getItem(UI_KEY) === 'min') { $('#demoNav').classList.add('is-min'); $('#demoToggle').textContent = '+'; }
   } catch (e) {}
 
+
+  /* ── 데모 — 폰트 크기 (모바일 수식 : size × 100vw / 390, 450 상한) ── */
+  const FS_KEY = 'fw-e-auth-m-fs';
+  const FS_DEFAULT = { h5: 18, p1: 16, p2: 15, p3: 14, p4: 13, c1: 12 };
+  const FS_KEYS = Object.keys(FS_DEFAULT);
+  const fsExpr = v => `calc(${v} * var(--ut))`;
+  const fsVal = k => {
+    const v = parseInt($(`#fs${k.toUpperCase()}`).value, 10);
+    return Number.isFinite(v) ? Math.min(48, Math.max(8, v)) : FS_DEFAULT[k];
+  };
+  function applyFs() {
+    const vals = {};
+    FS_KEYS.forEach(k => {
+      const v = fsVal(k);
+      vals[k] = v;
+      document.body.style.setProperty(`--fs-${k}`, fsExpr(v));
+    });
+    try { localStorage.setItem(FS_KEY, JSON.stringify(vals)); } catch (e) {}
+    readout();
+  }
+  $('#typeFields').addEventListener('input', e => {
+    if (e.target.matches('input[type="number"]')) applyFs();
+  });
+  $('#typeFields').addEventListener('change', e => {
+    if (!e.target.matches('input[type="number"]')) return;
+    e.target.value = fsVal(e.target.id.slice(2).toLowerCase());
+    applyFs();
+  });
+  $('#fsReset').addEventListener('click', () => {
+    Object.entries(FS_DEFAULT).forEach(([k, v]) => { $(`#fs${k.toUpperCase()}`).value = v; });
+    applyFs();
+  });
+  try {
+    const saved = JSON.parse(localStorage.getItem(FS_KEY) || 'null');
+    if (saved) Object.entries(saved).forEach(([k, v]) => { const el = $(`#fs${k.toUpperCase()}`); if (el) el.value = v; });
+  } catch (e) {}
+  applyFs();
   try { setBoxPad(localStorage.getItem(BP_KEY) || 'mid'); } catch (e) { setBoxPad('mid'); }
   show('login');
 })();

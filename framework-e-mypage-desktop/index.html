@@ -9,8 +9,8 @@
   /* ─────────────────────────────────────────────────────────────
      Framework E — My Page · 데스크탑
      Figma 8484:143885 · 기준 폭 1920 · 1rem = 14px
-     구현 범위 : 홈 · 위시리스트 · 쿠폰 · 리뷰 · 프로필 (+ 프로필 상세 다이얼로그)
-     제외 : 주문내역 탭 · 주문 상세 · 이미지 비율 variation
+     구현 범위 : 홈 · 주문내역 · 위시리스트 · 쿠폰 · 리뷰 · 프로필 (+ 프로필 상세 다이얼로그)
+     제외 : 주문 상세 · 이미지 비율 variation
 
      1) Typography
         font-size = (size value − 1) × 0.0083 × screen width + 1rem
@@ -51,9 +51,11 @@
     --mid-16:  calc(  8 * var(--us) + 8px);
     --mid-20:  calc( 12 * var(--us) + 8px);
     --mid-24:  calc( 16 * var(--us) + 8px);
+    --mid-28:  calc( 20 * var(--us) + 8px);
     --mid-32:  calc( 24 * var(--us) + 8px);
     --mid-40:  calc( 32 * var(--us) + 8px);
     --mid-48:  calc( 40 * var(--us) + 8px);
+    --mid-56:  calc( 48 * var(--us) + 8px);
     --mid-80:  calc( 72 * var(--us) + 8px);
     --mid-100: calc( 92 * var(--us) + 8px);
     --mid-120: calc(112 * var(--us) + 8px);
@@ -346,6 +348,120 @@
   .info-block .vals .en { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
   .inline { display: flex; align-items: center; gap: var(--mid-8); width: 100%; }
   .inline .div { flex-shrink: 0; width: 1px; height: 12px; background: var(--c-line); }
+
+  /* ── 주문내역 ────────────────────────────────────────────────── */
+  .order-list { display: flex; flex-direction: column; width: 100%; }
+  .oh-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-20);
+    width: 100%;
+    padding: var(--mid-24) 0 var(--mid-28);
+    border-bottom: 1px solid rgba(0, 0, 0, .08);
+  }
+  .oh-item .head { display: flex; align-items: flex-start; gap: var(--mid-24); width: 100%; }
+  .oh-item .head .text { display: flex; flex: 1 0 0; min-width: 0; flex-direction: column; gap: var(--mid-2); }
+  .oh-item .date {
+    width: 100%;
+    font-family: var(--font-en);
+    font-weight: 500;
+    font-size: var(--fs-p2);
+    line-height: var(--lh-p2);
+    font-variation-settings: "opsz" 14;
+  }
+  .oh-item .ono {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-4);
+    width: 100%;
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    color: var(--c-sub);
+    white-space: nowrap;
+  }
+  .oh-item .ono .v { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .oh-item .products { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-20); width: 100%; }
+
+  /* productList/default */
+  .pl-item { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-8); width: 100%; }
+  .pl-item .state { width: 100%; font-weight: 500; font-size: var(--fs-p3); line-height: var(--lh-p3); white-space: nowrap; }
+  .pl-item .row { display: flex; align-items: flex-start; gap: var(--mid-20); width: 100%; }
+  .pl-item .thumb {
+    flex-shrink: 0;
+    width: var(--mid-120);                    /* 시안 바인딩 : mid-120 */
+    height: var(--mid-120);
+    overflow: hidden;
+    background: var(--c-thumb);
+    border-radius: var(--radius-xs);
+  }
+  .pl-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .pl-item .text { display: flex; flex: 1 0 0; min-width: 0; flex-direction: column; align-items: flex-start; gap: var(--mid-4); }
+  .pl-item .name {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pl-item .info {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-6);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    white-space: nowrap;
+  }
+  .pl-item .info .opt { display: flex; align-items: center; gap: var(--mid-2); }
+  .pl-item .info .opt span,
+  .pl-item .info .qty { opacity: .5; }
+  .pl-item .info .qty .n { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .pl-item .info .div { flex-shrink: 0; width: 1px; height: 10px; background: var(--c-line); }
+  .pl-item .p { display: flex; align-items: baseline; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .pl-item .p .n { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+
+  /* ── pagination ──────────────────────────────────────────────── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--mid-56) var(--mid-8);
+  }
+  .pagination .inner { display: flex; align-items: center; gap: var(--mid-8); }
+  .pagination .page-list { display: flex; align-items: center; gap: var(--mid-2); }
+  /* paginationItem — annotation : number min width & height : 3ch */
+  .pagination .item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--mid-2);
+    font-size: var(--fs-p4);
+    line-height: 1.6;
+    opacity: .8;
+  }
+  .pagination .item .num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3ch;
+    min-height: 3ch;
+    font-family: var(--font-en);
+    font-variation-settings: "opsz" 14;
+  }
+  .pagination .item:not(.is-on) .num { opacity: .6; }
+  .pagination .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--c-line-soft);
+    border-radius: var(--radius-xs);
+  }
+  .pagination .nav-btn span { display: block; width: 16px; height: 16px; font-size: 13px; line-height: 16px; text-align: center; }
 
   /* ── 위시리스트 ──────────────────────────────────────────────── */
   .product-grid {
@@ -820,7 +936,7 @@
     <!-- tabs/default -->
     <nav class="tabs" id="tabs">
       <button type="button" class="is-on" data-go="home">홈</button>
-      <button type="button" data-go="orders" disabled title="구현 범위 제외">주문내역</button>
+      <button type="button" data-go="orders">주문내역</button>
       <button type="button" data-go="wishlist">위시리스트</button>
       <button type="button" data-go="coupon">쿠폰</button>
       <button type="button" data-go="review">리뷰</button>
@@ -870,6 +986,32 @@
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- ── 주문내역 ── -->
+      <section class="screen" data-screen="orders" data-empty-able>
+        <div class="filled" style="width:100%">
+          <div class="order-list" id="orderHistory"></div>
+          <nav class="pagination">
+            <div class="inner">
+              <button type="button" class="nav-btn" aria-label="이전"><span>‹</span></button>
+              <div class="page-list">
+                <button type="button" class="item is-on"><span class="num">1</span></button>
+                <button type="button" class="item"><span class="num">2</span></button>
+                <button type="button" class="item"><span class="num">3</span></button>
+                <button type="button" class="item"><span class="num">4</span></button>
+                <button type="button" class="item"><span class="num">5</span></button>
+                <button type="button" class="item"><span class="num">6</span></button>
+                <button type="button" class="item"><span class="num">7</span></button>
+                <button type="button" class="item"><span class="num">8</span></button>
+                <button type="button" class="item"><span class="num">9</span></button>
+                <button type="button" class="item"><span class="num">10</span></button>
+              </div>
+              <button type="button" class="nav-btn" aria-label="다음"><span>›</span></button>
+            </div>
+          </nav>
+        </div>
+        <div class="empty">비어있음</div>
       </section>
 
       <!-- ── 위시리스트 ── -->
@@ -1008,6 +1150,7 @@
   <strong>screen</strong>
   <div class="demo-seg" id="screenToggle">
     <button type="button" data-go="home">홈</button>
+    <button type="button" data-go="orders">주문내역</button>
     <button type="button" data-go="wishlist">위시리스트</button>
     <button type="button" data-go="coupon">쿠폰</button>
     <button type="button" data-go="review">리뷰</button>
@@ -1066,6 +1209,38 @@
           <p class="price"><span class="v">${won(PRICES[i][0] * (i + 2))}</span><span>원</span></p>
         </div>
       </div>
+    </div>`).join('');
+
+  /* 주문내역 10건 — 첫 건만 상품 2개 (시안) */
+  const OPTS = ['250ml', '6개입', '정기배송'];
+  const plItem = i => {
+    const [price] = PRICES[i % 4];
+    return `
+      <div class="pl-item">
+        <div class="row">
+          <div class="thumb"><img src="${img(i)}" alt=""></div>
+          <div class="text">
+            <p class="name">${NAMES[i % 4]}</p>
+            <p class="info">
+              <span class="opt">${OPTS.map(o => `<span>${o}</span>`).join('<span>/</span>')}</span>
+              <span class="div"></span>
+              <span class="qty"><span class="n">${(i % 3) + 1}</span><span>개</span></span>
+            </p>
+            <p class="p"><span class="n">${won(price)}</span><span>원</span></p>
+          </div>
+        </div>
+      </div>`;
+  };
+  $('#orderHistory').innerHTML = Array.from({ length: 10 }, (_, i) => `
+    <div class="oh-item">
+      <div class="head">
+        <div class="text">
+          <p class="date">2026. 0${(i % 8) + 1}. ${10 + i}.</p>
+          <p class="ono"><span>주문번호</span><span class="v">26123${i}ML4A34${i}</span></p>
+        </div>
+        <button type="button" class="link-btn">주문상세<img class="ico" src="assets/chevron-down.svg" alt=""></button>
+      </div>
+      <div class="products">${i === 0 ? plItem(0) + plItem(1) : plItem(i)}</div>
     </div>`).join('');
 
   /* 위시리스트 12개 */

@@ -9,8 +9,8 @@
   /* ─────────────────────────────────────────────────────────────
      Framework E — My Page · 모바일
      Figma 8484:143885 · 기준 폭 390 · 1rem = 14px
-     구현 범위 : 홈 · 위시리스트 · 쿠폰 · 리뷰 · 프로필 (+ 프로필 상세)
-     제외 : 주문내역 탭 · 주문 상세 · 이미지 비율 variation
+     구현 범위 : 홈 · 주문내역 · 위시리스트 · 쿠폰 · 리뷰 · 프로필 (+ 프로필 상세)
+     제외 : 주문 상세 · 이미지 비율 variation
 
      1) Typography  font-size = size value × 100vw / 390   (450px 에서 상한)
         · 데스크탑의 "≤ 1rem 고정" 예외는 모바일에 적용하지 않는다
@@ -308,6 +308,113 @@
   .info-block .vals .en { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
   .inline { display: flex; align-items: center; gap: var(--mid-8); width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); }
   .inline .div { flex-shrink: 0; width: 1px; height: 12px; background: var(--c-line); }
+
+  /* ── 주문내역 ────────────────────────────────────────────────── */
+  .order-list { display: flex; flex-direction: column; width: 100%; padding: 0 var(--px-20); }
+  .oh-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-20);
+    width: 100%;
+    padding: var(--mid-24) 0;
+    border-bottom: 1px solid rgba(0, 0, 0, .08);
+  }
+  .oh-item .head { display: flex; align-items: flex-start; gap: var(--mid-24); width: 100%; }
+  .oh-item .head .text { display: flex; flex: 1 0 0; min-width: 0; flex-direction: column; gap: var(--mid-2); }
+  .oh-item .date {
+    width: 100%;
+    font-family: var(--font-en);
+    font-weight: 500;
+    font-size: var(--fs-p2);
+    line-height: var(--lh-p2);
+    font-variation-settings: "opsz" 14;
+  }
+  .oh-item .ono {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-4);
+    width: 100%;
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    color: var(--c-sub);
+    white-space: nowrap;
+  }
+  .oh-item .ono .v { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .oh-item .products { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-16); width: 100%; }
+
+  /* productList/default */
+  .pl-item { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-8); width: 100%; }
+  .pl-item .row { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
+  .pl-item .thumb {
+    flex-shrink: 0;
+    width: var(--mid-100);                    /* 시안 바인딩 : mid-100 */
+    height: var(--mid-100);
+    overflow: hidden;
+    background: var(--c-thumb);
+    border-radius: var(--radius-xs);
+  }
+  .pl-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .pl-item .text { display: flex; flex: 1 0 0; min-width: 0; flex-direction: column; align-items: flex-start; gap: var(--mid-4); }
+  .pl-item .name {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pl-item .info {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-6);
+    max-width: 100%;
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    white-space: nowrap;
+  }
+  .pl-item .info .opt { display: flex; align-items: center; gap: var(--mid-2); min-width: 0; overflow: hidden; }
+  .pl-item .info .opt span,
+  .pl-item .info .qty { opacity: .5; }
+  .pl-item .info .qty { flex-shrink: 0; }
+  .pl-item .info .qty .n { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .pl-item .info .div { flex-shrink: 0; width: 1px; height: 10px; background: var(--c-line); }
+  .pl-item .p { display: flex; align-items: baseline; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .pl-item .p .n { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+
+  /* ── pagination — 모바일은 pageCounter ───────────────────────── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--mid-32) var(--mid-8);
+  }
+  .pagination .inner { display: flex; align-items: center; gap: var(--mid-8); }
+  .pagination .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px var(--c-line-soft);
+    border-radius: var(--radius-xs);
+  }
+  .pagination .nav-btn span { display: block; width: 16px; height: 16px; font-size: 13px; line-height: 16px; text-align: center; }
+  /* pageCounter — annotation : current · total min-width = N ch (N = total 자릿수, 최소 2) */
+  .pagination .counter {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    padding: var(--mid-4);
+    font-family: var(--font-en);
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    color: #1d1d1d;
+    font-variation-settings: "opsz" 14;
+  }
+  .pagination .counter .n { display: flex; align-items: center; justify-content: center; min-width: calc(var(--pg-ch, 2) * 1ch); }
 
   /* ── 위시리스트 ──────────────────────────────────────────────── */
   .product-grid {
@@ -739,6 +846,30 @@
     white-space: nowrap;
   }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; border-color: #111; }
+  .demo-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .demo-fields label { display: flex; align-items: center; gap: 2px; color: #777; }
+  .demo-fields input[type="number"] {
+    width: 34px;
+    padding: 3px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 3px;
+    font-size: 10px;
+    text-align: right;
+    background: #fff;
+  }
+  .demo-reset {
+    padding: 3px 6px;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 3px;
+    color: #777;
+    background: #fff;
+  }
   .demo-readout {
     margin-top: 5px;
     padding-top: 4px;
@@ -759,7 +890,7 @@
 
 <nav class="tabs" id="tabs">
   <button type="button" class="is-on" data-go="home">홈</button>
-  <button type="button" disabled title="구현 범위 제외">주문내역</button>
+  <button type="button" data-go="orders">주문내역</button>
   <button type="button" data-go="wishlist">위시리스트</button>
   <button type="button" data-go="coupon">쿠폰</button>
   <button type="button" data-go="review">리뷰</button>
@@ -803,6 +934,21 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- ── 주문내역 ── -->
+  <section class="screen" data-screen="orders" data-empty-able>
+    <div class="filled" style="width:100%">
+      <div class="order-list" id="orderHistory"></div>
+      <nav class="pagination">
+        <div class="inner">
+          <button type="button" class="nav-btn" aria-label="이전"><span>‹</span></button>
+          <div class="counter"><span class="n">1</span><span>/</span><span class="n">10</span></div>
+          <button type="button" class="nav-btn" aria-label="다음"><span>›</span></button>
+        </div>
+      </nav>
+    </div>
+    <div class="empty">비어있음</div>
   </section>
 
   <!-- ── 위시리스트 ── -->
@@ -925,6 +1071,7 @@
   <div class="demo-body">
     <div class="demo-seg" id="screenToggle">
       <button type="button" data-go="home">홈</button>
+      <button type="button" data-go="orders">주문</button>
       <button type="button" data-go="wishlist">위시</button>
       <button type="button" data-go="coupon">쿠폰</button>
       <button type="button" data-go="review">리뷰</button>
@@ -933,6 +1080,15 @@
     <div class="demo-seg" id="emptyToggle">
       <button type="button" data-empty="off">목록</button>
       <button type="button" data-empty="on">empty</button>
+    </div>
+    <div class="demo-fields" id="typeFields">
+      <label>P1<input type="number" id="fsP1" min="8" max="48" step="1" value="16"></label>
+      <label>P2<input type="number" id="fsP2" min="8" max="48" step="1" value="15"></label>
+      <label>P3<input type="number" id="fsP3" min="8" max="48" step="1" value="14"></label>
+      <label>P4<input type="number" id="fsP4" min="8" max="48" step="1" value="13"></label>
+      <label>C1<input type="number" id="fsC1" min="8" max="48" step="1" value="12"></label>
+      <label>C2<input type="number" id="fsC2" min="8" max="48" step="1" value="11"></label>
+      <button type="button" class="demo-reset" id="fsReset">reset</button>
     </div>
     <p class="demo-readout" id="readout">–</p>
   </div>
@@ -980,6 +1136,38 @@
         </div>
         <p class="price"><span class="v">${won(PRICES[i][0] * (i + 2))}</span><span>원</span></p>
       </div>
+    </div>`).join('');
+
+  /* 주문내역 10건 — 첫 건만 상품 2개 (시안) */
+  const OPTS = ['250ml', '6개입', '정기배송'];
+  const plItem = i => {
+    const [price] = PRICES[i % 4];
+    return `
+      <div class="pl-item">
+        <div class="row">
+          <div class="thumb"><img src="${img(i)}" alt=""></div>
+          <div class="text">
+            <p class="name">${NAMES[i % 4]}</p>
+            <p class="info">
+              <span class="opt">${OPTS.map(o => `<span>${o}</span>`).join('<span>/</span>')}</span>
+              <span class="div"></span>
+              <span class="qty"><span class="n">${(i % 3) + 1}</span><span>개</span></span>
+            </p>
+            <p class="p"><span class="n">${won(price)}</span><span>원</span></p>
+          </div>
+        </div>
+      </div>`;
+  };
+  $('#orderHistory').innerHTML = Array.from({ length: 10 }, (_, i) => `
+    <div class="oh-item">
+      <div class="head">
+        <div class="text">
+          <p class="date">2026. 0${(i % 8) + 1}. ${10 + i}.</p>
+          <p class="ono"><span>주문번호</span><span class="v">26123${i}ML4A34${i}</span></p>
+        </div>
+        <button type="button" class="link-btn">주문상세<img class="ico" src="assets/chevron-down.svg" alt=""></button>
+      </div>
+      <div class="products">${i === 0 ? plItem(0) + plItem(1) : plItem(i)}</div>
     </div>`).join('');
 
   $('#wishGrid').innerHTML = Array.from({ length: 12 }, (_, i) => {
@@ -1110,8 +1298,8 @@
     $('#readout').innerHTML =
       `viewport <b>${innerWidth}px</b> · 본문 <b>${px('--px-20').toFixed(2)}</b> · ` +
       `카드 <b>${px('--px-16').toFixed(2)}</b><br>` +
-      `화면 <b>${on ? on.dataset.screen : '–'}</b> · 높이 <b>${on ? on.getBoundingClientRect().height.toFixed(2) : '–'}</b> · ` +
-      `mid-32 <b>${px('--mid-32').toFixed(2)}</b> · P2 <b>${px('--fs-p2').toFixed(2)}</b>`;
+      `화면 <b>${on ? on.dataset.screen : '–'}</b> · 높이 <b>${on ? on.getBoundingClientRect().height.toFixed(2) : '–'}</b><br>` +
+      FS_KEYS.map(k => `${k.toUpperCase()} <b>${px('--fs-' + k).toFixed(2)}</b>`).join(' · ');
   }
   window.addEventListener('resize', readout);
 
@@ -1123,7 +1311,50 @@
   });
   if (load(UI_KEY, 'open') === 'min') { $('#demoNav').classList.add('is-min'); $('#demoToggle').textContent = '+'; }
 
+
+  /* ── 데모 — 폰트 크기 (모바일 수식 : size × 100vw / 390, 450 상한) ── */
+  const FS_KEY = 'fw-e-mypage-m-fs';
+  const FS_DEFAULT = { p1: 16, p2: 15, p3: 14, p4: 13, c1: 12, c2: 11 };
+  const FS_KEYS = Object.keys(FS_DEFAULT);
+  const fsExpr = v => `calc(${v} * var(--ut))`;
+  const fsVal = k => {
+    const v = parseInt($(`#fs${k.toUpperCase()}`).value, 10);
+    return Number.isFinite(v) ? Math.min(48, Math.max(8, v)) : FS_DEFAULT[k];
+  };
+  function applyFs() {
+    const vals = {};
+    FS_KEYS.forEach(k => {
+      const v = fsVal(k);
+      vals[k] = v;
+      document.body.style.setProperty(`--fs-${k}`, fsExpr(v));
+    });
+    try { localStorage.setItem(FS_KEY, JSON.stringify(vals)); } catch (e) {}
+    readout();
+  }
+  $('#typeFields').addEventListener('input', e => {
+    if (e.target.matches('input[type="number"]')) applyFs();
+  });
+  $('#typeFields').addEventListener('change', e => {
+    if (!e.target.matches('input[type="number"]')) return;
+    e.target.value = fsVal(e.target.id.slice(2).toLowerCase());
+    applyFs();
+  });
+  $('#fsReset').addEventListener('click', () => {
+    Object.entries(FS_DEFAULT).forEach(([k, v]) => { $(`#fs${k.toUpperCase()}`).value = v; });
+    applyFs();
+  });
+  try {
+    const saved = JSON.parse(localStorage.getItem(FS_KEY) || 'null');
+    if (saved) Object.entries(saved).forEach(([k, v]) => { const el = $(`#fs${k.toUpperCase()}`); if (el) el.value = v; });
+  } catch (e) {}
+  applyFs();
   setEmpty(load(EM_KEY, 'off'));
+  /* pageCounter — annotation : min-width = N ch (N = total 자릿수, 최소 2) */
+  document.querySelectorAll('.pagination .counter').forEach(c => {
+    const ns = c.querySelectorAll('.n');
+    const total = (ns[ns.length - 1]?.textContent || '').replace(/\D/g, '');
+    c.style.setProperty('--pg-ch', String(Math.max(2, total.length)));
+  });
   show(load(SC_KEY, 'home'));
 })();
 </script>
