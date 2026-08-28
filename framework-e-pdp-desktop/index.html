@@ -2089,6 +2089,7 @@
 
   function setTpl(t) {
     document.body.dataset.template = t;
+    if (typeof syncTab === 'function') syncTab();
     $$('#tplToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.tpl === t));
     store(TPL_KEY, t);
     readout();
@@ -2136,28 +2137,49 @@
     readout();
   }
 
-  /* ── tabs/productDetail — 클릭 시 활성 전환 + 섹션 이동 ──────
-     scroll-behavior / behavior:'smooth' 는 환경에 따라 무시되므로
-     rAF 로 직접 트위닝한다 (300ms ease-out).                        */
-  function smoothScrollTo(top, dur = 300) {
-    const from = scrollY, delta = top - from, t0 = performance.now();
-    if (Math.abs(delta) < 1) return;
-    (function step(t) {
-      const p = Math.min(1, (t - t0) / dur);
-      scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
-      if (p < 1) requestAnimationFrame(step);
-    })(t0);
+  /* ── tabs/productDetail ───────────────────────────────────────
+     · 클릭 : 전환 효과 없이 해당 섹션 위치로 즉시 이동
+     · 스크롤 : 현재 보고 있는 섹션의 탭이 자동으로 활성화 (스크롤스파이)
+     기준선은 헤더 바로 아래 — 섹션 상단이 그 선을 지나면 활성 전환.  */
+  const TAB_BTNS = $$('#tabBar button[data-target]');
+  const headerPx = () =>
+    parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
+  const sectionTop = id => {
+    const el = document.getElementById(id);
+    return el ? el.getBoundingClientRect().top + scrollY : Infinity;
+  };
+
+  function activate(i) {
+    TAB_BTNS.forEach((b, k) => b.classList.toggle('is-active', k === i));
   }
+
+  /* 현재 스크롤 위치에 해당하는 탭 인덱스
+     (3개 안에서 숨겨진 주문 정보 구간은 바로 앞 탭이 계속 활성) */
+  function currentTab() {
+    const last = document.body.dataset.tabcount === '3' ? 2 : TAB_BTNS.length - 1;
+    const de = document.documentElement;
+    /* 페이지 끝까지 내려가면 마지막(노출된) 탭 */
+    if (scrollY + de.clientHeight >= de.scrollHeight - 2) return last;
+    const line = scrollY + headerPx() + 1;
+    let idx = 0;
+    TAB_BTNS.forEach((b, k) => { if (sectionTop(b.dataset.target) <= line) idx = k; });
+    return Math.min(idx, last);
+  }
+
+  function syncTab() {
+    if (document.body.dataset.template !== 'b') return;
+    activate(currentTab());
+  }
+  addEventListener('scroll', syncTab, { passive: true });
+  addEventListener('resize', syncTab);
+
   /* 데모 — 탭 개수 (4개 ↔ 3개). 3개 안에서 주문 정보 탭이 빠진다 */
   const TC_KEY = 'fw-e-pdp-tabcount';
   function setTabCount(n) {
     document.body.dataset.tabcount = n;
     $$('#tabCountToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.tabcount === n));
-    /* 숨긴 탭이 선택돼 있었다면 첫 번째 탭으로 되돌린다 */
-    const on = $('#tabBar button.is-active');
-    if (on && getComputedStyle(on).display === 'none') {
-      $$('#tabBar button').forEach((x, i) => x.classList.toggle('is-active', i === 0));
-    }
+    /* 숨긴 탭이 빠지면 활성 탭을 스크롤 위치 기준으로 다시 잡는다 */
+    syncTab();
     store(TC_KEY, n);
     readout();
   }
@@ -2165,14 +2187,12 @@
     const b = e.target.closest('[data-tabcount]'); if (b) setTabCount(b.dataset.tabcount);
   });
 
+  /* 클릭 — 전환 효과 없이 즉시 점프. 이후 scroll 이벤트로 활성 탭이 재확인된다 */
   $('#tabBar').addEventListener('click', e => {
     const b = e.target.closest('button[data-target]');
     if (!b) return;
-    $$('#tabBar button').forEach(x => x.classList.toggle('is-active', x === b));
-    const sec = document.getElementById(b.dataset.target);
-    if (!sec) return;
-    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
-    smoothScrollTo(sec.getBoundingClientRect().top + scrollY - headerH);
+    activate(TAB_BTNS.indexOf(b));
+    scrollTo(0, Math.round(sectionTop(b.dataset.target) - headerPx()));
   });
 
   /* ── productImageCarousel — 레일 인터랙션 ─────────────────────
@@ -2601,6 +2621,7 @@
   setTabCount(load(TC_KEY, '4'));
   setCgap(load(CG_KEY, 'mid'));
   setTpl(load(TPL_KEY, 'a'));
+  syncTab();
 })();
 </script>
 
