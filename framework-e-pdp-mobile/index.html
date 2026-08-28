@@ -72,7 +72,9 @@
 
     /* px-* — 뷰포트 무관 고정 ------------------------------------ */
     --px-16: 16px;                      /* 화면 좌우 여백 */
-    --px-24: 24px;                      /* snackBarArea 하단 여백 */
+    --px-20: 20px;                      /* dialog/confirm 좌우 */
+    --px-24: 24px;                      /* snackBarArea 하단 · dialog/confirm 하단 */
+    --px-32: 32px;                      /* dialog/confirm 상단 · gap */
 
     /* 여백 버전 (데모 전환) ---------------------------------------
        --pad-x : 가로 여백   px-16(고정) ↔ mid-16(가변)
@@ -93,6 +95,16 @@
     --radius-2xs: 3px;
     --radius-xs:  4px;
     --radius-sm:  6px;
+
+    /* dialog/confirm — 너비 · 내부 여백 · 타이틀/디스크립션 폰트 (데모 전환) */
+    --cf-w-margin: calc(100vw - 32px);     /* 시안 : 뷰포트 너비 − 32 (좌우 16 제외) */
+    --cf-w-fluid:  91.7949vw;              /* 358 / 390 → 390 에서 358px */
+    --cf-w: var(--cf-w-margin);
+    --cf-32: var(--px-32);                 /* 기본 = 시안(px 토큰, 고정) */
+    --cf-24: var(--px-24);
+    --cf-20: var(--px-20);
+    --cf-fs-title: var(--fs-p2);
+    --cf-fs-desc:  var(--fs-p4);
     --radius-full: 9999px;
 
     /* Font / Color ----------------------------------------------- */
@@ -109,6 +121,26 @@
 
     --header-h: 60px;
   }
+
+  /* confirm 다이얼로그 3안 — 데스크탑과 같은 축(너비 × 내부 여백)
+     −32 + px  : 시안 그대로 (기본)
+     −32 + mid : 같은 너비 + 내부 여백만 mid
+     vw  + mid : 순수 vw 너비(91.7949vw) + 내부 여백 mid */
+  body[data-cfbox="margin-mid"],
+  body[data-cfbox="fluid-mid"] {
+    --cf-32: var(--mid-32);
+    --cf-24: var(--mid-24);
+    --cf-20: var(--mid-20);
+  }
+  body[data-cfbox="fluid-mid"] { --cf-w: var(--cf-w-fluid); }
+  body[data-cftitle="p1"] { --cf-fs-title: var(--fs-p1); }
+  body[data-cftitle="p2"] { --cf-fs-title: var(--fs-p2); }
+  body[data-cftitle="p3"] { --cf-fs-title: var(--fs-p3); }
+  body[data-cftitle="p4"] { --cf-fs-title: var(--fs-p4); }
+  body[data-cfdesc="p1"]  { --cf-fs-desc:  var(--fs-p1); }
+  body[data-cfdesc="p2"]  { --cf-fs-desc:  var(--fs-p2); }
+  body[data-cfdesc="p3"]  { --cf-fs-desc:  var(--fs-p3); }
+  body[data-cfdesc="p4"]  { --cf-fs-desc:  var(--fs-p4); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html {
@@ -879,6 +911,82 @@
     line-height: 1.2;
     white-space: nowrap;
   }
+
+  /* ── dialog/confirm (바로 구매하기) — Figma 8406:109892 ───────
+     시안 : width = 뷰포트 − 32 · gap px-32 · padding px-32 / px-20 / px-24
+            status bar · 브라우저 창을 제외한 영역 정중앙
+            (fixed + inset:0 이 곧 visual viewport 라 그대로 대응) */
+  .cf-dim {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(0, 0, 0, .5);
+    display: none;
+  }
+  .cf-dim.is-open { display: block; }
+
+  .cf-dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 601;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cf-32);
+    width: var(--cf-w);
+    padding: var(--cf-32) var(--cf-20) var(--cf-24);
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: #fff;
+    transform: translate(-50%, -50%);
+    display: none;
+  }
+  .cf-dialog.is-open { display: flex; }
+
+  .cf-dialog .cf-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-8);
+    width: 100%;
+    padding: 0 var(--mid-4);
+    text-align: center;
+  }
+  .cf-dialog .cf-text .t {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--cf-fs-title);   /* 시안 P2 */
+    line-height: 1.5;
+  }
+  .cf-dialog .cf-text .d {
+    width: 100%;
+    font-size: var(--cf-fs-desc);    /* 시안 P4 */
+    line-height: 1.6;
+    color: var(--c-sub);
+  }
+  .cf-dialog .cf-buttons { display: flex; align-items: center; gap: var(--mid-8); width: 100%; }
+  .cf-dialog .cf-btn {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    /* padding = em (@em base : button-label-medium 13px) — 시안 14 / 16px */
+    padding: 1.0769em 1.2308em;
+    border-radius: var(--radius-xs);
+    box-shadow: inset 0 0 0 1px #111;
+    font-weight: 500;
+    font-size: var(--fs-btn-m);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .cf-dialog .cf-btn.primary { background: #111; color: #fff; box-shadow: none; }
+
+  body.is-cf-open { overflow: hidden; }
+  body.is-cf-open #demoNav { display: none; }
+  #cfNav { display: none; }
+  body.is-cf-open #cfNav { display: grid; z-index: 700; }
 
   /* ── productOption — 옵션 선택 바텀시트 ──────────────────────── */
   .dim {
@@ -1679,10 +1787,50 @@
   <div class="sheet-foot">
     <div class="button-group">
       <button type="button" class="btn outlined">장바구니 담기</button>
-      <button type="button" class="btn filled">바로 구매하기</button>
+      <button type="button" class="btn filled" id="buyNow">바로 구매하기</button>
     </div>
   </div>
 </div>
+
+<!-- dialog/confirm — 바로 구매하기 (Figma 8406:109892) -->
+<div class="cf-dim" id="cfDim"></div>
+<div class="cf-dialog" id="cfDialog" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfDesc">
+  <div class="cf-text">
+    <p class="t" id="cfTitle">로그인이 필요해요</p>
+    <p class="d" id="cfDesc">로그인 페이지로 이동할까요?</p>
+  </div>
+  <div class="cf-buttons">
+    <button type="button" class="cf-btn" id="cfCancel">취소</button>
+    <button type="button" class="cf-btn primary">로그인</button>
+  </div>
+</div>
+
+<nav class="demo-nav" id="cfNav">
+  <strong>dialog</strong>
+  <div class="demo-seg" id="cfBoxToggle">
+    <button type="button" data-cfbox="margin-px">−32 + px</button>
+    <button type="button" data-cfbox="margin-mid">−32 + mid</button>
+    <button type="button" data-cfbox="fluid-mid">vw + mid</button>
+  </div>
+
+  <strong>title</strong>
+  <div class="demo-seg" id="cfTitleToggle">
+    <button type="button" data-cftitle="p1">P1</button>
+    <button type="button" data-cftitle="p2">P2</button>
+    <button type="button" data-cftitle="p3">P3</button>
+    <button type="button" data-cftitle="p4">P4</button>
+  </div>
+
+  <strong>desc</strong>
+  <div class="demo-seg" id="cfDescToggle">
+    <button type="button" data-cfdesc="p1">P1</button>
+    <button type="button" data-cfdesc="p2">P2</button>
+    <button type="button" data-cfdesc="p3">P3</button>
+    <button type="button" data-cfdesc="p4">P4</button>
+  </div>
+
+  <p class="demo-readout" id="cfReadout">–</p>
+</nav>
 
 <!-- 이미지 뷰어 -->
 <div class="viewer" id="viewer">
@@ -2081,6 +2229,77 @@
   $('#ratingToggle').addEventListener('click', e => {
     const b = e.target.closest('[data-rating]'); if (b) setRating(b.dataset.rating);
   });
+
+  /* ── 바로 구매하기 confirm 다이얼로그 ─────────────────────── */
+  const CF_BOX_KEY = 'fw-e-pdp-m-cfbox';
+  const CF_T_KEY   = 'fw-e-pdp-m-cftitle';
+  const CF_D_KEY   = 'fw-e-pdp-m-cfdesc';
+  const DESIGN_FS  = { p1: 16, p2: 15, p3: 14, p4: 13 };   /* @390 */
+  const cfDialog = $('#cfDialog'), cfDim = $('#cfDim');
+
+  function cfReadout() {
+    if (!document.body.classList.contains('is-cf-open')) return;
+    const cs = getComputedStyle(cfDialog), r = cfDialog.getBoundingClientRect();
+    const t = document.body.dataset.cftitle, d = document.body.dataset.cfdesc;
+    const tp = parseFloat(getComputedStyle($('#cfTitle')).fontSize);
+    const dp = parseFloat(getComputedStyle($('#cfDesc')).fontSize);
+    const note = document.body.dataset.cfbox === 'fluid-mid' ? ' (91.7949vw)' : ' (100vw − 32)';
+    $('#cfReadout').innerHTML =
+      `viewport <b>${innerWidth}px</b> · 다이얼로그 <b>${r.width.toFixed(2)}px</b>${note} · 높이 <b>${r.height.toFixed(2)}</b><br>` +
+      `여백 상 <b>${parseFloat(cs.paddingTop).toFixed(2)}</b> / 좌우 <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / ` +
+      `하 <b>${parseFloat(cs.paddingBottom).toFixed(2)}</b> · gap <b>${parseFloat(cs.rowGap).toFixed(2)}</b><br>` +
+      `title <b>${t.toUpperCase()}</b> ${DESIGN_FS[t]}px@390 → <b>${tp.toFixed(2)}</b> · ` +
+      `desc <b>${d.toUpperCase()}</b> ${DESIGN_FS[d]}px@390 → <b>${dp.toFixed(2)}</b>`;
+  }
+  function setCfBox(mode) {
+    document.body.dataset.cfbox = mode;
+    $$('#cfBoxToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cfbox === mode));
+    try { localStorage.setItem(CF_BOX_KEY, mode); } catch (e) {}
+    cfReadout();
+  }
+  function setCfTitle(size) {
+    document.body.dataset.cftitle = size;
+    $$('#cfTitleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cftitle === size));
+    try { localStorage.setItem(CF_T_KEY, size); } catch (e) {}
+    cfReadout();
+  }
+  function setCfDesc(size) {
+    document.body.dataset.cfdesc = size;
+    $$('#cfDescToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cfdesc === size));
+    try { localStorage.setItem(CF_D_KEY, size); } catch (e) {}
+    cfReadout();
+  }
+  function openCf() {
+    document.body.classList.add('is-cf-open');
+    cfDim.classList.add('is-open');
+    cfDialog.classList.add('is-open');
+    cfReadout();
+  }
+  function closeCf() {
+    document.body.classList.remove('is-cf-open');
+    cfDim.classList.remove('is-open');
+    cfDialog.classList.remove('is-open');
+  }
+  $('#buyNow').addEventListener('click', openCf);
+  $('#cfCancel').addEventListener('click', closeCf);
+  cfDim.addEventListener('click', closeCf);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.body.classList.contains('is-cf-open')) closeCf();
+  });
+  $('#cfBoxToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cfbox]'); if (b) setCfBox(b.dataset.cfbox);
+  });
+  $('#cfTitleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cftitle]'); if (b) setCfTitle(b.dataset.cftitle);
+  });
+  $('#cfDescToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cfdesc]'); if (b) setCfDesc(b.dataset.cfdesc);
+  });
+  const cfLoad = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  setCfBox(cfLoad(CF_BOX_KEY, 'margin-px'));
+  setCfTitle(cfLoad(CF_T_KEY, 'p2'));
+  setCfDesc(cfLoad(CF_D_KEY, 'p4'));
+  window.addEventListener('resize', cfReadout);
 
   const PAD_KEY = 'fw-e-pdp-m-pad';
   const PAD = {
