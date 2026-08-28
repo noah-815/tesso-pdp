@@ -2558,7 +2558,7 @@
         <div class="option-list">
           ${g.items.map(it => `
             <button type="button" data-label="${it.label}" data-add="${it.add}"${it.soldout ? ' disabled' : ''}${sel && sel.label === it.label ? ' class="is-selected"' : ''}>
-              <span class="label">${it.soldout ? '(품절) ' : ''}${it.label}</span>${g.key === LAST_KEY && it.add ? `<span class="extra"><span class="num">+${won(it.add)}</span>원</span>` : ''}
+              <span class="label">${it.soldout ? '(품절) ' : ''}${it.label}</span>${g.key === LAST_KEY && it.add ? `<span class="extra"><span class="num">${won(it.add)}</span>원</span>` : ''}
             </button>`).join('')}
         </div>
       </div>`;

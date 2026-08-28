@@ -2141,7 +2141,7 @@
       const icon = prev ? 'assets/chevron-down.svg' : 'assets/chevron-down-disabled.svg';
       const opts = g.items.map((it, ii) => {
         /* +금액은 마지막 옵션 그룹에서만 노출 */
-        const add = (g.key === LAST_KEY && it.add > 0) ? `<span>+${won(it.add)}원</span>` : '';
+        const add = (g.key === LAST_KEY && it.add > 0) ? `<span>${won(it.add)}원</span>` : '';
         const dis = it.soldout ? ' disabled' : '';
         const on  = sel && sel.name === it.name ? ' is-on' : '';
         const nm  = it.soldout ? `${it.name} (품절)` : it.name;
