@@ -67,6 +67,7 @@
     --mid-24: calc(16 * var(--us) + 8px);
     --mid-28: calc(20 * var(--us) + 8px);
     --mid-32: calc(24 * var(--us) + 8px);
+    --mid-56: calc(48 * var(--us) + 8px);
     --mid-36: calc(28 * var(--us) + 8px);
     --mid-40: calc(32 * var(--us) + 8px);
 
@@ -917,6 +918,130 @@
     white-space: nowrap;
   }
 
+  /* ── dialog/inquiry (상품 문의) — Figma 10231:90123 ───────────
+     모바일은 다이얼로그가 아니라 전체 화면 페이지 (statusBar·브라우저 창 제외).
+     헤더 · 버튼 영역 고정, 가운데 콘텐츠만 스크롤한다.               */
+  .inq-page {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    flex-direction: column;
+    background: #fff;
+    display: none;                 /* 전환 효과 없이 즉시 노출 */
+  }
+  .inq-page.is-open { display: flex; }
+
+  .inq-page .inq-head {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--mid-16) var(--mid-56);
+    background: #fff;
+  }
+  .inq-page .inq-head .title {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p2);
+    line-height: var(--lh-p2);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* iconButton/default 32 — 시안 right 16 (토큰 없음 → px) */
+  .inq-page .inq-head .close {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-xs);
+  }
+  .inq-page .inq-head .close img { width: 24px; height: 24px; }
+
+  .inq-page .inq-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-24);
+    padding: var(--mid-24) var(--px-16) var(--mid-32);
+  }
+
+  /* productList/default — 썸네일 mid-56 */
+  .inq-page .inq-product { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
+  .inq-page .inq-product .thumb {
+    flex-shrink: 0;
+    width: var(--mid-56);
+    height: var(--mid-56);
+    border-radius: var(--radius-2xs);
+    overflow: hidden;
+    background: var(--c-fill);
+  }
+  .inq-page .inq-product .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .inq-page .inq-product .name {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+  }
+
+  /* multiLine — 상하좌우 padding 은 em (@em base : p3) · 시안 15 / 17px */
+  .inq-page .inq-multi { display: flex; flex-direction: column; gap: var(--mid-10); width: 100%; }
+  .inq-page .inq-multi .field {
+    width: 100%;
+    height: 327px;                 /* 토큰 없음 → 시안 px */
+    padding: 1.0714em 1.2143em;
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    border-radius: var(--radius-xs);
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+    color: var(--c-text);
+    resize: none;
+  }
+  .inq-page .inq-multi .field::placeholder { color: rgba(17, 17, 17, .3); }
+  .inq-page .inq-multi .support {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    width: 100%;
+    padding-right: var(--mid-2);
+  }
+  .inq-page .inq-multi .support .check-box {
+    flex: 1 0 0;
+    min-width: 0;
+    padding: var(--mid-1) 0;
+  }
+  .inq-page .inq-multi .support .check-box .label {
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+  }
+  .inq-page .inq-multi .support .counter {
+    flex-shrink: 0;
+    min-width: 90px;               /* 토큰 없음 → 시안 px */
+    font-family: var(--font-en);
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+    text-align: right;
+    color: rgba(17, 17, 17, .6);
+  }
+
+  .inq-page .inq-foot {
+    flex-shrink: 0;
+    padding: var(--v-16) var(--px-16) calc(var(--v-16) + env(safe-area-inset-bottom, 0px));
+    background: #fff;
+  }
+
   /* ── dialog/confirm (바로 구매하기) — Figma 8406:109892 ───────
      시안 : width = 뷰포트 − 32 · gap px-32 · padding px-32 / px-20 / px-24
             status bar · 브라우저 창을 제외한 영역 정중앙
@@ -1613,7 +1738,7 @@
   <section class="section" id="inquiry">
     <div class="section-head">
       <h2 class="title">상품 문의</h2>
-      <button type="button" class="btn-small">문의하기</button>
+      <button type="button" class="btn-small" id="inqOpen">문의하기</button>
     </div>
     <div class="filter-bar">
       <label class="check-box">
@@ -1795,6 +1920,32 @@
       <button type="button" class="btn outlined">장바구니 담기</button>
       <button type="button" class="btn filled" id="buyNow">바로 구매하기</button>
     </div>
+  </div>
+</div>
+
+<!-- dialog/inquiry — 상품 문의 (Figma 10231:90123) · 전체 화면 -->
+<div class="inq-page" id="inqPage" role="dialog" aria-modal="true" aria-labelledby="inqTitle">
+  <div class="inq-head">
+    <p class="title" id="inqTitle">상품 문의</p>
+    <button type="button" class="close" id="inqClose" aria-label="닫기"><img src="assets/close.svg" alt=""></button>
+  </div>
+  <div class="inq-body">
+    <div class="inq-product">
+      <div class="thumb"><img src="assets/product-1.png" alt=""></div>
+      <p class="name">전해질 보충 음료 블러드 오렌지</p>
+    </div>
+    <div class="inq-multi">
+      <textarea class="field" id="inqText" maxlength="5000" placeholder="문의하실 내용을 입력해주세요"></textarea>
+      <div class="support">
+        <label class="check-box">
+          <input type="checkbox"><span class="box"></span><span class="label">비밀글로 문의하기</span>
+        </label>
+        <span class="counter" id="inqCounter">0/5,000</span>
+      </div>
+    </div>
+  </div>
+  <div class="inq-foot">
+    <button type="button" class="btn-cta" id="inqSubmit" disabled>문의 등록</button>
   </div>
 </div>
 
@@ -2261,6 +2412,30 @@
     try { saved = localStorage.getItem(key) || 'open'; } catch (e) {}
     apply(saved === 'min');
   });
+
+  /* ── 상품 문의 (전체 화면) ─────────────────────────────────── */
+  const inqPage = $('#inqPage'), inqText = $('#inqText'), inqCounter = $('#inqCounter');
+  const inqNum = n => n.toLocaleString('ko-KR');
+  function inqSync() {
+    const len = inqText.value.length;
+    inqCounter.textContent = `${inqNum(len)}/${inqNum(inqText.maxLength)}`;
+    $('#inqSubmit').disabled = len === 0;
+  }
+  $('#inqOpen').addEventListener('click', () => {
+    inqPage.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    inqSync();
+    inqText.focus({ preventScroll: true });
+  });
+  $('#inqClose').addEventListener('click', () => {
+    inqPage.classList.remove('is-open');
+    document.body.style.overflow = '';
+  });
+  inqText.addEventListener('input', inqSync);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && inqPage.classList.contains('is-open')) $('#inqClose').click();
+  });
+  inqSync();
 
   /* ── 바로 구매하기 confirm 다이얼로그 ─────────────────────── */
   const CF_BOX_KEY = 'fw-e-pdp-m-cfbox';
