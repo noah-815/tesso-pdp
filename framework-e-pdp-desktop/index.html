@@ -889,8 +889,9 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    width: 286px;                  /* 토큰 없음 → px */
-    /* padding = em (@ button-label-medium 13px) — 시안 14 / 16px */
+    /* 너비 · padding 모두 em (@em base : button-label-medium 13px)
+       22em = 286px @13 — 폰트 크기를 바꾸면 버튼도 함께 커진다 */
+    width: 22em;
     font-size: var(--fs-btn-m);
     padding: 1.0769em 1.2308em;
     box-shadow: inset 0 0 0 1px var(--c-line);
