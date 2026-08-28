@@ -951,10 +951,10 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  /* iconButton/default 32 — 시안 right 16 (토큰 없음 → px) */
+  /* iconButton/default 32 — 본문 좌우 여백과 같은 mid-16 선에 맞춘다 */
   .inq-page .inq-head .close {
     position: absolute;
-    right: 16px;
+    right: var(--mid-16);
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -974,7 +974,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--mid-24);
-    padding: var(--mid-24) var(--px-16) var(--mid-32);
+    padding: var(--mid-24) var(--mid-16) var(--mid-32);   /* 좌우 mid */
   }
 
   /* productList/default — 썸네일 mid-56 */
@@ -1038,7 +1038,7 @@
 
   .inq-page .inq-foot {
     flex-shrink: 0;
-    padding: var(--v-16) var(--px-16) calc(var(--v-16) + env(safe-area-inset-bottom, 0px));
+    padding: var(--v-16) var(--mid-16) calc(var(--v-16) + env(safe-area-inset-bottom, 0px));   /* 좌우 mid */
     background: #fff;
   }
 
