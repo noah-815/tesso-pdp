@@ -572,12 +572,6 @@
     line-height: var(--lh-p1);
     white-space: nowrap;
   }
-  .coupon .benefit .off {
-    font-weight: 600;
-    font-size: var(--fs-p3);
-    line-height: var(--lh-p3);
-    color: #ff6058;
-  }
   .coupon .cinfo {
     display: flex;
     flex-direction: column;
@@ -587,6 +581,211 @@
     line-height: var(--lh-p4);
   }
   .coupon .cinfo p { opacity: .8; }
+
+
+  /* ══ 주문 상세 · 신청 플로우 ═══════════════════════════════════
+     Figma 8484:144608(기본) 144822(취소) 144919(반품) 145014(교환)
+           8484:144137(취소 요청) 143890(반품/교환 요청)
+     신청 플로우는 마이페이지 셸(타이틀 · 탭) 없이 본문 6컬럼만 노출  */
+  body[data-shell="plain"] .content-area > .title-area,
+  body[data-shell="plain"] .tabs { display: none; }
+  body[data-shell="plain"] .main { padding-top: 80px; }   /* 시안 titleArea y = 80 */
+
+  /* 공통 섹션 — 상하 mid-32 · 내부 gap mid-20 · 하단 구분선 */
+  .od-sec {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-20);
+    width: 100%;
+    padding: var(--mid-32) 0;
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+  }
+  .od-sec.is-last { padding-bottom: var(--mid-20); border-bottom: 0; }
+  .od-sec.no-line { border-bottom: 0; }
+  .od-sec > .t {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-24);
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p2);
+    line-height: var(--lh-p2);
+  }
+  .od-sec > .t > span { flex: 1 0 0; min-width: 0; }
+
+  /* titleArea */
+  .od-head { padding: 0 0 var(--mid-32); }
+  .od-head .h { width: 100%; font-weight: 600; font-size: var(--fs-p1); line-height: var(--lh-p1); }
+  .od-head .meta { display: flex; flex-direction: column; gap: var(--mid-4); width: 100%; }
+  .od-head .date {
+    display: flex; align-items: center; gap: var(--mid-6);
+    font-weight: 500; font-size: var(--fs-p3); line-height: var(--lh-p3);
+  }
+  .od-head .no {
+    display: flex; align-items: flex-start; gap: var(--mid-8);
+    font-size: var(--fs-p4); line-height: var(--lh-p4); color: var(--c-sub);
+  }
+  .od-head .en { font-family: var(--font-en); }
+  /* 신청 플로우 타이틀 — 설명문 유무에 따라 하단 여백이 다르다 (시안 24 / 28) */
+  .od-head.req { gap: var(--mid-8); padding-bottom: var(--mid-24); border-bottom: 0; }
+  .od-head.req.has-desc { padding-bottom: var(--mid-28); }
+  .od-head.req .h { font-weight: 500; }
+  .od-head.req .desc { font-size: var(--fs-p3); line-height: var(--lh-p3); color: var(--c-sub); }
+  /* 신청 플로우의 첫 섹션(상품 목록)은 위 여백 없이 바로 붙는다 (시안 productArea pt 0) */
+  .od-head.req + .od-sec { padding-top: 0; }
+
+  /* stepper — 상하 여백은 시안 px (토큰 없음) */
+  .od-stepper {
+    display: flex; align-items: flex-start; gap: var(--mid-8); width: 100%;
+    padding: 20px 0 48px;
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+  }
+  .od-stepper .st { flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; gap: var(--mid-12); }
+  .od-stepper .st i { display: block; width: 100%; height: 5px; background: #111; border-radius: 1px; }
+  .od-stepper .st p { width: 100%; font-size: var(--fs-p4); line-height: var(--lh-p4); text-align: center; }
+  .od-stepper .st.off i, .od-stepper .st.off p { opacity: .2; }
+
+  /* 거절 안내 */
+  .od-reject { width: 100%; padding: var(--mid-8) 0; }
+  .od-reject .box {
+    display: flex; flex-direction: column; gap: var(--mid-4);
+    padding: var(--mid-28) 29px;               /* 29px — 토큰 없음 → 시안 px */
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 6px;
+  }
+  .od-reject .box .rt { font-weight: 500; font-size: var(--fs-p2); line-height: var(--lh-p2); }
+  .od-reject .box .rd {
+    font-family: var(--font-en); font-size: var(--fs-p3);
+    line-height: var(--lh-p3); color: var(--c-sub);
+  }
+
+  /* 배송지 / 수거지 */
+  .od-addr {
+    display: flex; flex-direction: column; gap: var(--mid-8); width: 100%;
+    font-size: var(--fs-p3); line-height: var(--lh-p3);
+  }
+  .od-addr .info { display: flex; align-items: center; gap: var(--mid-8); color: var(--c-sub); }
+  .od-addr .info .div { width: 1px; height: 12px; background: var(--c-line); }
+  .od-addr .req { display: flex; align-items: center; gap: var(--mid-8); }
+  .od-addr .req .k { color: var(--c-sub); }
+  .od-addr .en { font-family: var(--font-en); }
+
+  /* 배송 조회 · 취소 요청 일시 */
+  .od-line { width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .od-line a { color: inherit; text-decoration: underline; }
+  .od-line.en { font-family: var(--font-en); }
+
+  /* 사유 (반품/교환) */
+  .od-reason { display: flex; flex-direction: column; gap: var(--mid-8); width: 100%;
+               font-size: var(--fs-p3); line-height: var(--lh-p3); }
+
+  /* productList — 상태 라벨이 붙는 목록은 gap mid-20, 아니면 mid-16 (시안) */
+  .od-list { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
+  .od-list.has-state { gap: var(--mid-20); }
+  .od-item { display: flex; flex-direction: column; gap: var(--mid-8); width: 100%; }
+  .od-item .state { width: 100%; font-weight: 500; font-size: var(--fs-p3); line-height: var(--lh-p3); }
+  .od-item .row { display: flex; align-items: flex-start; gap: var(--mid-20); width: 100%; }
+  .od-item .thumb {
+    position: relative; flex-shrink: 0;
+    width: var(--mid-120); height: var(--mid-120);
+    border-radius: var(--radius-xs); overflow: hidden; background: #ddd;
+  }
+  .od-item .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .od-item .txt { display: flex; flex: 1 0 0; min-width: 0; flex-direction: column; gap: var(--mid-4); }
+  .od-item .name {
+    width: 100%; font-weight: 500; font-size: var(--fs-p3); line-height: var(--lh-p3);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .od-item .opt {
+    display: flex; align-items: center; gap: var(--mid-6);
+    font-size: var(--fs-p4); line-height: var(--lh-p4); white-space: nowrap;
+  }
+  .od-item .opt .o { display: flex; align-items: center; gap: var(--mid-2); opacity: .5; }
+  .od-item .opt .div { width: 1px; height: 10px; background: var(--c-line); }
+  .od-item .opt .q { opacity: .5; }
+  .od-item .en { font-family: var(--font-en); }
+  .od-item .price { font-size: var(--fs-p3); line-height: var(--lh-p3); }
+
+  /* productList/checkbox — 반품·교환 요청 1단계 */
+  .od-item.check .thumb .cb { position: absolute; left: 8px; top: 8px; }
+  .od-item.check .txt { min-height: calc(var(--mid-120) + 24px); }
+  .od-item.check .num { margin-top: auto; align-self: flex-end; }
+  .od-cb {
+    display: block; width: 20px; height: 20px; border-radius: var(--radius-2xs);
+    background: #111 center / 12px no-repeat
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.2l2.6 2.6L10 3.4' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .num {
+    display: inline-flex; align-items: center;
+    box-shadow: inset 0 0 0 1px var(--c-line-soft);
+    border-radius: var(--radius-xs);
+  }
+  .num button { display: flex; align-items: center; justify-content: center; width: 34px; height: 30px; }
+  .num .v {
+    min-width: 32px; text-align: center;
+    font-family: var(--font-en); font-size: var(--fs-p4); line-height: var(--lh-p4);
+  }
+
+  /* 결제 / 환불 정보 */
+  .od-pay { display: flex; flex-direction: column; width: 100%; }
+  .od-pay .top {
+    display: flex; flex-direction: column; gap: var(--mid-6); width: 100%;
+    padding-bottom: var(--mid-20); border-bottom: 1px solid rgba(0, 0, 0, .06);
+  }
+  .od-pay .bottom { display: flex; flex-direction: column; gap: var(--mid-8); width: 100%; padding-top: var(--mid-20); }
+  .od-pay.refund .top { padding-bottom: var(--mid-24); border-bottom-color: rgba(0, 0, 0, .1); }
+  .od-pay.refund .bottom { padding-top: var(--mid-24); }
+  .od-pay .r {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    font-size: var(--fs-p3); line-height: var(--lh-p3);
+  }
+  .od-pay .r .k { display: flex; align-items: center; gap: var(--mid-2); color: var(--c-sub); }
+  .od-pay .r .k .q { width: 22px; height: 22px; opacity: .5; }
+  .od-pay .en { font-family: var(--font-en); }
+  .od-pay .r.total .k { color: var(--c-text); }
+  .od-pay .r.total .v { font-weight: 600; font-size: var(--fs-p2); line-height: var(--lh-p2); }
+  .od-pay .rgroup { display: flex; flex-direction: column; gap: var(--mid-4); width: 100%; }
+  .od-pay .note { width: 100%; font-size: var(--fs-c1); line-height: var(--lh-c1); color: var(--c-sub); }
+
+  /* 신청 폼 — select/Field · multiLine · radioButton */
+  .od-field, .od-textarea {
+    width: 100%; box-shadow: inset 0 0 0 1px var(--c-line); border-radius: var(--radius-xs);
+    font-size: var(--fs-p3); line-height: var(--lh-p3);
+  }
+  .od-field {
+    display: flex; align-items: center; gap: var(--mid-8);
+    padding: 0.6643em 1.1429em;                /* em @em base : p3 — 시안 41h */
+  }
+  .od-field .ph { flex: 1 0 0; min-width: 0; color: rgba(17, 17, 17, .5); }
+  .od-field .ico { width: 20px; height: 20px; opacity: .6; }
+  .od-textarea { height: 160px; padding: 0.8571em 1.1429em; color: rgba(17, 17, 17, .5); }
+  .od-count { width: 100%; text-align: right; font-size: var(--fs-c1); line-height: var(--lh-c1); color: var(--c-sub); }
+  .od-fields { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+  .od-radio { display: flex; align-items: center; gap: 24px; }
+  .od-radio label { display: flex; align-items: center; gap: 8px; font-size: var(--fs-p3); line-height: var(--lh-p3); cursor: pointer; }
+  .od-radio input { position: absolute; opacity: 0; pointer-events: none; }
+  .od-radio .rb {
+    position: relative; width: 16px; height: 16px; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .3);
+  }
+  .od-radio input:checked + .rb { box-shadow: inset 0 0 0 1px #111; }
+  .od-radio input:checked + .rb::after {
+    content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #111;
+  }
+
+  /* buttonArea */
+  .od-btns { display: flex; align-items: center; gap: var(--mid-8); width: 100%; padding-top: var(--mid-28); }
+  .od-btns .b {
+    flex: 1 0 0; min-width: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.0714em 1.5714em;                /* em @em base : button-label-large */
+    border-radius: var(--radius-xs);
+    font-weight: 500; font-size: var(--fs-btn-l); line-height: 1.2;
+  }
+  .od-btns .b.line { box-shadow: inset 0 0 0 1px #111; }
+  .od-btns .b.fill { background: #111; color: #fff; }
+  .od-btns .b:disabled { background: rgba(0, 0, 0, .06); color: rgba(17, 17, 17, .3); box-shadow: none; }
 
   /* ── 리뷰 ────────────────────────────────────────────────────── */
   .review-list { display: flex; flex-direction: column; width: 100%; }
@@ -1032,6 +1231,357 @@
         <div class="empty">비어있음</div>
       </section>
 
+
+      <!-- ── 주문 상세 · 기본 ── -->
+      <section class="screen" data-screen="od-default">
+        <div class="od-sec od-head">
+          <p class="h">주문 상세</p>
+          <div class="meta">
+            <p class="date"><span class="en">2026. 12. 31. 18:30</span><span>결제</span></p>
+            <p class="no"><span>주문번호</span><span class="en">20261231ABCDE</span></p>
+          </div>
+        </div>
+      <div class="od-sec">
+        <p class="t"><span>배송지 정보</span><button type="button" class="u-btn">변경</button></p>
+        <div class="od-addr">
+          <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <p class="info"><span>이강인</span><span class="div"></span><span class="en">010-1234-1234</span></p>
+          <p class="req"><span class="k">배송 요청사항</span><span>경비실에 맡겨주세요.</span></p>
+        </div>
+      </div>
+        <div class="od-sec">
+          <p class="t"><span>배송 조회</span></p>
+          <p class="od-line"><a href="#">CJ 584223396785</a></p>
+        </div>
+        <div class="od-sec">
+          <p class="t"><span>주문 상품</span></p>
+          <div class="od-list" data-list="5" data-state="배송완료"></div>
+        </div>
+        <div class="od-sec is-last">
+          <p class="t"><span>결제 정보</span></p>
+        <div class="od-pay">
+          <div class="top">
+            <p class="r"><span class="k">상품 금액</span><span class="v"><span class="en">124,000</span>원</span></p>
+            <p class="r"><span class="k">배송비</span><span class="v"><span class="en">3,500</span>원</span></p>
+            <p class="r"><span class="k">쿠폰 할인</span><span class="v"><span class="en">-7,500</span>원</span></p>
+          </div>
+          <div class="bottom">
+            <p class="r total"><span class="k">총 결제 금액</span><span class="v"><span class="en">120,000</span>원</span></p>
+            <p class="r"><span class="k">결제 수단</span><span class="v">신용카드 (국민 1234)</span></p>
+          </div>
+        </div>
+        </div>
+        <div class="od-btns">
+          <button type="button" class="b line" data-go="req-rex1">반품/교환 요청</button>
+          <button type="button" class="b fill">상품 리뷰</button>
+        </div>
+      </section>
+
+      <!-- ── 주문 상세 · 취소 ── -->
+      <section class="screen" data-screen="od-cancel">
+        <div class="od-sec od-head">
+          <p class="h">주문 상세</p>
+          <div class="meta">
+            <p class="date"><span class="en">2026. 12. 31. 18:30</span><span>결제</span></p>
+            <p class="no"><span>주문번호</span><span class="en">20261231ABCDE</span></p>
+          </div>
+        </div>
+      <div class="od-sec">
+        <p class="t"><span>배송지 정보</span></p>
+        <div class="od-addr">
+          <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <p class="info"><span>이강인</span><span class="div"></span><span class="en">010-1234-1234</span></p>
+          <p class="req"><span class="k">배송 요청사항</span><span>경비실에 맡겨주세요.</span></p>
+        </div>
+      </div>
+        <div class="od-sec">
+          <p class="t"><span>취소 요청 일시</span></p>
+          <p class="od-line en">2026. 12. 31. 20:35</p>
+        </div>
+        <div class="od-sec">
+          <p class="t"><span>주문 상품</span></p>
+          <div class="od-list" data-list="5" data-state="주문취소"></div>
+        </div>
+        <div class="od-sec is-last no-line">
+          <p class="t"><span>환불 정보</span></p>
+        <div class="od-pay refund">
+          <div class="top">
+            <p class="r"><span class="k">상품 금액</span><span class="v"><span class="en">124,000</span>원</span></p>
+            <p class="r"><span class="k">배송비</span><span class="v"><span class="en">3,500</span>원</span></p>
+            <p class="r"><span class="k">쿠폰 할인</span><span class="v"><span class="en">-7,500</span>원</span></p>
+            <p class="r"><span class="k">총 결제 금액</span><span class="v"><span class="en">120,000</span>원</span></p>
+          </div>
+          <div class="bottom">
+            <p class="r total"><span class="k">예상 환불 금액</span><span class="v"><span class="en">120,000</span>원</span></p>
+            <p class="r"><span class="k">환불 수단</span><span class="v">신용카드 (국민 1234)</span></p>
+            <p class="r"><span class="k">환불 상태</span><span class="v">환불 완료</span></p>
+          </div>
+        </div>
+        </div>
+      </section>
+
+      <!-- ── 반품 상세 ── -->
+      <section class="screen" data-screen="od-return">
+        <div class="od-sec od-head">
+          <p class="h">반품 상세</p>
+          <div class="meta">
+            <p class="date"><span class="en">2026. 12. 31. 18:30</span><span>요청</span></p>
+            <p class="no"><span>반품 주문번호</span><span class="en">RET_01HNH38WC3NR</span></p>
+          </div>
+        </div>
+        <div class="od-stepper">
+          <div class="st"><i></i><p>반품요청</p></div>
+          <div class="st off"><i></i><p>주문상품 수거중</p></div>
+          <div class="st off"><i></i><p>반품완료</p></div>
+        </div>
+        <div class="od-reject">
+          <div class="box">
+            <p class="rt">반품 요청이 거절되었어요</p>
+            <p class="rd">2024. 12. 31. 18:00</p>
+          </div>
+        </div>
+        <div class="od-sec">
+          <p class="t"><span>반품 사유</span></p>
+          <div class="od-reason">
+            <p>단순 변심</p>
+            <p>{{반품/교환 사유 자세한 내용 입력 시 노출됩니다.}}</p>
+          </div>
+        </div>
+      <div class="od-sec">
+        <p class="t"><span>수거지 정보</span></p>
+        <div class="od-addr">
+          <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <p class="info"><span>이강인</span><span class="div"></span><span class="en">010-1234-1234</span></p>
+          <p class="req"><span class="k">수거 요청사항</span><span>경비실에 맡겨주세요.</span></p>
+        </div>
+      </div>
+        <div class="od-sec">
+          <p class="t"><span>주문 상품</span></p>
+          <div class="od-list" data-list="3"></div>
+        </div>
+        <div class="od-sec is-last no-line">
+          <p class="t"><span>환불 정보</span></p>
+        <div class="od-pay refund">
+          <div class="top">
+            <p class="r"><span class="k">상품 금액</span><span class="v"><span class="en">124,000</span>원</span></p>
+            <p class="r"><span class="k">쿠폰 할인</span><span class="v"><span class="en">-7,500</span>원</span></p>
+            <p class="r"><span class="k">반품 수거비</span><span class="v"><span class="en">-3,500</span>원</span></p>
+          </div>
+          <div class="bottom">
+            <div class="rgroup">
+              <p class="r total"><span class="k">예상 환불 금액</span><span class="v"><span class="en">113,000</span>원</span></p>
+              <p class="note">최종 환불 금액은 반품절차를 진행한 후 확정됩니다</p>
+            </div>
+            <p class="r"><span class="k">환불 수단</span><span class="v">신용카드 (국민 1234)</span></p>
+            <p class="r"><span class="k">환불 상태</span><span class="v">환불 미승인</span></p>
+          </div>
+        </div>
+        </div>
+        <div class="od-btns">
+          <button type="button" class="b fill" data-go="od-default">관련 주문 보기</button>
+        </div>
+      </section>
+
+      <!-- ── 교환 상세 ── -->
+      <section class="screen" data-screen="od-exchange">
+        <div class="od-sec od-head">
+          <p class="h">교환 상세</p>
+          <div class="meta">
+            <p class="date"><span class="en">2026. 12. 31. 18:30</span><span>요청</span></p>
+            <p class="no"><span>교환 주문번호</span><span class="en">SWAP_01JQ6CVNFO7B</span></p>
+          </div>
+        </div>
+        <div class="od-stepper">
+          <div class="st"><i></i><p>교환 요청</p></div>
+          <div class="st off"><i></i><p>주문상품 수거중</p></div>
+          <div class="st off"><i></i><p>교환상품 준비중</p></div>
+          <div class="st off"><i></i><p>교환상품 배송중</p></div>
+          <div class="st off"><i></i><p>교환완료</p></div>
+        </div>
+        <div class="od-reject">
+          <div class="box">
+            <p class="rt">교환 요청이 거절되었어요</p>
+            <p class="rd">2024. 12. 31. 18:00</p>
+          </div>
+        </div>
+        <div class="od-sec">
+          <p class="t"><span>교환 사유</span></p>
+          <div class="od-reason">
+            <p>상품 오배송</p>
+            <p>{{반품/교환 사유 자세한 내용 입력 시 노출됩니다.}}</p>
+          </div>
+        </div>
+      <div class="od-sec">
+        <p class="t"><span>수거지 정보</span></p>
+        <div class="od-addr">
+          <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <p class="info"><span>이강인</span><span class="div"></span><span class="en">010-1234-1234</span></p>
+          <p class="req"><span class="k">수거 요청사항</span><span>경비실에 맡겨주세요.</span></p>
+        </div>
+      </div>
+      <div class="od-sec">
+        <p class="t"><span>배송지 정보</span></p>
+        <div class="od-addr">
+          <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <p class="info"><span>이강인</span><span class="div"></span><span class="en">010-1234-1234</span></p>
+          <p class="req"><span class="k">배송 요청사항</span><span>경비실에 맡겨주세요.</span></p>
+        </div>
+      </div>
+        <div class="od-sec">
+          <p class="t"><span>배송 조회</span></p>
+          <p class="od-line"><a href="#">CJ 584223396785</a></p>
+        </div>
+        <div class="od-sec no-line">
+          <p class="t"><span>교환 상품</span></p>
+          <div class="od-list" data-list="3"></div>
+        </div>
+        <div class="od-btns">
+          <button type="button" class="b fill" data-go="od-default">관련 주문 보기</button>
+        </div>
+      </section>
+
+      <!-- ── 취소 요청 ── -->
+      <section class="screen" data-screen="req-cancel">
+        <div class="od-head req">
+          <p class="h">취소 요청</p>
+        </div>
+        <div class="od-sec">
+          <div class="od-list" data-list="3"></div>
+        </div>
+        <div class="od-sec is-last no-line">
+          <p class="t"><span>환불 정보</span></p>
+        <div class="od-pay refund">
+          <div class="top">
+            <p class="r"><span class="k">상품 금액</span><span class="v"><span class="en">124,000</span>원</span></p>
+            <p class="r"><span class="k">배송비</span><span class="v"><span class="en">3,500</span>원</span></p>
+            <p class="r"><span class="k">쿠폰 할인</span><span class="v"><span class="en">-7,500</span>원</span></p>
+            <p class="r"><span class="k">총 결제 금액</span><span class="v"><span class="en">120,000</span>원</span></p>
+          </div>
+          <div class="bottom">
+            <p class="r total"><span class="k">예상 환불 금액</span><span class="v"><span class="en">120,000</span>원</span></p>
+            <p class="r"><span class="k">환불 수단</span><span class="v">신용카드 (국민 1234)</span></p>
+            <p class="r"><span class="k">환불 상태</span><span class="v">환불 완료</span></p>
+          </div>
+        </div>
+        </div>
+        <div class="od-btns">
+          <button type="button" class="b fill" data-go="od-cancel">취소 요청</button>
+        </div>
+      </section>
+
+      <!-- ── 반품/교환 요청 · 1단계 ── -->
+      <section class="screen" data-screen="req-rex1">
+        <div class="od-head req has-desc">
+          <p class="h">반품/교환 요청</p>
+          <p class="desc">반품 혹은 교환 요청할 상품과 수량을 선택해주세요</p>
+        </div>
+        <div class="od-sec">
+          <div class="od-list" data-list="3" data-check="1"></div>
+        </div>
+        <div class="od-sec">
+          <p class="t"><span>반품/교환 사유</span></p>
+          <div class="od-fields">
+            <div class="od-field"><span class="ph">반품/교환 사유</span><img class="ico" src="assets/chevron-down.svg" alt=""></div>
+            <div>
+              <div class="od-textarea">자세한 내용을 입력해주세요 (선택 사항)</div>
+              <p class="od-count"><span class="en">0/100</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="od-sec no-line">
+          <p class="t"><span>해결방법</span></p>
+          <div class="od-radio">
+            <label><input type="radio" name="rexWay" value="return" checked><span class="rb"></span>반품</label>
+            <label><input type="radio" name="rexWay" value="exchange"><span class="rb"></span>교환</label>
+          </div>
+        </div>
+        <div class="od-btns">
+          <button type="button" class="b fill" id="rexNext">다음</button>
+        </div>
+      </section>
+
+      <!-- ── 반품/교환 요청 · 2단계 (반품) ── -->
+      <section class="screen" data-screen="req-rex-return">
+        <div class="od-head req">
+          <p class="h">반품/교환 요청</p>
+        </div>
+        <div class="od-sec">
+          <div class="od-list" data-list="3"></div>
+        </div>
+        <div class="od-sec">
+          <p class="t"><span>반품 사유</span></p>
+          <div class="od-reason">
+            <p>단순 변심</p>
+            <p>{{반품/교환 사유 자세한 내용 입력 시 노출됩니다.}}</p>
+          </div>
+        </div>
+      <div class="od-sec">
+        <p class="t"><span>수거지 정보</span><button type="button" class="u-btn">변경</button></p>
+        <div class="od-addr">
+          <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <p class="info"><span>이강인</span><span class="div"></span><span class="en">010-1234-1234</span></p>
+          <p class="req"><span class="k">수거 요청사항</span><span>경비실에 맡겨주세요.</span></p>
+        </div>
+      </div>
+        <div class="od-sec is-last no-line">
+          <p class="t"><span>환불 정보</span></p>
+        <div class="od-pay refund">
+          <div class="top">
+            <p class="r"><span class="k">상품 금액</span><span class="v"><span class="en">124,000</span>원</span></p>
+            <p class="r"><span class="k">쿠폰 할인</span><span class="v"><span class="en">-7,500</span>원</span></p>
+            <p class="r"><span class="k">반품 수거비</span><span class="v"><span class="en">-3,500</span>원</span></p>
+          </div>
+          <div class="bottom">
+            <div class="rgroup">
+              <p class="r total"><span class="k">예상 환불 금액</span><span class="v"><span class="en">113,000</span>원</span></p>
+              <p class="note">최종 환불 금액은 반품절차를 진행한 후 확정됩니다</p>
+            </div>
+            <p class="r"><span class="k">환불 수단</span><span class="v">신용카드 (국민 1234)</span></p>
+            <p class="r"><span class="k">환불 상태</span><span class="v">환불 미승인</span></p>
+          </div>
+        </div>
+        </div>
+        <div class="od-btns">
+          <button type="button" class="b fill" data-go="od-return">반품 요청</button>
+        </div>
+      </section>
+
+      <!-- ── 반품/교환 요청 · 2단계 (교환) ── -->
+      <section class="screen" data-screen="req-rex-exchange">
+        <div class="od-head req">
+          <p class="h">반품/교환 요청</p>
+        </div>
+        <div class="od-sec">
+          <div class="od-list" data-list="3"></div>
+        </div>
+        <div class="od-sec">
+          <p class="t"><span>교환 사유</span></p>
+          <div class="od-reason">
+            <p>상품 오배송</p>
+            <p>{{반품/교환 사유 자세한 내용 입력 시 노출됩니다.}}</p>
+          </div>
+        </div>
+      <div class="od-sec">
+        <p class="t"><span>수거지 정보</span><button type="button" class="u-btn">변경</button></p>
+        <div class="od-addr">
+          <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <p class="info"><span>이강인</span><span class="div"></span><span class="en">010-1234-1234</span></p>
+          <p class="req"><span class="k">수거 요청사항</span><span>경비실에 맡겨주세요.</span></p>
+        </div>
+      </div>
+      <div class="od-sec">
+        <p class="t"><span>배송지 정보</span><button type="button" class="u-btn">변경</button></p>
+        <div class="od-addr">
+          <p>[12345] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <p class="info"><span>이강인</span><span class="div"></span><span class="en">010-1234-1234</span></p>
+          <p class="req"><span class="k">배송 요청사항</span><span>경비실에 맡겨주세요.</span></p>
+        </div>
+      </div>
+        <div class="od-btns">
+          <button type="button" class="b fill" data-go="od-exchange">교환 요청</button>
+        </div>
+      </section>
+
       <!-- ── 프로필 ── -->
       <section class="screen" data-screen="profile">
         <div class="p-sec">
@@ -1157,6 +1707,22 @@
     <button type="button" data-go="profile">프로필</button>
   </div>
 
+  <strong>order detail</strong>
+  <div class="demo-seg" id="odToggle">
+    <button type="button" data-go="od-default">기본</button>
+    <button type="button" data-go="od-cancel">취소</button>
+    <button type="button" data-go="od-return">반품</button>
+    <button type="button" data-go="od-exchange">교환</button>
+  </div>
+
+  <strong>claim</strong>
+  <div class="demo-seg" id="reqToggle">
+    <button type="button" data-go="req-cancel">취소 요청</button>
+    <button type="button" data-go="req-rex1">반품/교환 1</button>
+    <button type="button" data-go="req-rex-return">2 · 반품</button>
+    <button type="button" data-go="req-rex-exchange">2 · 교환</button>
+  </div>
+
   <strong>state</strong>
   <div class="demo-seg" id="emptyToggle">
     <button type="button" data-empty="off">목록</button>
@@ -1276,7 +1842,7 @@
     <div class="coupon">
       <div class="summary">
         <p class="name">${n}</p>
-        <p class="benefit"><span>${v} 할인</span>${off ? `<span class="off">${off}원</span>` : ''}</p>
+        <p class="benefit"><span>${v} 할인</span></p>
       </div>
       <div class="cinfo">
         <p>${cond}</p>
@@ -1323,16 +1889,75 @@
     </div>`).join('');
 
   /* ── 화면 전환 ─────────────────────────────────────────────── */
+  /* ── 주문 상세 · 신청 플로우 ───────────────────────────────
+     productList/default(+checkbox) 를 data-list 개수만큼 렌더.
+     data-state 가 있으면 상단 상태 라벨이 붙는다(시안 orderState=on). */
+  const OD_PRICES = [40000, 38000, 42000, 22000, 26000];
+  const OPTIONS = ['250ml / 오렌지 / 텀블러', '500ml / 레몬 / 보틀', '250ml x 6 / 자몽 / 아이스팩'];
+  function odItem(i, state, check) {
+    const opt = OPTIONS[i % OPTIONS.length].split(' / ')
+      .map(v => `<span>${v}</span>`).join('<span>/</span>');
+    return `
+      <div class="od-item${check ? ' check' : ''}">
+        ${state ? `<p class="state">${state}</p>` : ''}
+        <div class="row">
+          <div class="thumb"><img src="${img(i)}" alt="">${check ? '<span class="cb od-cb"></span>' : ''}</div>
+          <div class="txt">
+            <p class="name">${NAMES[i % NAMES.length]}</p>
+            <p class="opt">
+              <span class="o">${opt}</span>
+              <span class="div"></span>
+              <span class="q"><span class="en">${(i % 3) + 1}</span>개</span>
+            </p>
+            <p class="price"><span class="en">${won(OD_PRICES[i % OD_PRICES.length])}</span>원</p>
+            ${check ? `<div class="num">
+              <button type="button" aria-label="수량 감소">–</button>
+              <span class="v">1</span>
+              <button type="button" aria-label="수량 증가">+</button>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+  $$('.od-list').forEach(el => {
+    const n = +el.dataset.list || 3;
+    el.classList.toggle('has-state', !!el.dataset.state);
+    el.innerHTML = Array.from({ length: n }, (_, i) =>
+      odItem(i, el.dataset.state, el.dataset.check === '1')).join('');
+  });
+
+  /* 상세는 주문내역 탭 아래, 신청 플로우는 셸 없이 본문만 */
+  const OD_SCREENS = ['od-default', 'od-cancel', 'od-return', 'od-exchange'];
+  const REQ_SCREENS = ['req-cancel', 'req-rex1', 'req-rex-return', 'req-rex-exchange'];
+
   function show(name) {
     const next = $(`.screen[data-screen="${name}"]`);
     if (!next) return;
+    const isReq = REQ_SCREENS.includes(name);
+    const isOd  = OD_SCREENS.includes(name);
+    document.body.dataset.shell = isReq ? 'plain' : 'full';
     $$('.screen').forEach(s => s.classList.toggle('is-on', s === next));
-    $$('#tabs button').forEach(b => b.classList.toggle('is-on', b.dataset.go === name));
+    /* 주문 상세는 주문내역 탭을 활성 상태로 유지 */
+    const tabName = isOd ? 'orders' : name;
+    $$('#tabs button').forEach(b => b.classList.toggle('is-on', b.dataset.go === tabName));
     $$('#screenToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.go === name));
+    $$('#odToggle button, #reqToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.go === name));
     scrollTo(0, 0);
     store(SC_KEY, name);
     readout();
   }
+
+  /* 1단계 '다음' — 선택한 해결방법에 따라 2단계로 */
+  $('#rexNext').addEventListener('click', () => {
+    const way = $('input[name="rexWay"]:checked')?.value || 'return';
+    show(way === 'exchange' ? 'req-rex-exchange' : 'req-rex-return');
+  });
+
+  /* 주문내역 항목 클릭 → 주문 상세 */
+  $('#orderHistory')?.addEventListener('click', e => {
+    if (e.target.closest('button')) return;
+    if (e.target.closest('.oh-item')) show('od-default');
+  });
   document.addEventListener('click', e => {
     const go = e.target.closest('[data-go]');
     if (go && !go.disabled) { show(go.dataset.go); return; }
