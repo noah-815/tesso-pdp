@@ -729,10 +729,9 @@
     color: #6a6a6a;
   }
   /* annotation : 가격 너비 min width = 7ch (1ch = 해당 폰트 숫자 '0'의 폭)
-     — 7ch 를 넘으면 hug. ch 가 숫자 폰트 기준으로 풀려야 하므로 DM Sans 를 건다. */
+     — 7ch 를 넘으면 hug. --font 스택이 DM Sans 우선이라 숫자는 DM Sans 로 잡힌다. */
   .option-list button .extra .num {
     min-width: 7ch;
-    font-family: var(--font-en);
     font-variation-settings: "opsz" 14;
     text-align: right;
   }
@@ -924,7 +923,13 @@
     line-height: 1.5;
   }
   .section-head .rating-area { flex-shrink: 0; display: flex; align-items: center; gap: var(--mid-6); }
-  .section-head .rating-area .score { font-size: var(--fs-p1); line-height: 1.5; }
+  /* score — 시안 EN/body/P1 (semibold) : DM Sans SemiBold 600 */
+  .section-head .rating-area .score {
+    font-variation-settings: "opsz" 14;
+    font-weight: 600;
+    font-size: var(--fs-p1);
+    line-height: 1.5;
+  }
 
   /* rating 높이 2안 (데모 토글)
      px : 시안 그대로 20px 고정
