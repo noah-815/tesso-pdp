@@ -933,13 +933,15 @@
 
   /* rating 높이 2안 (데모 토글)
      px : 시안 그대로 20px 고정
-     em : @em base = 바로 옆 점수 텍스트(score, P1) → 20 / 18 = 1.1111em
-          점수 폰트를 키우면 별도 같이 커진다 */
+     em : @em base = 바로 옆 점수 텍스트(score, P1)
+          1920 에서 P1 은 (18/14 − 1) × 0.83vw + 1rem = 18.5529px 로 풀리므로
+          시안 20px 이 그대로 나오려면 20 / 18.5529 = 1.078em
+          (점수 폰트를 키우면 별이 같이 커진다) */
   .rating { display: flex; align-items: center; }
   .rating img { width: var(--rating-size, 20px); height: var(--rating-size, 20px); }
   body[data-rating="em"] .rating-area .rating {
     font-size: var(--fs-p1);
-    --rating-size: 1.1111em;
+    --rating-size: 1.078em;
   }
 
   .filter-bar {
