@@ -577,26 +577,36 @@
   }
 
   /* ── tab/productDetail (템플릿 B 하단 탭바) ──────────────────── */
+  /* tabs/productDetail (8394:59332 — 수정본)
+     · 12컬럼 그리드 위에 얹히고 content 는 4컬럼부터 6칸
+     · content 좌우 padding = mid-40, 탭 4개가 flex:1 로 균등 분할
+     · 선택 표시는 밑줄이 아니라 medium + opacity 1 (미선택 regular 0.4)
+     · 시안엔 상단 구분선 없음 — 배경만 흰색(sticky 겹침 대비)          */
   .tab-bar {
     position: sticky;
     bottom: 0;
     z-index: 150;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--mid-100);           /* 시안 tab/productDetail — gap mid-100 */
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
     padding: 0 var(--grid-margin);
-    border-top: 1px solid var(--c-line-soft);
     background: #fff;
   }
-  /* productDetailTabItem — 어노테이션 없음 → 시안 px 그대로.
-     높이는 hug (폰트가 커지면 같이 커짐) */
-  .tab-bar button {
+  .tab-bar .tabs-content {
+    grid-column: 4 / span 6;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-top: 17px;
-    padding-bottom: 16px;
+    padding: 0 var(--mid-40);
+  }
+  /* productDetailTabItem — 상하 padding 만 mid-12 바인딩, labelArea 는 시안 px */
+  .tab-bar button {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--mid-12) 0;
     font-size: var(--fs-p3);       /* 14px — 고정 (시안 paragraph-3) */
     line-height: 1.6;
     color: var(--c-text);
@@ -606,11 +616,9 @@
     align-items: center;
     justify-content: center;
     padding: 4px 10px;
-    border-bottom: 2px solid transparent;
   }
   .tab-bar button:not(.is-active) { opacity: 0.4; }
   .tab-bar button.is-active { font-weight: 500; }
-  .tab-bar button.is-active .txt { border-bottom-color: var(--c-text); }
 
   /* ── 하위 섹션 자리 (다음 단계에서 구현) ─────────────────────── */
   .section-stub {
@@ -1941,11 +1949,13 @@
   </div>
 </div>
 
-<nav class="tab-bar">
-  <button type="button" class="is-active"><span class="txt">상품 정보</span></button>
-  <button type="button"><span class="txt">리뷰</span></button>
-  <button type="button"><span class="txt">상품 문의</span></button>
-  <button type="button"><span class="txt">주문 정보</span></button>
+<nav class="tab-bar" id="tabBar">
+  <div class="tabs-content">
+    <button type="button" class="is-active" data-target="productDetail"><span class="txt">상품 설명</span></button>
+    <button type="button" data-target="review"><span class="txt">상품 리뷰</span></button>
+    <button type="button" data-target="inquiry"><span class="txt">상품 문의</span></button>
+    <button type="button" data-target="orderInfo"><span class="txt">주문 정보</span></button>
+  </div>
 </nav>
 
 <!-- 데모 컨트롤 — 시안에 없는 요소 -->
@@ -2112,6 +2122,28 @@
     try { localStorage.setItem(PW_KEY, JSON.stringify(st)); } catch (e) {}
     readout();
   }
+
+  /* ── tabs/productDetail — 클릭 시 활성 전환 + 섹션 이동 ──────
+     scroll-behavior / behavior:'smooth' 는 환경에 따라 무시되므로
+     rAF 로 직접 트위닝한다 (300ms ease-out).                        */
+  function smoothScrollTo(top, dur = 300) {
+    const from = scrollY, delta = top - from, t0 = performance.now();
+    if (Math.abs(delta) < 1) return;
+    (function step(t) {
+      const p = Math.min(1, (t - t0) / dur);
+      scrollTo(0, from + delta * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+  $('#tabBar').addEventListener('click', e => {
+    const b = e.target.closest('button[data-target]');
+    if (!b) return;
+    $$('#tabBar button').forEach(x => x.classList.toggle('is-active', x === b));
+    const sec = document.getElementById(b.dataset.target);
+    if (!sec) return;
+    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 0;
+    smoothScrollTo(sec.getBoundingClientRect().top + scrollY - headerH);
+  });
 
   /* ── productImageCarousel — 레일 인터랙션 ─────────────────────
      루프 없음 + 선택 섬네일 중앙 정렬 (framework-e-pdp/carousel 과 동일)
