@@ -46,7 +46,7 @@
     /* ── Typography ───────────────────────────────────────────── */
     --fs-c1:    12px;   /* caption-1           0.857rem → 고정 */
     --fs-p4:    13px;   /* paragraph-4         0.929rem → 고정 */
-    --fs-p2:    16px;   /* paragraph-2         1.1429rem → 가변 (이 화면 미사용) */
+    --fs-p2:    calc((1.1429 - 1) * 0.83vw + 1rem);   /* paragraph-2 16px @1920 — 가변 */
     --fs-p3:    14px;   /* paragraph-3         1rem     → 고정 */
     --fs-btn-s: 13px;   /* button-label-small  0.929rem → 고정 */
     --fs-btn-m: 13px;   /* button-label-medium 0.929rem → 고정 */
@@ -110,6 +110,16 @@
     --radius-2xs: 3px;
     --radius-xs:  4px;
     --radius-sm:  6px;
+
+    /* dialog/confirm — 너비 · 내부 여백 · 타이틀/디스크립션 폰트 (데모 전환) */
+    --cf-w-fixed: 400px;
+    --cf-w-fluid: 20.8333vw;               /* 400 / 1920 → 1920 에서 400px */
+    --cf-w: var(--cf-w-fixed);
+    --cf-32: 32px;                         /* 기본 = 시안(px 토큰, 고정) */
+    --cf-24: 24px;
+    --cf-20: 20px;
+    --cf-fs-title: var(--fs-p2);
+    --cf-fs-desc:  var(--fs-p4);
     --radius-md:  8px;
 
     /* ── Font / Color ─────────────────────────────────────────── */
@@ -138,6 +148,24 @@
     --carousel-gap-y: var(--mid-16);
     --header-h: 54px;
   }
+
+  /* confirm 다이얼로그 3안 — 내부 여백만 mid 로 바꾸고, vw 안은 너비까지 */
+  body[data-cfbox="fixed-mid"],
+  body[data-cfbox="fluid-mid"] {
+    --cf-32: var(--mid-32);
+    --cf-24: var(--mid-24);
+    --cf-20: var(--mid-20);
+  }
+  body[data-cfbox="fluid-mid"] { --cf-w: var(--cf-w-fluid); }
+  /* 타이틀 · 디스크립션 사이즈 전환 */
+  body[data-cftitle="p1"] { --cf-fs-title: var(--fs-p1); }
+  body[data-cftitle="p2"] { --cf-fs-title: var(--fs-p2); }
+  body[data-cftitle="p3"] { --cf-fs-title: var(--fs-p3); }
+  body[data-cftitle="p4"] { --cf-fs-title: var(--fs-p4); }
+  body[data-cfdesc="p1"]  { --cf-fs-desc:  var(--fs-p1); }
+  body[data-cfdesc="p2"]  { --cf-fs-desc:  var(--fs-p2); }
+  body[data-cfdesc="p3"]  { --cf-fs-desc:  var(--fs-p3); }
+  body[data-cfdesc="p4"]  { --cf-fs-desc:  var(--fs-p4); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; font-size: 14px; }   /* 1rem = 14px */
@@ -1297,6 +1325,86 @@
   .order-info .oi-img img { width: 100%; height: 100%; object-fit: cover; }
 
   /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  /* ── dialog/confirm (바로 구매하기) — Figma 8406:109893 ───────
+     시안 : width 400 고정 · gap px-32 · padding px-32 / px-20 / px-24
+            (내부 여백이 px 토큰이라 뷰포트와 무관하게 고정)
+     데모 3안
+       400 + px  : 시안 그대로 — 기본
+       400 + mid : 너비 400 고정 + 내부 여백만 mid-* (가변)
+       vw  + mid : 너비 20.8333vw (400/1920) + 내부 여백 mid-*        */
+  .cf-dim {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(0, 0, 0, .5);
+    display: none;                 /* 전환 효과 없이 즉시 노출 */
+  }
+  .cf-dim.is-open { display: block; }
+
+  .cf-dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 601;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cf-32);
+    width: var(--cf-w);
+    max-width: calc(100% - 40px);
+    padding: var(--cf-32) var(--cf-20) var(--cf-24);
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: #fff;
+    transform: translate(-50%, -50%);
+    display: none;
+  }
+  .cf-dialog.is-open { display: flex; }
+
+  .cf-dialog .cf-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-8);
+    width: 100%;
+    padding: 0 var(--mid-4);
+    text-align: center;
+  }
+  .cf-dialog .cf-text .t {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--cf-fs-title);   /* 시안 P2 */
+    line-height: 1.5;
+  }
+  .cf-dialog .cf-text .d {
+    width: 100%;
+    font-size: var(--cf-fs-desc);    /* 시안 P4 */
+    line-height: 1.6;
+    color: var(--c-sub);
+  }
+  .cf-dialog .cf-buttons { display: flex; align-items: center; gap: var(--mid-8); width: 100%; }
+  .cf-dialog .cf-btn {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    /* padding = em (@em base : button-label-medium 13px) — 시안 14 / 16px */
+    padding: 1.0769em 1.2308em;
+    border-radius: var(--radius-xs);
+    box-shadow: inset 0 0 0 1px #111;
+    font-weight: 500;
+    font-size: var(--fs-btn-m);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .cf-dialog .cf-btn.primary { background: #111; color: #fff; box-shadow: none; }
+
+  body.is-cf-open { overflow: hidden; }
+  body.is-cf-open #demoNav { display: none; }
+  #cfNav { display: none; }
+  body.is-cf-open #cfNav { display: grid; z-index: 700; }
+
   /* ── dialog/inquiry (상품 문의) — Figma 10131:113377 ──────────
      PDP 위에 dim + 중앙 다이얼로그. 클래스는 PDP 와 겹치지 않게 inq- 접두. */
   .inq-dim {
@@ -1624,7 +1732,7 @@
             </div>
             <div class="button-group">
               <button type="button" class="btn outlined">장바구니 담기</button>
-              <button type="button" class="btn filled">바로 구매하기</button>
+              <button type="button" class="btn filled" id="buyNow">바로 구매하기</button>
             </div>
           </div>
         </div>
@@ -2019,6 +2127,46 @@
 
 <!-- 데모 컨트롤 — 시안에 없는 요소 -->
 <!-- dialog/inquiry — 상품 문의 (Figma 10131:113377) -->
+<!-- dialog/confirm — 바로 구매하기 (Figma 8406:109893) -->
+<div class="cf-dim" id="cfDim"></div>
+<div class="cf-dialog" id="cfDialog" role="alertdialog" aria-modal="true" aria-labelledby="cfTitle" aria-describedby="cfDesc">
+  <div class="cf-text">
+    <p class="t" id="cfTitle">로그인이 필요해요</p>
+    <p class="d" id="cfDesc">로그인 페이지로 이동할까요?</p>
+  </div>
+  <div class="cf-buttons">
+    <button type="button" class="cf-btn" id="cfCancel">취소</button>
+    <button type="button" class="cf-btn primary">로그인</button>
+  </div>
+</div>
+
+<nav class="demo-nav" id="cfNav">
+  <strong>dialog</strong>
+  <div class="demo-seg" id="cfBoxToggle">
+    <button type="button" data-cfbox="fixed-px">400 + px</button>
+    <button type="button" data-cfbox="fixed-mid">400 + mid</button>
+    <button type="button" data-cfbox="fluid-mid">vw + mid</button>
+  </div>
+
+  <strong>title</strong>
+  <div class="demo-seg" id="cfTitleToggle">
+    <button type="button" data-cftitle="p1">P1</button>
+    <button type="button" data-cftitle="p2">P2</button>
+    <button type="button" data-cftitle="p3">P3</button>
+    <button type="button" data-cftitle="p4">P4</button>
+  </div>
+
+  <strong>desc</strong>
+  <div class="demo-seg" id="cfDescToggle">
+    <button type="button" data-cfdesc="p1">P1</button>
+    <button type="button" data-cfdesc="p2">P2</button>
+    <button type="button" data-cfdesc="p3">P3</button>
+    <button type="button" data-cfdesc="p4">P4</button>
+  </div>
+
+  <p class="demo-readout" id="cfReadout">–</p>
+</nav>
+
 <div class="inq-dim" id="inqDim"></div>
 <div class="inq-dialog" id="inqDialog" role="dialog" aria-modal="true" aria-labelledby="inqTitle">
   <div class="inq-head">
@@ -2601,6 +2749,75 @@
     }
   } catch (e) {}
   applyPw();
+
+  /* ── 바로 구매하기 confirm 다이얼로그 ─────────────────────── */
+  const CF_BOX_KEY = 'fw-e-pdp-cfbox';
+  const CF_T_KEY   = 'fw-e-pdp-cftitle';
+  const CF_D_KEY   = 'fw-e-pdp-cfdesc';
+  const DESIGN_FS  = { p1: 18, p2: 16, p3: 14, p4: 13 };   /* @1920 */
+  const FIXED_FS   = { p3: true, p4: true };               /* ≤ 1rem → 고정 */
+  const cfDialog = $('#cfDialog'), cfDim = $('#cfDim');
+
+  function cfReadout() {
+    if (!document.body.classList.contains('is-cf-open')) return;
+    const cs = getComputedStyle(cfDialog);
+    const t = document.body.dataset.cftitle, d = document.body.dataset.cfdesc;
+    const tp = parseFloat(getComputedStyle($('#cfTitle')).fontSize);
+    const dp = parseFloat(getComputedStyle($('#cfDesc')).fontSize);
+    const note = document.body.dataset.cfbox === 'fluid-mid' ? ' (20.8333vw)' : '';
+    $('#cfReadout').innerHTML =
+      `viewport <b>${innerWidth}px</b> · 다이얼로그 <b>${cfDialog.getBoundingClientRect().width.toFixed(2)}px</b>${note} · ` +
+      `높이 <b>${cfDialog.getBoundingClientRect().height.toFixed(2)}</b><br>` +
+      `여백 상 <b>${parseFloat(cs.paddingTop).toFixed(2)}</b> / 좌우 <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / ` +
+      `하 <b>${parseFloat(cs.paddingBottom).toFixed(2)}</b> · gap <b>${parseFloat(cs.rowGap).toFixed(2)}</b><br>` +
+      `title <b>${t.toUpperCase()}</b> ${DESIGN_FS[t]}px@1920${FIXED_FS[t] ? '(고정)' : ''} → <b>${tp.toFixed(2)}</b> · ` +
+      `desc <b>${d.toUpperCase()}</b> ${DESIGN_FS[d]}px@1920${FIXED_FS[d] ? '(고정)' : ''} → <b>${dp.toFixed(2)}</b>`;
+  }
+  function setCfBox(mode) {
+    document.body.dataset.cfbox = mode;
+    $$('#cfBoxToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cfbox === mode));
+    store(CF_BOX_KEY, mode); cfReadout();
+  }
+  function setCfTitle(size) {
+    document.body.dataset.cftitle = size;
+    $$('#cfTitleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cftitle === size));
+    store(CF_T_KEY, size); cfReadout();
+  }
+  function setCfDesc(size) {
+    document.body.dataset.cfdesc = size;
+    $$('#cfDescToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cfdesc === size));
+    store(CF_D_KEY, size); cfReadout();
+  }
+  function openCf() {
+    document.body.classList.add('is-cf-open');
+    cfDim.classList.add('is-open');
+    cfDialog.classList.add('is-open');
+    cfReadout();
+  }
+  function closeCf() {
+    document.body.classList.remove('is-cf-open');
+    cfDim.classList.remove('is-open');
+    cfDialog.classList.remove('is-open');
+  }
+  $('#buyNow').addEventListener('click', openCf);
+  $('#cfCancel').addEventListener('click', closeCf);
+  cfDim.addEventListener('click', closeCf);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.body.classList.contains('is-cf-open')) closeCf();
+  });
+  $('#cfBoxToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cfbox]'); if (b) setCfBox(b.dataset.cfbox);
+  });
+  $('#cfTitleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cftitle]'); if (b) setCfTitle(b.dataset.cftitle);
+  });
+  $('#cfDescToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cfdesc]'); if (b) setCfDesc(b.dataset.cfdesc);
+  });
+  setCfBox(load(CF_BOX_KEY, 'fixed-px'));
+  setCfTitle(load(CF_T_KEY, 'p2'));
+  setCfDesc(load(CF_D_KEY, 'p4'));
+  window.addEventListener('resize', cfReadout);
 
   /* ── 상품 문의 다이얼로그 ─────────────────────────────────── */
   const INQ_KEY = 'fw-e-pdp-inqbox';
