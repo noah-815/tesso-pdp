@@ -266,16 +266,25 @@
   /* 썸네일 열은 in-flow 콘텐츠가 없어 행 높이를 밀지 않는다
      → 행 높이는 메인 이미지(aspect-ratio 1:1)가 결정하고 열은 거기에 stretch */
   .carousel .thumb-col { grid-column: 1; position: relative; }
+  /* 레일 — 네이티브 스크롤 대신 transform 트랙 (휠/드래그 자유 탐색,
+     양 끝 클램프, 선택 시 0.3s 로 중앙 정렬) */
   .carousel .thumb-list {
     position: absolute;
     inset: 0;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .carousel .thumb-track {
     display: flex;
     flex-direction: column;
-    gap: var(--carousel-gap-y);        /* 썸네일 사이 row gap */
-    overflow-y: auto;
-    scrollbar-width: none;
+    gap: var(--carousel-gap-y);        /* 썸네일 사이 row gap = STEP 기준 */
+    will-change: transform;
   }
-  .carousel .thumb-list::-webkit-scrollbar { display: none; }
+  .carousel .thumb-track.is-animating {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
   .carousel .thumb-list .thumb {
     flex-shrink: 0;
     width: 100%;
@@ -283,10 +292,15 @@
     border-radius: var(--radius-sm);
     overflow: hidden;
     cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
   }
-  .carousel .thumb-list .thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .carousel .thumb-list .thumb:not(.is-active) { opacity: 0.4; }
-  .carousel .thumb-list .thumb.is-empty { background: #ddd; opacity: 0.6; }
+  .carousel .thumb-list .thumb img {
+    width: 100%; height: 100%; object-fit: cover;
+    pointer-events: none;
+  }
+  .carousel .thumb-list .thumb.is-active { opacity: 1; }
+  .carousel .thumb-list .thumb.is-empty { background: #ddd; opacity: 0.6; cursor: default; }
   /* 위/아래에 이미지가 더 있을 때만 해당 그라디언트 노출 */
   .carousel .gradient {
     position: absolute;
@@ -294,15 +308,13 @@
     right: 0;
     height: 120px;                 /* 토큰 없음 → px */
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
+    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.3s ease;
   }
   .carousel .gradient.top    { top: 0;    background: linear-gradient(to top,    rgba(255,255,255,0) 0%, #fff 80%); }
   .carousel .gradient.bottom { bottom: 0; background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, #fff 80%); }
-  .carousel .thumb-col.at-top .gradient.bottom,
-  .carousel .thumb-col.at-bottom .gradient.top,
-  .carousel .thumb-col.scrolling .gradient { opacity: 1; }
-  .carousel .thumb-col.at-top .gradient.top,
+  .carousel .thumb-col.at-top .gradient.top { opacity: 0; }
   .carousel .thumb-col.at-bottom .gradient.bottom { opacity: 0; }
   .carousel .main {
     grid-column: 2 / span 5;       /* 5컬럼 + 4거터 = 774.83 @1920 */
@@ -312,7 +324,11 @@
     border-radius: var(--radius-md);
     overflow: hidden;
   }
-  .carousel .main img { width: 100%; height: 100%; object-fit: cover; }
+  .carousel .main img {
+    width: 100%; height: 100%; object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+  }
 
   /* 데모 — 카테고리 노출 여부 */
   body[data-category="off"] .category { display: none; }
@@ -1487,12 +1503,14 @@
     <div class="carousel">
       <div class="thumb-col at-top" id="thumbCol">
       <div class="thumb-list" id="thumbList">
-        <button type="button" class="thumb is-active" data-src="assets/product-1.png"><img src="assets/product-1.png" alt=""></button>
-        <button type="button" class="thumb" data-src="assets/product-2.png"><img src="assets/product-2.png" alt=""></button>
-        <button type="button" class="thumb" data-src="assets/product-3.png"><img src="assets/product-3.png" alt=""></button>
-        <button type="button" class="thumb" data-src="assets/product-1.png"><img src="assets/product-1.png" alt=""></button>
-        <button type="button" class="thumb" data-src="assets/product-4.png"><img src="assets/product-4.png" alt=""></button>
-        <div class="thumb is-empty"></div>
+        <div class="thumb-track" id="thumbTrack">
+          <button type="button" class="thumb is-active" data-src="assets/product-1.png"><img src="assets/product-1.png" alt=""></button>
+          <button type="button" class="thumb" data-src="assets/product-2.png"><img src="assets/product-2.png" alt=""></button>
+          <button type="button" class="thumb" data-src="assets/product-3.png"><img src="assets/product-3.png" alt=""></button>
+          <button type="button" class="thumb" data-src="assets/product-1.png"><img src="assets/product-1.png" alt=""></button>
+          <button type="button" class="thumb" data-src="assets/product-4.png"><img src="assets/product-4.png" alt=""></button>
+          <div class="thumb is-empty"></div>
+        </div>
       </div>
       <div class="gradient top"></div>
       <div class="gradient bottom"></div>
@@ -2037,16 +2055,6 @@
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
 
-  /* 캐러셀 — 썸네일 클릭 시 메인 이미지 교체 (전환 효과 없이 즉시) */
-  $('#thumbList').addEventListener('click', e => {
-    const t = e.target.closest('.thumb[data-src]');
-    if (!t) return;
-    $$('#thumbList .thumb').forEach(b => b.classList.remove('is-active'));
-    t.classList.add('is-active');
-    $('#mainImage').src = t.dataset.src;
-    t.scrollIntoView({ block: 'nearest' });
-  });
-
   $('#moreBtn').addEventListener('click', () => {
     $('#productDetail').classList.add('is-expanded');
   });
@@ -2105,18 +2113,77 @@
     readout();
   }
 
-  /* 썸네일 리스트 — 위/아래 남은 이미지에 따라 그라디언트 노출 */
-  const thumbList = $('#thumbList'), thumbCol = $('#thumbCol');
-  function syncThumbGradient() {
-    const atTop = thumbList.scrollTop <= 1;
-    const atBottom = thumbList.scrollTop + thumbList.clientHeight >= thumbList.scrollHeight - 1;
-    thumbCol.classList.toggle('at-top', atTop && !atBottom);
-    thumbCol.classList.toggle('at-bottom', atBottom && !atTop);
-    thumbCol.classList.toggle('scrolling', !atTop && !atBottom);
+  /* ── productImageCarousel — 레일 인터랙션 ─────────────────────
+     루프 없음 + 선택 섬네일 중앙 정렬 (framework-e-pdp/carousel 과 동일)
+     · 레일 : 휠 스크롤 / 세로 드래그로 자유 탐색, 양 끝 클램프
+     · 선택 : 섬네일 클릭 → 메인 이미지 즉시 교체 + 0.3s 중앙 정렬
+     · 메인 : 전환 효과 없음, 가로 스와이프 페이징 미제공          */
+  const rail = $('#thumbList'), track = $('#thumbTrack'), thumbCol = $('#thumbCol');
+  const thumbs = $$('#thumbTrack .thumb');
+  const N = thumbs.length;                 /* 빈 칸 포함 — 레일 길이 기준 */
+  let current = 0, scroll = 0;
+  let SLIDE = 0, GAP = 0, STEP = 0, railH = 0, maxScroll = 0;
+
+  function measure() {
+    SLIDE = thumbs[0].getBoundingClientRect().height;   /* 정수 반올림 회피 */
+    GAP   = parseFloat(getComputedStyle(track).rowGap) || 0;
+    STEP  = SLIDE + GAP;
+    railH = rail.getBoundingClientRect().height;
+    maxScroll = Math.max(0, STEP * N - GAP - railH);
   }
-  thumbList.addEventListener('scroll', syncThumbGradient);
-  window.addEventListener('resize', syncThumbGradient);
-  syncThumbGradient();
+  const clampScroll = v => Math.min(maxScroll, Math.max(0, v));
+  /* 선택 섬네일이 레일 중앙에 오는 오프셋 (양 끝에서는 경계에 맞춰 멈춤) */
+  const centerOffset = i => clampScroll(i * STEP - (railH - SLIDE) / 2);
+
+  function setScroll(px, animate) {
+    scroll = px;
+    track.classList.toggle('is-animating', !!animate);
+    track.style.transform = `translate3d(0, ${-scroll}px, 0)`;
+    thumbCol.classList.toggle('at-top', scroll <= 2);
+    thumbCol.classList.toggle('at-bottom', scroll >= maxScroll - 2);
+  }
+
+  function selectThumb(i) {
+    i = Math.min(N - 1, Math.max(0, i));
+    if (i === current || !thumbs[i].dataset.src) return;
+    $('#mainImage').src = thumbs[i].dataset.src;     /* 전환 효과 없이 즉시 */
+    current = i;
+    thumbs.forEach((t, v) => t.classList.toggle('is-active', v === current));
+    setScroll(centerOffset(current), true);
+  }
+
+  /* 클릭 + 세로 드래그 — 5px 이상 움직이면 드래그로 간주해 선택하지 않는다 */
+  let drag = null;
+  rail.addEventListener('pointerdown', e => {
+    /* pointer capture 이후에는 e.target 이 rail 로 고정되므로 미리 기억 */
+    drag = { y: e.clientY, from: scroll, moved: false, pressed: e.target.closest('.thumb') };
+    rail.setPointerCapture(e.pointerId);
+  });
+  rail.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dy = e.clientY - drag.y;
+    if (Math.abs(dy) > 5) drag.moved = true;
+    if (drag.moved) setScroll(clampScroll(drag.from - dy), false);
+  });
+  rail.addEventListener('pointerup', () => {
+    if (!drag) return;
+    if (!drag.moved && drag.pressed) selectThumb(thumbs.indexOf(drag.pressed));
+    drag = null;
+  });
+  rail.addEventListener('pointercancel', () => { drag = null; });
+
+  /* 휠 — 레일 위에서는 페이지 대신 섬네일 목록을 스크롤(선택은 바뀌지 않음) */
+  rail.addEventListener('wheel', e => {
+    e.preventDefault();
+    setScroll(clampScroll(scroll + e.deltaY), false);
+  }, { passive: false });
+
+  window.addEventListener('resize', () => {
+    measure();
+    setScroll(centerOffset(current), false);
+  });
+  measure();
+  setScroll(0, false);
 
   /* ── 옵션 선택 · 추가 ────────────────────────────────────────
      용량 → 맛 → 추가옵션 순으로 활성화되고, 세 값이 모두 정해지면
