@@ -1008,9 +1008,10 @@
     z-index: 401;
     display: flex;
     flex-direction: column;
-    /* note — 전체 시트 max height 는 85dvh
-       (브라우저창·status bar 제외한 영역 높이의 85%) */
-    max-height: 85dvh;
+    /* note — 전체 시트 높이는 hug 가 아니라 85dvh 고정
+       (브라우저창·status bar 제외한 영역 높이의 85%)
+       타이틀·버튼 영역은 고정, 가운데 콘텐츠만 스크롤한다 */
+    height: 85dvh;
     background: #fff;
     transform: translateY(100%);
     transition: transform 0.25s ease;
@@ -1907,10 +1908,9 @@
      · 드래그 1회 = 최대 1장 · 루프 없음 · 끝단 러버밴딩 없음
      · 수평/수직 방향 잠금 — 세로 스크롤은 브라우저에 양보
      · dot 4슬롯 창 + 트랙 슬라이딩 (창 밖은 축소·페이드)                */
-  const FILES = [
-    'product-1.png', 'product-2.png', 'product-3.png', 'product-4.png',
-    'product-1.png', 'product-2.png', 'product-3.png', 'product-4.png',
-  ];
+  /* 레퍼런스(framework-e-pdp/mobile)와 동일하게 15장 구성 —
+     보유 이미지 4종을 순환해 채운다. 도트 4슬롯 슬라이딩 창이 제대로 드러난다. */
+  const FILES = Array.from({ length: 15 }, (_, i) => `product-${(i % 4) + 1}.png`);
   const hero = $('#hero'), track = $('#imgTrack'), dotsTrack = $('#dots');
 
   FILES.forEach((f, k) => {
