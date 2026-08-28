@@ -703,9 +703,10 @@
     border-right: var(--mid-4) solid transparent;   /* 실제 두께 4px */
     background-clip: content-box;
   }
+  /* option/product — 이름은 여러 줄로 늘어나고 가격은 첫 줄에 붙는다 (시안 items-start) */
   .option-list button {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: var(--mid-12);
     width: 100%;
@@ -719,7 +720,22 @@
   .option-list button:hover:not(:disabled) { background: rgba(0, 0, 0, 0.02); }
   .option-list button.is-selected { font-weight: 500; background: var(--c-fill); }
   .option-list button:disabled { color: var(--c-disabled-text); cursor: default; }
-  .option-list button .extra { flex-shrink: 0; color: #6a6a6a; }
+  .option-list button .label { flex: 1 0 0; min-width: 0; }
+  .option-list button .extra {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    color: #6a6a6a;
+  }
+  /* annotation : 가격 너비 min width = 7ch (1ch = 해당 폰트 숫자 '0'의 폭)
+     — 7ch 를 넘으면 hug. ch 가 숫자 폰트 기준으로 풀려야 하므로 DM Sans 를 건다. */
+  .option-list button .extra .num {
+    min-width: 7ch;
+    font-family: var(--font-en);
+    font-variation-settings: "opsz" 14;
+    text-align: right;
+  }
   .option-list button:disabled .extra { color: inherit; }
 
   /* ── selectedOption ──────────────────────────────────────────── */
@@ -1459,6 +1475,20 @@
   #inqNav { display: none; }
   /* dim(600) · 다이얼로그(601) 보다 위 — 딤 위에서 조작할 수 있게 */
   body.is-inq-open #inqNav { display: grid; z-index: 700; }
+  /* 패널 접기 — 접으면 토글 버튼만 남는다 */
+  .demo-nav.is-min { grid-template-columns: auto; }
+  .demo-nav.is-min > *:not(.demo-toggle) { display: none; }
+  /* id 로 노출을 제어하는 항목(tab count)은 특정도가 높아 따로 눌러준다 */
+  .demo-nav.is-min #tabCountLabel,
+  .demo-nav.is-min #tabCountToggle { display: none; }
+  .demo-toggle {
+    grid-column: 1 / -1;
+    justify-self: end;
+    padding: 2px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    color: #777;
+  }
   .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
   .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
@@ -2021,6 +2051,8 @@
 </nav>
 
 <nav class="demo-nav" id="demoNav">
+  <button type="button" class="demo-toggle" id="demoToggle" aria-label="패널 접기">–</button>
+
   <strong>template</strong>
   <div class="demo-seg" id="tplToggle">
     <button type="button" data-tpl="a">A</button>
@@ -2306,13 +2338,17 @@
       { label: '수박', add: 2000, soldout: true }, { label: '복숭아', add: 2000 },
       { label: '무맛(플레인)', add: 0 }, { label: '믹스', add: 3000 },
     ] },
+    /* 마지막 그룹 — 긴 옵션명 3개를 연달아 두고 가격대를 섞어(백만 1 · 만 1 · 나머지 십만)
+       option/product 의 이름 줄바꿈과 가격 7ch 컬럼을 함께 확인한다. */
     { key: 'extra', label: '추가옵션', items: [
       { label: '선택 안 함', add: 0 },
-      { label: '텀블러', add: 8000 },   { label: '보틀', add: 12000 },
-      { label: '아이스팩', add: 1500 }, { label: '보냉백', add: 9000 },
-      { label: '스티커 팩', add: 2000 },{ label: '전용 컵', add: 6000 },
-      { label: '선물 포장', add: 3000 },{ label: '메시지 카드', add: 1000, soldout: true },
-      { label: '세트 구성', add: 15000 },
+      { label: '프리미엄 보냉 텀블러 500ml 스테인리스 진공 이중구조 매트 블랙 에디션 · 이름 각인 서비스 포함 · 전용 세척 브러시와 보관 파우치 동봉', add: 1250000 },
+      { label: '한정판 굿즈 세트 — 스티커 팩 12종 + 아크릴 키링 + 엽서 3종 + 전용 파우치 + 미니 포스터로 구성된 컬렉터 에디션 (수량 한정)', add: 180000 },
+      { label: '전용 보냉백 라지 사이즈 24캔 수납 방수 원단 · 숄더 스트랩과 네임 자수 포함 · 아이스팩 2개 기본 제공되는 여름 한정 구성', add: 32000 },
+      { label: '텀블러', add: 120000 },   { label: '보틀', add: 150000 },
+      { label: '아이스팩', add: 110000 }, { label: '보냉백', add: 190000 },
+      { label: '전용 컵', add: 130000 },  { label: '메시지 카드', add: 140000, soldout: true },
+      { label: '세트 구성', add: 170000 },
     ] },
   ];
   const LAST_KEY = OPTION_GROUPS[OPTION_GROUPS.length - 1].key;   /* + 금액은 이 그룹에만 노출 */
@@ -2339,7 +2375,7 @@
         <div class="option-list">
           ${g.items.map(it => `
             <button type="button" data-label="${it.label}" data-add="${it.add}"${it.soldout ? ' disabled' : ''}${sel && sel.label === it.label ? ' class="is-selected"' : ''}>
-              <span>${it.soldout ? '(품절) ' : ''}${it.label}</span>${g.key === LAST_KEY && it.add ? `<span class="extra">+${won(it.add)}원</span>` : ''}
+              <span class="label">${it.soldout ? '(품절) ' : ''}${it.label}</span>${g.key === LAST_KEY && it.add ? `<span class="extra"><span class="num">+${won(it.add)}</span>원</span>` : ''}
             </button>`).join('')}
         </div>
       </div>`;
@@ -2633,6 +2669,20 @@
 
   $('#cCategory').checked = load(CASE_KEY, 'on') === 'on';
   applyCase();
+  /* ── 데모 패널 접기/펼치기 ─────────────────────────────────── */
+  const UI_KEY = 'fw-e-pdp-ui';
+  $('#demoToggle').addEventListener('click', () => {
+    const min = $('#demoNav').classList.toggle('is-min');
+    $('#demoToggle').textContent = min ? '+' : '–';
+    $('#demoToggle').setAttribute('aria-label', min ? '패널 펼치기' : '패널 접기');
+    store(UI_KEY, min ? 'min' : 'open');
+  });
+  if (load(UI_KEY, 'open') === 'min') {
+    $('#demoNav').classList.add('is-min');
+    $('#demoToggle').textContent = '+';
+    $('#demoToggle').setAttribute('aria-label', '패널 펼치기');
+  }
+
   setSoPad(load(SOP_KEY, 'em'));
   setTabCount(load(TC_KEY, '4'));
   setCgap(load(CG_KEY, 'mid'));
