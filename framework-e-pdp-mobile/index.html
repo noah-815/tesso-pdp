@@ -99,6 +99,7 @@
     /* dialog/confirm — 너비 · 내부 여백 · 타이틀/디스크립션 폰트 (데모 전환) */
     --cf-w-margin: calc(100vw - 32px);     /* 시안 : 뷰포트 너비 − 32 (좌우 16 제외) */
     --cf-w-fluid:  91.7949vw;              /* 358 / 390 → 390 에서 358px */
+    --cf-w-mid:    calc(350 * var(--us) + 8px);   /* 358 을 mid 공식으로 (8px 하한) */
     --cf-w: var(--cf-w-margin);
     --cf-32: var(--px-32);                 /* 기본 = 시안(px 토큰, 고정) */
     --cf-24: var(--px-24);
@@ -122,17 +123,21 @@
     --header-h: 60px;
   }
 
-  /* confirm 다이얼로그 3안 — 데스크탑과 같은 축(너비 × 내부 여백)
+  /* confirm 다이얼로그 4안 — 데스크탑과 같은 축(너비 × 내부 여백)
      −32 + px  : 시안 그대로 (기본)
      −32 + mid : 같은 너비 + 내부 여백만 mid
-     vw  + mid : 순수 vw 너비(91.7949vw) + 내부 여백 mid */
+     vw  + mid : 순수 vw 너비(91.7949vw) + 내부 여백 mid
+     mid + mid : 너비도 mid 공식 (350×us+8) + 내부 여백 mid
+                 — vw 안과 달리 8px 하한이 있어 좁은 화면에서 덜 줄어든다 */
   body[data-cfbox="margin-mid"],
-  body[data-cfbox="fluid-mid"] {
+  body[data-cfbox="fluid-mid"],
+  body[data-cfbox="mid-mid"] {
     --cf-32: var(--mid-32);
     --cf-24: var(--mid-24);
     --cf-20: var(--mid-20);
   }
   body[data-cfbox="fluid-mid"] { --cf-w: var(--cf-w-fluid); }
+  body[data-cfbox="mid-mid"]   { --cf-w: var(--cf-w-mid); }
   body[data-cftitle="p1"] { --cf-fs-title: var(--fs-p1); }
   body[data-cftitle="p2"] { --cf-fs-title: var(--fs-p2); }
   body[data-cftitle="p3"] { --cf-fs-title: var(--fs-p3); }
@@ -1814,6 +1819,7 @@
     <button type="button" data-cfbox="margin-px">−32 + px</button>
     <button type="button" data-cfbox="margin-mid">−32 + mid</button>
     <button type="button" data-cfbox="fluid-mid">vw + mid</button>
+    <button type="button" data-cfbox="mid-mid">mid + mid</button>
   </div>
 
   <strong>title</strong>
@@ -2266,7 +2272,8 @@
     const t = document.body.dataset.cftitle, d = document.body.dataset.cfdesc;
     const tp = parseFloat(getComputedStyle($('#cfTitle')).fontSize);
     const dp = parseFloat(getComputedStyle($('#cfDesc')).fontSize);
-    const note = document.body.dataset.cfbox === 'fluid-mid' ? ' (91.7949vw)' : ' (100vw − 32)';
+    const NOTE = { 'fluid-mid': ' (91.7949vw)', 'mid-mid': ' (mid 358)' };
+    const note = NOTE[document.body.dataset.cfbox] || ' (100vw − 32)';
     $('#cfReadout').innerHTML =
       `viewport <b>${innerWidth}px</b> · 다이얼로그 <b>${r.width.toFixed(2)}px</b>${note} · 높이 <b>${r.height.toFixed(2)}</b><br>` +
       `여백 상 <b>${parseFloat(cs.paddingTop).toFixed(2)}</b> / 좌우 <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / ` +

@@ -114,6 +114,7 @@
     /* dialog/confirm — 너비 · 내부 여백 · 타이틀/디스크립션 폰트 (데모 전환) */
     --cf-w-fixed: 400px;
     --cf-w-fluid: 20.8333vw;               /* 400 / 1920 → 1920 에서 400px */
+    --cf-w-mid:   calc(392 * var(--us) + 8px);   /* 400 을 mid 공식으로 (8px 하한) */
     --cf-w: var(--cf-w-fixed);
     --cf-32: 32px;                         /* 기본 = 시안(px 토큰, 고정) */
     --cf-24: 24px;
@@ -151,12 +152,14 @@
 
   /* confirm 다이얼로그 3안 — 내부 여백만 mid 로 바꾸고, vw 안은 너비까지 */
   body[data-cfbox="fixed-mid"],
-  body[data-cfbox="fluid-mid"] {
+  body[data-cfbox="fluid-mid"],
+  body[data-cfbox="mid-mid"] {
     --cf-32: var(--mid-32);
     --cf-24: var(--mid-24);
     --cf-20: var(--mid-20);
   }
   body[data-cfbox="fluid-mid"] { --cf-w: var(--cf-w-fluid); }
+  body[data-cfbox="mid-mid"]   { --cf-w: var(--cf-w-mid); }
   /* 타이틀 · 디스크립션 사이즈 전환 */
   body[data-cftitle="p1"] { --cf-fs-title: var(--fs-p1); }
   body[data-cftitle="p2"] { --cf-fs-title: var(--fs-p2); }
@@ -1328,10 +1331,12 @@
   /* ── dialog/confirm (바로 구매하기) — Figma 8406:109893 ───────
      시안 : width 400 고정 · gap px-32 · padding px-32 / px-20 / px-24
             (내부 여백이 px 토큰이라 뷰포트와 무관하게 고정)
-     데모 3안
+     데모 4안
        400 + px  : 시안 그대로 — 기본
        400 + mid : 너비 400 고정 + 내부 여백만 mid-* (가변)
-       vw  + mid : 너비 20.8333vw (400/1920) + 내부 여백 mid-*        */
+       vw  + mid : 너비 20.8333vw (400/1920) + 내부 여백 mid-*
+       mid + mid : 너비도 mid 공식 (392×us+8) + 내부 여백 mid-*
+                   — vw 안과 달리 8px 하한이 있어 좁은 화면에서 덜 줄어든다  */
   .cf-dim {
     position: fixed;
     inset: 0;
@@ -2148,6 +2153,7 @@
     <button type="button" data-cfbox="fixed-px">400 + px</button>
     <button type="button" data-cfbox="fixed-mid">400 + mid</button>
     <button type="button" data-cfbox="fluid-mid">vw + mid</button>
+    <button type="button" data-cfbox="mid-mid">mid + mid</button>
   </div>
 
   <strong>title</strong>
@@ -2789,7 +2795,8 @@
     const t = document.body.dataset.cftitle, d = document.body.dataset.cfdesc;
     const tp = parseFloat(getComputedStyle($('#cfTitle')).fontSize);
     const dp = parseFloat(getComputedStyle($('#cfDesc')).fontSize);
-    const note = document.body.dataset.cfbox === 'fluid-mid' ? ' (20.8333vw)' : '';
+    const NOTE = { 'fluid-mid': ' (20.8333vw)', 'mid-mid': ' (mid 400)' };
+    const note = NOTE[document.body.dataset.cfbox] || '';
     $('#cfReadout').innerHTML =
       `viewport <b>${innerWidth}px</b> · 다이얼로그 <b>${cfDialog.getBoundingClientRect().width.toFixed(2)}px</b>${note} · ` +
       `높이 <b>${cfDialog.getBoundingClientRect().height.toFixed(2)}</b><br>` +
