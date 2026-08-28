@@ -71,6 +71,7 @@
     --mid-16:  calc(  8 * var(--us) + 8px);
     --mid-20:  calc( 12 * var(--us) + 8px);
     --mid-24:  calc( 16 * var(--us) + 8px);
+    --mid-25:  calc( 17 * var(--us) + 8px);
     --mid-28:  calc( 20 * var(--us) + 8px);
     --mid-32:  calc( 24 * var(--us) + 8px);
     --mid-40:  calc( 32 * var(--us) + 8px);
@@ -97,6 +98,14 @@
     --dialog-max-h: 85vh;
 
     /* ── Radius ───────────────────────────────────────────────── */
+    /* selectedOptionItem 내부 여백 2안 (데모 토글)
+       em  (시안·기본) : @em base P3 → 24 / 20 / 25px · gap 24
+       mid            : 같은 값을 mid 토큰으로 → 뷰포트에 따라 증감 */
+    --so-pt:  1.7143em;
+    --so-px:  1.4286em;
+    --so-pb:  1.7857em;
+    --so-gap: 1.7143em;
+
     --radius-3xs: 2px;
     --radius-2xs: 3px;
     --radius-xs:  4px;
@@ -136,6 +145,14 @@
   body[data-cgap="px"]    { --carousel-gap-x: 16px; --carousel-gap-y: 16px; }
   /* split — 가로는 페이지 거터와 같은 16px 고정, 세로는 가변 mid-16 */
   body[data-cgap="split"] { --carousel-gap-x: 16px; --carousel-gap-y: var(--mid-16); }
+
+  /* selectedOption 내부 여백 — em(시안) ↔ mid */
+  body[data-sopad="mid"] {
+    --so-pt:  var(--mid-24);
+    --so-px:  var(--mid-20);
+    --so-pb:  var(--mid-25);
+    --so-gap: var(--mid-24);
+  }
 
   /* 상품 문의 다이얼로그 여백 4안
      560 + px  (기본·시안) · 560 + mid · vw + mid · mid + mid */
@@ -692,8 +709,8 @@
     align-items: flex-start;
     width: 100%;
     font-size: var(--fs-p3);       /* em base */
-    gap: 1.7143em;                 /* 24px */
-    padding: 1.7143em 1.4286em 1.7857em;   /* 24 / 20 / 25px */
+    gap: var(--so-gap);            /* 24px */
+    padding: var(--so-pt) var(--so-px) var(--so-pb);   /* 24 / 20 / 25px */
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
   .so-item .name-area { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
@@ -1963,6 +1980,12 @@
 </nav>
 
 <nav class="demo-nav" id="demoNav">
+  <strong>option pad</strong>
+  <div class="demo-seg" id="soPadToggle">
+    <button type="button" data-sopad="em">em (시안)</button>
+    <button type="button" data-sopad="mid">mid</button>
+  </div>
+
   <strong>template</strong>
   <div class="demo-seg" id="tplToggle">
     <button type="button" data-tpl="a">A</button>
@@ -2296,7 +2319,10 @@
       `carousel ↔ <b>${px('--carousel-gap-x').toFixed(2)}px</b> / ` +
       `↕ <b>${px('--carousel-gap-y').toFixed(2)}px</b> · ` +
       `thumb col <b>${($('#thumbCol')?.getBoundingClientRect().width || 0).toFixed(2)}px</b> ` +
-      `(grid col ${px('--grid-col').toFixed(2)})<br>${type}`;
+      `(grid col ${px('--grid-col').toFixed(2)})<br>` +
+      `option pad <b>${document.body.dataset.sopad || 'em'}</b> — ` +
+      `상 <b>${px('--so-pt').toFixed(2)}</b> / 좌우 <b>${px('--so-px').toFixed(2)}</b> / ` +
+      `하 <b>${px('--so-pb').toFixed(2)}</b> · gap <b>${px('--so-gap').toFixed(2)}</b><br>${type}`;
   }
 
   $('#typeFields').addEventListener('input', e => {
@@ -2400,6 +2426,19 @@
   syncInqCount();
   setInqBox(load(INQ_KEY, 'fixed-px'));
 
+  /* ── 데모 — selectedOption 내부 여백 (em ↔ mid) ───────────── */
+  const SOP_KEY = 'fw-e-pdp-sopad';
+  function setSoPad(mode) {
+    document.body.dataset.sopad = mode;
+    $$('#soPadToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.sopad === mode));
+    store(SOP_KEY, mode);
+    readout();
+  }
+  $('#soPadToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-sopad]');
+    if (b) setSoPad(b.dataset.sopad);
+  });
+
   /* ── 스낵바 — 뜨고 3초 후 사라짐 (annotation) ─────────────── */
   const snack = $('#snackbar');
   let snackTimer = null;
@@ -2425,6 +2464,7 @@
 
   $('#cCategory').checked = load(CASE_KEY, 'on') === 'on';
   applyCase();
+  setSoPad(load(SOP_KEY, 'em'));
   setCgap(load(CG_KEY, 'mid'));
   setTpl(load(TPL_KEY, 'a'));
 })();

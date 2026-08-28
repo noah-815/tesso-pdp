@@ -39,12 +39,21 @@
     --mid-6:  6px;
     --mid-8:  8px;
     --mid-12: calc(  4 * var(--us) + 8px);
+    --mid-16: calc(  8 * var(--us) + 8px);
+    --mid-20: calc( 12 * var(--us) + 8px);
     --mid-24: calc( 16 * var(--us) + 8px);
     --mid-32: calc( 24 * var(--us) + 8px);
     --mid-40: calc( 32 * var(--us) + 8px);
 
     /* px-* — 뷰포트 무관 고정 ------------------------------------ */
     --px-16: 16px;                            /* 화면 좌우 여백 */
+
+    /* productCard 간격 — A안 2열(mid-12) · B안 1열(mid-16)
+       vw 안 : 390 에서 시안 값이 되는 순수 vw. mid 와 달리 8px 하한이
+       없어 화면이 좁아질수록 그대로 비례해 줄어든다. */
+    --card-gap:    var(--mid-12);
+    --card-gap-vw: calc(12 * 100vw / 390);    /* 3.0769vw */
+    --card-gap-y:  var(--mid-40);             /* A안 행 간격 */
 
     /* search 상하 padding 2안 (데모 토글) — 시안은 24px, 바인딩 없음
        em  : @em base P2 → 24 / 15 = 1.6em · 폰트가 커지면 함께 커짐
@@ -64,6 +73,18 @@
     --c-line-soft: rgba(0, 0, 0, 0.1);
     --c-thumb-bg: #f4f4f4;
   }
+
+  /* 카드 스타일 B — 1열 · productInfo 가 카드 안에서 배경(#f9f9f9)을 갖는다.
+     시안(8433:274297) : thumbnail annotation "상품 카드형 디자인일 때는
+     모바일에서 1열로 노출" · 카드 사이 gap = mid-16 */
+  body[data-cardstyle="b"] {
+    --card-gap:    var(--mid-16);
+    --card-gap-vw: calc(16 * 100vw / 390);    /* 4.1026vw */
+    --card-gap-y:  var(--card-gap);
+  }
+
+  /* 카드 간격 2안 — mid (하한 8px) ↔ 시안 값을 vw 로 환산 (하한 없음) */
+  body[data-cardgap="vw"] { --card-gap: var(--card-gap-vw); }
 
   /* search 상하 padding — em(기본) ↔ mid-24 */
   body[data-searchpad="mid"] { --search-pad-y: var(--mid-24); }
@@ -174,14 +195,14 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--mid-40);
+    gap: var(--card-gap-y);
     width: 100%;
     padding: var(--mid-12) var(--px-16) var(--mid-40);
   }
   .product-group .row {
     display: flex;
     align-items: flex-start;
-    gap: var(--mid-12);
+    gap: var(--card-gap);
     width: 100%;
   }
 
@@ -224,6 +245,19 @@
     width: 100%;
     padding: var(--mid-12) var(--mid-4) 0;    /* 모바일 pt = mid-12 */
   }
+  /* ── 카드 스타일 B ──────────────────────────────────────────────
+     카드 전체가 radius-sm 으로 클리핑되고, productInfo 가 카드 내부에서
+     배경 #f9f9f9 + padding mid-20 / px-16 을 갖는다. */
+  body[data-cardstyle="b"] .card {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  body[data-cardstyle="b"] .card .image-area { border-radius: 0; }
+  body[data-cardstyle="b"] .card .info {
+    background: #f9f9f9;
+    padding: var(--mid-20) var(--px-16);
+  }
+
   /* 이름 — 줄바꿈 허용 (시안 : 모바일에서 2줄) */
   .card .name {
     width: 100%;
@@ -405,6 +439,14 @@
     <button type="button" id="demoToggle" aria-label="패널 접기">–</button>
   </div>
   <div class="demo-body">
+    <div class="demo-seg" id="styleToggle">
+      <button type="button" data-cardstyle="a">card A</button>
+      <button type="button" data-cardstyle="b">card B</button>
+    </div>
+    <div class="demo-seg" id="gapToggle">
+      <button type="button" data-cardgap="mid">gap mid</button>
+      <button type="button" data-cardgap="vw">gap vw</button>
+    </div>
     <div class="demo-seg" id="padToggle">
       <button type="button" data-searchpad="em">em (P2)</button>
       <button type="button" data-searchpad="mid">mid-24</button>
@@ -465,13 +507,40 @@
       </a>`;
   }
 
-  const ROWS = 6;                          /* 한 행 2개 */
+  const COUNT = 12;                        /* A안 2열 × 6행 · B안 1열 × 12 */
   function render() {
-    $('#grid').innerHTML = Array.from({ length: ROWS }, (_, r) =>
-      `<div class="row">${Array.from({ length: 2 }, (_, c) => card(r * 2 + c)).join('')}</div>`
+    const per = document.body.dataset.cardstyle === 'b' ? 1 : 2;
+    const rows = COUNT / per;
+    $('#grid').innerHTML = Array.from({ length: rows }, (_, r) =>
+      `<div class="row">${Array.from({ length: per }, (_, c) => card(r * per + c)).join('')}</div>`
     ).join('');
-    $('#total').textContent = ROWS * 2;
+    $('#total').textContent = COUNT;
   }
+
+  /* ── 데모 — 카드 스타일 (A ↔ B) ───────────────────────────── */
+  const STYLE_KEY = 'fw-e-search-m-cardstyle';
+  function setStyle(mode) {
+    document.body.dataset.cardstyle = mode;
+    $$('#styleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cardstyle === mode));
+    try { localStorage.setItem(STYLE_KEY, mode); } catch (e) {}
+    render();
+    readout();
+  }
+  $('#styleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cardstyle]'); if (b) setStyle(b.dataset.cardstyle);
+  });
+
+  /* ── 데모 — 카드 간격 (mid ↔ vw) ──────────────────────────── */
+  const GAP_KEY = 'fw-e-search-m-gap';
+  function setGap(mode) {
+    document.body.dataset.cardgap = mode;
+    $$('#gapToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cardgap === mode));
+    try { localStorage.setItem(GAP_KEY, mode); } catch (e) {}
+    readout();
+  }
+  $('#gapToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cardgap]'); if (b) setGap(b.dataset.cardgap);
+  });
 
   /* ── 데모 — search 상하 padding (em ↔ mid) ────────────────── */
   const PAD_KEY = 'fw-e-search-m-pad';
@@ -522,9 +591,10 @@
     const c = $('.card');
     $('#readout').innerHTML =
       `viewport <b>${innerWidth}px</b> · 좌우 <b>${px('--px-16').toFixed(2)}</b> · ` +
-      `카드 간격 <b>${px('--mid-12').toFixed(2)}</b><br>` +
+      `카드 간격 <b>${px('--card-gap').toFixed(2)}</b> (${document.body.dataset.cardgap || 'mid'})<br>` +
       `카드 <b>${c ? c.getBoundingClientRect().width.toFixed(2) : '–'}px</b> · ` +
-      `행 간격 <b>${px('--mid-40').toFixed(2)}</b><br>` +
+      `행 간격 <b>${px('--card-gap-y').toFixed(2)}</b> · ` +
+      `style <b>${(document.body.dataset.cardstyle || 'a').toUpperCase()}</b><br>` +
       `search 상하 <b>${document.body.dataset.searchpad || 'em'}</b> ` +
       `<b>${parseFloat(getComputedStyle($('.search-bar')).paddingTop).toFixed(2)}</b> · ` +
       `바 높이 <b>${$('.search-bar').getBoundingClientRect().height.toFixed(2)}</b><br>` +
@@ -550,7 +620,11 @@
   let pad = 'em';
   try { pad = localStorage.getItem(PAD_KEY) || 'em'; } catch (e) {}
   setPad(pad);
-  render();
+  let gap = 'mid', cstyle = 'a';
+  try { gap = localStorage.getItem(GAP_KEY) || 'mid'; } catch (e) {}
+  try { cstyle = localStorage.getItem(STYLE_KEY) || 'a'; } catch (e) {}
+  setGap(gap);
+  setStyle(cstyle);
 
   /* pageCounter — annotation : current · total min-width = N ch
      (N = total 자릿수, 최소 2). total 이 바뀌면 둘 다 같은 N 으로 맞춘다. */

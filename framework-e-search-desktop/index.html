@@ -42,6 +42,7 @@
     --mid-12: calc(  4 * var(--us) + 8px);
     --mid-16: calc(  8 * var(--us) + 8px);
     --mid-24: calc( 16 * var(--us) + 8px);
+    --mid-20: calc( 12 * var(--us) + 8px);
     --mid-28: calc( 20 * var(--us) + 8px);
     --mid-56: calc( 48 * var(--us) + 8px);
     --mid-80: calc( 72 * var(--us) + 8px);
@@ -59,6 +60,7 @@
        화면이 좁아질수록 비례해서 그대로 줄어든다. */
     --card-gap: var(--mid-16);
     --card-gap-vw: calc(16 * 100vw / 1920);   /* 0.8333vw */
+    --card-gap-y: var(--mid-56);              /* A안 행 간격 (B안은 카드 gap 과 동일) */
 
     /* Radius / Font / Color -------------------------------------- */
     --radius-2xs: 3px;
@@ -74,6 +76,10 @@
     --c-line-soft: rgba(0, 0, 0, 0.1);
     --c-thumb-bg: #f4f4f4;
   }
+
+  /* 카드 스타일 B — productInfo 가 카드 안으로 들어가 배경(#f9f9f9)을 가진다.
+     시안(8433:274298) : productGroup gap = mid-16 (행 간격도 카드 gap 과 동일) */
+  body[data-cardstyle="b"] { --card-gap-y: var(--card-gap); }
 
   /* 카드 간격 2안 — mid-16 (하한 8px) ↔ 16px 을 vw 로 환산 (하한 없음) */
   body[data-cardgap="vw"] { --card-gap: var(--card-gap-vw); }
@@ -199,7 +205,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--mid-56);
+    gap: var(--card-gap-y);
     width: 100%;
     padding: var(--mid-28) var(--margin) var(--mid-80);
   }
@@ -250,6 +256,19 @@
     width: 100%;
     padding: var(--mid-16) var(--mid-4) 0;
   }
+  /* ── 카드 스타일 B ──────────────────────────────────────────────
+     카드 전체가 radius-md 로 클리핑되고, productInfo 가 카드 내부에서
+     배경 #f9f9f9 + padding mid-28 / mid-24 를 갖는다. */
+  body[data-cardstyle="b"] .card {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  body[data-cardstyle="b"] .card .image-area { border-radius: 0; }
+  body[data-cardstyle="b"] .card .info {
+    background: #f9f9f9;
+    padding: var(--mid-28) var(--mid-24);
+  }
+
   /* 이름 — 줄바꿈 허용 + 넘치면 말줄임 (시안 : 데스크탑 1줄 · 모바일 2줄) */
   .card .name {
     width: 100%;
@@ -448,6 +467,12 @@
 
 <!-- 데모 컨트롤 — 시안에 없는 요소 -->
 <nav class="demo-nav">
+  <strong>card style</strong>
+  <div class="demo-seg" id="styleToggle">
+    <button type="button" data-cardstyle="a">A</button>
+    <button type="button" data-cardstyle="b">B</button>
+  </div>
+
   <strong>card gap</strong>
   <div class="demo-seg" id="gapToggle">
     <button type="button" data-cardgap="mid">mid-16</button>
@@ -527,6 +552,18 @@
     $('#total').textContent = ROWS * 4;
   }
 
+  /* ── 데모 — 카드 스타일 (A ↔ B) ───────────────────────────── */
+  const STYLE_KEY = 'fw-e-search-cardstyle';
+  function setStyle(mode) {
+    document.body.dataset.cardstyle = mode;
+    $$('#styleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cardstyle === mode));
+    store(STYLE_KEY, mode);
+    readout();
+  }
+  $('#styleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-cardstyle]'); if (b) setStyle(b.dataset.cardstyle);
+  });
+
   function setGap(mode) {
     document.body.dataset.cardgap = mode;
     $$('#gapToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.cardgap === mode));
@@ -589,7 +626,8 @@
       `viewport <b>${innerWidth}px</b> · margin <b>${px('--margin').toFixed(2)}</b> · ` +
       `card gap <b>${px('--card-gap').toFixed(2)}</b><br>` +
       `카드 <b>${c ? c.getBoundingClientRect().width.toFixed(2) : '–'}px</b> · ` +
-      `행 간격 <b>${px('--mid-56').toFixed(2)}</b><br>` +
+      `행 간격 <b>${px('--card-gap-y').toFixed(2)}</b> · ` +
+      `style <b>${(document.body.dataset.cardstyle || 'a').toUpperCase()}</b><br>` +
       `search 상하 <b>${document.body.dataset.searchpad || 'em'}</b> ` +
       `<b>${parseFloat(getComputedStyle($('.search-bar')).paddingTop).toFixed(2)}</b> · ` +
       `바 높이 <b>${$('.search-bar').getBoundingClientRect().height.toFixed(2)}</b> · ` +
@@ -604,6 +642,7 @@
   applyFs();
   setPad(load(PAD_KEY, 'em'));
   setGap(load(GAP_KEY, 'mid'));
+  setStyle(load(STYLE_KEY, 'a'));
   render();
   readout();
 })();
