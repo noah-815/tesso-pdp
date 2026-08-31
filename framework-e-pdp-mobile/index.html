@@ -78,9 +78,13 @@
     --px-32: 32px;                      /* dialog/confirm 상단 · gap */
 
     /* 여백 버전 (데모 전환) ---------------------------------------
-       --pad-x : 가로 여백   px-16(고정) ↔ mid-16(가변)
-       --v-*   : 세로 padding  mid(가변) ↔ px(고정)
-       A(기본) 가로 px / 세로 mid · B 가로 px / 세로 px · C 가로 mid / 세로 mid */
+       --pad-x : 가로 여백 · --v-* : 세로 padding
+       A(기본) 가로 px / 세로 mid  ← 시안
+       B       가로 px / 세로 px
+       C       가로 mid / 세로 mid
+       D       가로 vw / 세로 vw   ← mid 와 나란히 비교하는 안
+       vw 안은 390 기준값을 그대로 비례시킨 순수 vw (하한 없음),
+       mid 안은 8px 을 남기고 그 위만 비례 → 좁은 화면에서 차이가 벌어진다 */
     --pad-x: var(--px-16);
     --v-12: var(--mid-12);
     --v-16: var(--mid-16);
@@ -172,6 +176,14 @@
   }
   /* C — 가로 여백을 mid 가변으로 */
   body[data-hpad="mid"] { --pad-x: var(--mid-16); }
+  /* D — 가로·세로 모두 순수 vw (N × 100vw / 390, 8px 하한 없음) */
+  body[data-hpad="vw"] { --pad-x: calc(16 * var(--us)); }
+  body[data-vpad="vw"] {
+    --v-12: calc(12 * var(--us)); --v-16: calc(16 * var(--us));
+    --v-20: calc(20 * var(--us)); --v-24: calc(24 * var(--us));
+    --v-28: calc(28 * var(--us)); --v-32: calc(32 * var(--us));
+    --v-36: calc(36 * var(--us)); --v-40: calc(40 * var(--us));
+  }
 
   /* 시트가 열려 있는 동안 뒤 화면 스크롤 잠금 */
   body.is-locked { overflow: hidden; }
@@ -2047,6 +2059,7 @@
     <button type="button" data-pad="a">px / mid</button>
     <button type="button" data-pad="b">px / px</button>
     <button type="button" data-pad="c">mid / mid</button>
+    <button type="button" data-pad="d">vw / vw</button>
   </div>
 
   <strong>rating</strong>
@@ -2589,6 +2602,7 @@
     a: { hpad: 'px',  vpad: 'mid' },   /* 가로 px-16 고정 / 세로 mid 가변 (기본·시안) */
     b: { hpad: 'px',  vpad: 'px'  },   /* 가로 px-16 고정 / 세로 px 고정 */
     c: { hpad: 'mid', vpad: 'mid' },   /* 가로 mid 가변 / 세로 mid 가변 */
+    d: { hpad: 'vw',  vpad: 'vw'  },   /* 가로 vw / 세로 vw — mid 와 비교용 */
   };
   function setPad(v) {
     const st = PAD[v] || PAD.a;
@@ -2689,7 +2703,9 @@
       `viewport <b>${innerWidth}px</b> · 타이포 1px <b>${px('--ut').toFixed(3)}</b>` +
       `${innerWidth > 450 ? ' <sup>450 고정</sup>' : ''} · spacing 1px <b>${px('--us').toFixed(3)}</b><br>` +
       `가로여백 <b>${px('--pad-x').toFixed(2)}</b> · 세로 v-24 <b>${px('--v-24').toFixed(2)}</b> · ` +
-      `v-40 <b>${px('--v-40').toFixed(2)}</b> · mid-16 <b>${px('--mid-16').toFixed(2)}</b><br>${type}`;
+      `v-40 <b>${px('--v-40').toFixed(2)}</b><br>` +
+      `같은 값 비교 — 16 : px <b>16.00</b> / mid <b>${px('--mid-16').toFixed(2)}</b> / vw <b>${(16 * px('--us')).toFixed(2)}</b> · ` +
+      `40 : mid <b>${px('--mid-40').toFixed(2)}</b> / vw <b>${(40 * px('--us')).toFixed(2)}</b><br>${type}`;
   }
 
   $('#typeFields').addEventListener('input', e => {
