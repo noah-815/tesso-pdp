@@ -1004,10 +1004,22 @@
   }
 
   /* multiLine — 상하좌우 padding 은 em (@em base : p3) · 시안 15 / 17px */
-  .inq-page .inq-multi { display: flex; flex-direction: column; gap: var(--mid-10); width: 100%; }
+  .inq-page .inq-multi {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mid-10);
+    width: 100%;
+    /* 화면이 낮으면 이 블록이 줄어들며 본문 스크롤 자체가 생기지 않게 한다 */
+    flex: 0 1 auto;
+    min-height: 0;
+  }
   .inq-page .inq-multi .field {
     width: 100%;
-    height: 327px;                 /* 토큰 없음 → 시안 px */
+    /* 시안 327px 을 상한으로 두고, 자리가 모자라면 줄어든다.
+       고정 높이면 짧은 화면에서 본문이 넘쳐 필드 박스가 버튼 위에서 잘린다
+       — 그 잘린 단면이 선처럼 보이던 문제. */
+    flex: 0 1 327px;
+    min-height: 140px;
     padding: 1.0714em 1.2143em;
     box-shadow: inset 0 0 0 1px var(--c-line);
     border-radius: var(--radius-xs);
