@@ -1473,6 +1473,10 @@
     flex: 1 1 auto;
     min-height: 0;
     width: 100%;
+    /* 스크롤러 자신을 flex 컬럼으로 둬야 안쪽 높이가 전달된다.
+       (height:100% 는 부모 높이가 auto 라 auto 로 풀려 동작하지 않음) */
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     /* 스크롤바 미노출 (시안에 없는 요소) */
     scrollbar-width: none;
@@ -1486,6 +1490,9 @@
     gap: var(--d-24);
     width: 100%;
     padding: var(--d-16) var(--d-24) var(--d-24);
+    /* 다이얼로그가 85vh 에 걸리면 이 블록이 줄어들며 안쪽 필드가 먼저 작아진다 */
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   /* productList/default */
@@ -1508,10 +1515,22 @@
   }
 
   /* multiLine */
-  .inq-multiline { display: flex; flex-direction: column; gap: var(--d-10); width: 100%; }
+  .inq-multiline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--d-10);
+    width: 100%;
+    /* 화면이 낮으면 이 블록이 줄어들며 본문 스크롤 자체가 생기지 않게 한다 */
+    flex: 0 1 auto;
+    min-height: 0;
+  }
   .inq-multiline .field {
     width: 100%;
-    height: 327px;                 /* 시안 — 토큰 없음 → px */
+    /* 시안 327px 을 상한으로 두고, 자리가 모자라면 줄어든다.
+       고정 높이면 낮은 화면에서 본문이 넘쳐 필드 박스가 버튼 위에서 잘리고
+       그 잘린 단면이 선처럼 보인다. */
+    flex: 0 1 327px;
+    min-height: 140px;
     /* annotation — multiLine textField padding 은 3안 모두 em 고정.
        @em base : P3 (입력 텍스트) → 시안 15 / 17px */
     font-size: var(--fs-p3);
