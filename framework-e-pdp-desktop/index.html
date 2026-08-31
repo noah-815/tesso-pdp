@@ -96,6 +96,8 @@
     --dialog-w-mid: calc(552 * var(--us) + 8px);   /* mid 공식 (560−8)×100vw/1920+8 */
     --dialog-w: var(--dialog-w-fixed);
     --dialog-max-h: 85vh;
+    /* 가변 안(vw+mid · mid+mid)에서만 걸리는 너비 하한/상한 — 데모에서 조절 */
+    --dw-min: 0px;   --dw-max: 100vw;
 
     /* ── Radius ───────────────────────────────────────────────── */
     /* selectedOptionItem 내부 여백 2안 (데모 토글)
@@ -121,6 +123,7 @@
     --cf-20: 20px;
     --cf-fs-title: var(--fs-p2);
     --cf-fs-desc:  var(--fs-p4);
+    --cfw-min: 0px;  --cfw-max: 100vw;
     --radius-md:  8px;
 
     /* ── Font / Color ─────────────────────────────────────────── */
@@ -160,6 +163,11 @@
   }
   body[data-cfbox="fluid-mid"] { --cf-w: var(--cf-w-fluid); }
   body[data-cfbox="mid-mid"]   { --cf-w: var(--cf-w-mid); }
+  /* 너비가 가변인 두 안에서만 min/max 를 적용한다 (고정 안은 그대로 400) */
+  body[data-cfbox="fluid-mid"] .cf-dialog,
+  body[data-cfbox="mid-mid"] .cf-dialog {
+    width: min(max(var(--cfw-min), min(var(--cf-w), var(--cfw-max))), 100%);
+  }
   /* 타이틀 · 디스크립션 사이즈 전환 */
   body[data-cftitle="p1"] { --cf-fs-title: var(--fs-p1); }
   body[data-cftitle="p2"] { --cf-fs-title: var(--fs-p2); }
@@ -199,6 +207,11 @@
   }
   body[data-inqbox="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
   body[data-inqbox="mid-mid"]   { --dialog-w: var(--dialog-w-mid); }
+  /* 너비가 가변인 두 안에서만 min/max 를 적용한다 (고정 안은 그대로 560) */
+  body[data-inqbox="fluid-mid"] .inq-dialog,
+  body[data-inqbox="mid-mid"] .inq-dialog {
+    width: min(max(var(--dw-min), min(var(--dialog-w), var(--dw-max))), 100%);
+  }
   body.is-inq-open { overflow: hidden; }
 
   /* 브라우저 스크롤바 미노출 (시안에 없는 요소) */
@@ -1610,6 +1623,18 @@
   /* id 로 노출을 제어하는 항목(tab count)은 특정도가 높아 따로 눌러준다 */
   .demo-nav.is-min #tabCountLabel,
   .demo-nav.is-min #tabCountToggle { display: none; }
+  /* 너비 min/max 는 가변 안에서만 노출 */
+  #inqWLabel, #inqWFields, #cfWLabel, #cfWFields { display: none; }
+  body[data-inqbox="fluid-mid"] #inqWLabel,
+  body[data-inqbox="mid-mid"]   #inqWLabel,
+  body[data-cfbox="fluid-mid"]  #cfWLabel,
+  body[data-cfbox="mid-mid"]    #cfWLabel  { display: block; }
+  body[data-inqbox="fluid-mid"] #inqWFields,
+  body[data-inqbox="mid-mid"]   #inqWFields,
+  body[data-cfbox="fluid-mid"]  #cfWFields,
+  body[data-cfbox="mid-mid"]    #cfWFields { display: flex; }
+  .demo-nav.is-min #inqWLabel, .demo-nav.is-min #inqWFields,
+  .demo-nav.is-min #cfWLabel,  .demo-nav.is-min #cfWFields { display: none; }
   .demo-toggle {
     grid-column: 1 / -1;
     justify-self: end;
@@ -2156,6 +2181,15 @@
     <button type="button" data-cfbox="mid-mid">mid + mid</button>
   </div>
 
+  <strong id="cfWLabel">dialog w</strong>
+  <div class="demo-fields" id="cfWFields">
+    <label class="demo-check"><input type="checkbox" id="cfWMinOn">min</label>
+    <label class="is-off"><input type="number" id="cfWMin" min="0" max="2000" step="10" value="320" disabled><span class="demo-unit">px</span></label>
+    <label class="demo-check"><input type="checkbox" id="cfWMaxOn">max</label>
+    <label class="is-off"><input type="number" id="cfWMax" min="0" max="4000" step="10" value="480" disabled><span class="demo-unit">px</span></label>
+    <button type="button" class="demo-reset" id="cfWReset">reset</button>
+  </div>
+
   <strong>title</strong>
   <div class="demo-seg" id="cfTitleToggle">
     <button type="button" data-cftitle="p1">P1</button>
@@ -2223,6 +2257,15 @@
     <button type="button" data-inqbox="fixed-mid">560 + mid</button>
     <button type="button" data-inqbox="fluid-mid">vw + mid</button>
     <button type="button" data-inqbox="mid-mid">mid + mid</button>
+  </div>
+
+  <strong id="inqWLabel">dialog w</strong>
+  <div class="demo-fields" id="inqWFields">
+    <label class="demo-check"><input type="checkbox" id="inqWMinOn">min</label>
+    <label class="is-off"><input type="number" id="inqWMin" min="0" max="2000" step="10" value="480" disabled><span class="demo-unit">px</span></label>
+    <label class="demo-check"><input type="checkbox" id="inqWMaxOn">max</label>
+    <label class="is-off"><input type="number" id="inqWMax" min="0" max="4000" step="10" value="640" disabled><span class="demo-unit">px</span></label>
+    <button type="button" class="demo-reset" id="inqWReset">reset</button>
   </div>
   <p class="demo-readout" id="inqReadout">–</p>
 </nav>
@@ -2784,6 +2827,38 @@
     apply(saved === 'min');
   });
 
+  /* ── 다이얼로그 너비 min/max ───────────────────────────────
+     가변 안(vw+mid · mid+mid)에서만 노출된다. 끄면 하한 0 / 상한 100vw 라
+     클램프가 사실상 없는 상태가 되어 원래 계산값이 그대로 나온다.       */
+  function dialogWidthClamp(id, vars, key, def, after) {
+    const fields = $(`#${id}Fields`);
+    const minOn = $(`#${id}MinOn`), maxOn = $(`#${id}MaxOn`);
+    const minIn = $(`#${id}Min`),   maxIn = $(`#${id}Max`);
+    function apply() {
+      const on = minOn.checked, xo = maxOn.checked;
+      const mn = parseFloat(minIn.value) || 0, mx = parseFloat(maxIn.value) || 0;
+      document.body.style.setProperty(vars.min, on ? `${mn}px` : '0px');
+      document.body.style.setProperty(vars.max, xo ? `${mx}px` : '100vw');
+      minIn.disabled = !on; maxIn.disabled = !xo;
+      minIn.closest('label').classList.toggle('is-off', !on);
+      maxIn.closest('label').classList.toggle('is-off', !xo);
+      store(key, JSON.stringify({ mn, mx, on, xo }));
+      after();
+    }
+    fields.addEventListener('input', apply);
+    fields.addEventListener('change', apply);
+    $(`#${id}Reset`).addEventListener('click', () => {
+      minIn.value = def.mn; maxIn.value = def.mx;
+      minOn.checked = def.on; maxOn.checked = def.xo;
+      apply();
+    });
+    try {
+      const st = JSON.parse(load(key, 'null'));
+      if (st) { minIn.value = st.mn; maxIn.value = st.mx; minOn.checked = !!st.on; maxOn.checked = !!st.xo; }
+    } catch (e) {}
+    return apply;
+  }
+
   /* ── 바로 구매하기 confirm 다이얼로그 ─────────────────────── */
   const CF_BOX_KEY = 'fw-e-pdp-cfbox';
   const CF_T_KEY   = 'fw-e-pdp-cftitle';
@@ -2800,13 +2875,17 @@
     const dp = parseFloat(getComputedStyle($('#cfDesc')).fontSize);
     const NOTE = { 'fluid-mid': ' (20.8333vw)', 'mid-mid': ' (mid 400)' };
     const note = NOTE[document.body.dataset.cfbox] || '';
+    const clamp = NOTE[document.body.dataset.cfbox]
+      ? `<br>너비 제한 min <b>${$('#cfWMinOn').checked ? $('#cfWMin').value + 'px' : 'off'}</b> · ` +
+        `max <b>${$('#cfWMaxOn').checked ? $('#cfWMax').value + 'px' : 'off'}</b>`
+      : '';
     $('#cfReadout').innerHTML =
       `viewport <b>${innerWidth}px</b> · 다이얼로그 <b>${cfDialog.getBoundingClientRect().width.toFixed(2)}px</b>${note} · ` +
       `높이 <b>${cfDialog.getBoundingClientRect().height.toFixed(2)}</b><br>` +
       `여백 상 <b>${parseFloat(cs.paddingTop).toFixed(2)}</b> / 좌우 <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / ` +
       `하 <b>${parseFloat(cs.paddingBottom).toFixed(2)}</b> · gap <b>${parseFloat(cs.rowGap).toFixed(2)}</b><br>` +
       `title <b>${t.toUpperCase()}</b> ${DESIGN_FS[t]}px@1920${FIXED_FS[t] ? '(고정)' : ''} → <b>${tp.toFixed(2)}</b> · ` +
-      `desc <b>${d.toUpperCase()}</b> ${DESIGN_FS[d]}px@1920${FIXED_FS[d] ? '(고정)' : ''} → <b>${dp.toFixed(2)}</b>`;
+      `desc <b>${d.toUpperCase()}</b> ${DESIGN_FS[d]}px@1920${FIXED_FS[d] ? '(고정)' : ''} → <b>${dp.toFixed(2)}</b>` + clamp;
   }
   function setCfBox(mode) {
     document.body.dataset.cfbox = mode;
@@ -2851,6 +2930,9 @@
   });
   /* 폰트 크기 초기화 — 시안 기본값(타이틀 P2 · 디스크립션 P4)으로 되돌린다 */
   $('#cfFsReset').addEventListener('click', () => { setCfTitle('p2'); setCfDesc('p4'); });
+  const applyCfW = dialogWidthClamp('cfW', { min: '--cfw-min', max: '--cfw-max' },
+    'fw-e-pdp-cfw', { mn: 320, mx: 480, on: false, xo: false }, () => cfReadout());
+  applyCfW();
   setCfBox(load(CF_BOX_KEY, 'fixed-px'));
   setCfTitle(load(CF_T_KEY, 'p2'));
   setCfDesc(load(CF_D_KEY, 'p4'));
@@ -2871,7 +2953,11 @@
       `(스크롤바 점유 <b>${sb.toFixed(2)}</b>) · 콘텐츠 폭 <b>${$('.inq-multiline .field').getBoundingClientRect().width.toFixed(2)}</b><br>` +
       `토큰 24 <b>${px('--d-24').toFixed(2)}</b> · 20 <b>${px('--d-20').toFixed(2)}</b> · ` +
       `16 <b>${px('--d-16').toFixed(2)}</b> · 10 <b>${px('--d-10').toFixed(2)}</b> · ` +
-      `썸네일 <b>${px('--d-80').toFixed(2)}</b>`;
+      `썸네일 <b>${px('--d-80').toFixed(2)}</b>` +
+      (['fluid-mid', 'mid-mid'].includes(document.body.dataset.inqbox)
+        ? `<br>너비 제한 min <b>${$('#inqWMinOn').checked ? $('#inqWMin').value + 'px' : 'off'}</b> · ` +
+          `max <b>${$('#inqWMaxOn').checked ? $('#inqWMax').value + 'px' : 'off'}</b>`
+        : '');
   }
   function setInqBox(mode) {
     document.body.dataset.inqbox = mode;
@@ -2905,6 +2991,9 @@
   const syncInqCount = () => { inqCounter.textContent = `${inqText.value.length.toLocaleString('ko-KR')}/5,000`; };
   inqText.addEventListener('input', syncInqCount);
   syncInqCount();
+  const applyInqW = dialogWidthClamp('inqW', { min: '--dw-min', max: '--dw-max' },
+    'fw-e-pdp-inqw', { mn: 480, mx: 640, on: false, xo: false }, () => inqReadout());
+  applyInqW();
   setInqBox(load(INQ_KEY, 'fixed-px'));
 
   /* ── 데모 — 리뷰 rating 높이 (20px ↔ em) ───────────────────

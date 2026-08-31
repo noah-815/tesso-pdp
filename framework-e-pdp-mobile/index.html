@@ -107,6 +107,8 @@
     --cf-20: var(--px-20);
     --cf-fs-title: var(--fs-p2);
     --cf-fs-desc:  var(--fs-p4);
+    /* 가변 안(vw+mid · mid+mid)에서만 걸리는 너비 하한/상한 — 데모에서 조절 */
+    --cfw-min: 0px;  --cfw-max: 100vw;
     --radius-full: 9999px;
 
     /* Font / Color ----------------------------------------------- */
@@ -139,6 +141,11 @@
   }
   body[data-cfbox="fluid-mid"] { --cf-w: var(--cf-w-fluid); }
   body[data-cfbox="mid-mid"]   { --cf-w: var(--cf-w-mid); }
+  /* 너비가 가변인 두 안에서만 min/max 를 적용한다 (−32 안은 그대로) */
+  body[data-cfbox="fluid-mid"] .cf-dialog,
+  body[data-cfbox="mid-mid"] .cf-dialog {
+    width: min(max(var(--cfw-min), min(var(--cf-w), var(--cfw-max))), 100%);
+  }
   body[data-cftitle="p1"] { --cf-fs-title: var(--fs-p1); }
   body[data-cftitle="p2"] { --cf-fs-title: var(--fs-p2); }
   body[data-cftitle="p3"] { --cf-fs-title: var(--fs-p3); }
@@ -1440,6 +1447,15 @@
   .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
   .demo-fields { display: flex; align-items: center; gap: 6px; }
   .demo-fields label { display: flex; align-items: center; gap: 3px; color: #777; }
+  .demo-fields label.is-off { opacity: 0.5; }
+  .demo-unit { color: #bbb; }
+  /* 너비 min/max 는 가변 안에서만 노출 */
+  #cfWLabel, #cfWFields { display: none; }
+  body[data-cfbox="fluid-mid"] #cfWLabel,
+  body[data-cfbox="mid-mid"]   #cfWLabel  { display: block; }
+  body[data-cfbox="fluid-mid"] #cfWFields,
+  body[data-cfbox="mid-mid"]   #cfWFields { display: flex; flex-wrap: wrap; }
+  .demo-nav.is-min #cfWLabel, .demo-nav.is-min #cfWFields { display: none; }
   .demo-fields input[type="number"] {
     width: 40px;
     padding: 3px 4px;
@@ -1973,6 +1989,15 @@
     <button type="button" data-cfbox="mid-mid">mid + mid</button>
   </div>
 
+  <strong id="cfWLabel">dialog w</strong>
+  <div class="demo-fields" id="cfWFields">
+    <label class="demo-check"><input type="checkbox" id="cfWMinOn">min</label>
+    <label class="is-off"><input type="number" id="cfWMin" min="0" max="2000" step="10" value="288" disabled><span class="demo-unit">px</span></label>
+    <label class="demo-check"><input type="checkbox" id="cfWMaxOn">max</label>
+    <label class="is-off"><input type="number" id="cfWMax" min="0" max="4000" step="10" value="400" disabled><span class="demo-unit">px</span></label>
+    <button type="button" class="demo-reset" id="cfWReset">reset</button>
+  </div>
+
   <strong>title</strong>
   <div class="demo-seg" id="cfTitleToggle">
     <button type="button" data-cftitle="p1">P1</button>
@@ -2437,6 +2462,38 @@
   });
   inqSync();
 
+  /* ── 다이얼로그 너비 min/max ───────────────────────────────
+     가변 안(vw+mid · mid+mid)에서만 노출된다. 끄면 하한 0 / 상한 100vw 라
+     클램프가 사실상 없는 상태가 되어 원래 계산값이 그대로 나온다.       */
+  function dialogWidthClamp(id, vars, key, def, after) {
+    const fields = $(`#${id}Fields`);
+    const minOn = $(`#${id}MinOn`), maxOn = $(`#${id}MaxOn`);
+    const minIn = $(`#${id}Min`),   maxIn = $(`#${id}Max`);
+    function apply() {
+      const on = minOn.checked, xo = maxOn.checked;
+      const mn = parseFloat(minIn.value) || 0, mx = parseFloat(maxIn.value) || 0;
+      document.body.style.setProperty(vars.min, on ? `${mn}px` : '0px');
+      document.body.style.setProperty(vars.max, xo ? `${mx}px` : '100vw');
+      minIn.disabled = !on; maxIn.disabled = !xo;
+      minIn.closest('label').classList.toggle('is-off', !on);
+      maxIn.closest('label').classList.toggle('is-off', !xo);
+      try { localStorage.setItem(key, JSON.stringify({ mn, mx, on, xo })); } catch (e) {}
+      after();
+    }
+    fields.addEventListener('input', apply);
+    fields.addEventListener('change', apply);
+    $(`#${id}Reset`).addEventListener('click', () => {
+      minIn.value = def.mn; maxIn.value = def.mx;
+      minOn.checked = def.on; maxOn.checked = def.xo;
+      apply();
+    });
+    try {
+      const st = JSON.parse(localStorage.getItem(key) || 'null');
+      if (st) { minIn.value = st.mn; maxIn.value = st.mx; minOn.checked = !!st.on; maxOn.checked = !!st.xo; }
+    } catch (e) {}
+    return apply;
+  }
+
   /* ── 바로 구매하기 confirm 다이얼로그 ─────────────────────── */
   const CF_BOX_KEY = 'fw-e-pdp-m-cfbox';
   const CF_T_KEY   = 'fw-e-pdp-m-cftitle';
@@ -2452,12 +2509,16 @@
     const dp = parseFloat(getComputedStyle($('#cfDesc')).fontSize);
     const NOTE = { 'fluid-mid': ' (91.7949vw)', 'mid-mid': ' (mid 358)' };
     const note = NOTE[document.body.dataset.cfbox] || ' (100vw − 32)';
+    const clamp = NOTE[document.body.dataset.cfbox]
+      ? `<br>너비 제한 min <b>${$('#cfWMinOn').checked ? $('#cfWMin').value + 'px' : 'off'}</b> · ` +
+        `max <b>${$('#cfWMaxOn').checked ? $('#cfWMax').value + 'px' : 'off'}</b>`
+      : '';
     $('#cfReadout').innerHTML =
       `viewport <b>${innerWidth}px</b> · 다이얼로그 <b>${r.width.toFixed(2)}px</b>${note} · 높이 <b>${r.height.toFixed(2)}</b><br>` +
       `여백 상 <b>${parseFloat(cs.paddingTop).toFixed(2)}</b> / 좌우 <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / ` +
       `하 <b>${parseFloat(cs.paddingBottom).toFixed(2)}</b> · gap <b>${parseFloat(cs.rowGap).toFixed(2)}</b><br>` +
       `title <b>${t.toUpperCase()}</b> ${DESIGN_FS[t]}px@390 → <b>${tp.toFixed(2)}</b> · ` +
-      `desc <b>${d.toUpperCase()}</b> ${DESIGN_FS[d]}px@390 → <b>${dp.toFixed(2)}</b>`;
+      `desc <b>${d.toUpperCase()}</b> ${DESIGN_FS[d]}px@390 → <b>${dp.toFixed(2)}</b>` + clamp;
   }
   function setCfBox(mode) {
     document.body.dataset.cfbox = mode;
@@ -2670,6 +2731,9 @@
       $('#cSoldout').checked  = !!c.soldout;
     }
   } catch (e) {}
+  const applyCfW = dialogWidthClamp('cfW', { min: '--cfw-min', max: '--cfw-max' },
+    'fw-e-pdp-m-cfw', { mn: 288, mx: 400, on: false, xo: false }, () => cfReadout());
+  applyCfW();
   try { setRating(localStorage.getItem(RT_KEY) || 'px'); } catch (e) { setRating('px'); }
   try { setPad(localStorage.getItem(PAD_KEY) || 'a'); } catch (e) { setPad('a'); }
   applyCase();
