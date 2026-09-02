@@ -41,7 +41,8 @@
     --lh-c1: 1.2;
 
     /* Spacing — mid-* -------------------------------------------- */
-    --mid-2:   2px;                           /* 값 < 8 → 고정 */
+    --mid-1:   1px;                           /* 값 < 8 → 고정 */
+    --mid-2:   2px;
     --mid-4:   4px;
     --mid-6:   6px;
     --mid-8:   8px;
@@ -56,6 +57,7 @@
     --mid-40:  calc( 32 * var(--us) + 8px);
     --mid-48:  calc( 40 * var(--us) + 8px);
     --mid-56:  calc( 48 * var(--us) + 8px);
+    --mid-64:  calc( 56 * var(--us) + 8px);
     --mid-80:  calc( 72 * var(--us) + 8px);
     --mid-100: calc( 92 * var(--us) + 8px);
     --mid-120: calc(112 * var(--us) + 8px);
@@ -214,7 +216,8 @@
   .screen { display: none; flex-direction: column; align-items: flex-start; width: 100%; }
   .screen.is-on { display: flex; }
   /* 프로필만 좌우 70px 안쪽으로 (시안 — 토큰 없음 → px) */
-  .screen[data-screen="profile"] { padding: 0 70px; }
+  /* 시안 : 본문 컬럼 안쪽으로 mid-64 만큼 들여쓴다 (933 − 64×2 = 805) */
+  .screen[data-screen="profile"] { padding: 0 var(--mid-64); }
 
   /* ── 공통 : 섹션 타이틀 영역 ─────────────────────────────────── */
   .sec { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
@@ -252,7 +255,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-bottom: 1px;
+    /* 시안 : text py = mid-1, button pb = 1px */
+    padding: var(--mid-1) 0 calc(var(--mid-1) + 1px);
     border-bottom: 1px solid #111;
     font-weight: 500;
     font-size: var(--fs-btn-s);
@@ -864,12 +868,13 @@
   /* 배송지 */
   .addr-sec { gap: var(--mid-12); padding-bottom: var(--mid-20); }
   .addr-list { display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
-  .addr-item { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; width: 100%; padding: var(--mid-20) 0; }
+  .addr-item { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-12); width: 100%; padding: var(--mid-20) 0; }
   .addr-item .badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 7px 9px;                         /* 시안 — 토큰 없음 → px */
+    /* 시안 em/em-6 · em/em-8 (@em base : C1 12px) → 0.5em / 0.6667em */
+    padding: 0.5em 0.6667em;
     box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .1);
     border-radius: var(--radius-2xs);
     font-size: var(--fs-c1);
@@ -880,12 +885,14 @@
   .addr-item .text { display: flex; flex: 1 0 0; min-width: 0; flex-direction: column; gap: var(--mid-12); }
   .addr-item .head-text { display: flex; flex-direction: column; gap: var(--mid-6); width: 100%; }
   .addr-item .addr { width: 100%; font-weight: 500; font-size: var(--fs-p3); line-height: var(--lh-p3); }
-  .addr-item .who { display: flex; align-items: center; gap: var(--mid-8); font-size: var(--fs-p3); line-height: var(--lh-p3); color: var(--c-sub); white-space: nowrap; }
-  .addr-item .who .div { flex-shrink: 0; width: 1px; height: 12px; background: var(--c-line); }
+  /* 시안 em/em-6 (@em base : P3 14px) → 0.4286em */
+  .addr-item .who { display: flex; align-items: center; gap: 0.4286em; font-size: var(--fs-p3); line-height: var(--lh-p3); color: var(--c-sub); white-space: nowrap; }
+  .addr-item .who .div { flex-shrink: 0; width: 1px; height: 13px; background: var(--c-line); }
   .addr-item .req { display: flex; gap: var(--mid-8); width: 100%; font-size: var(--fs-p3); line-height: var(--lh-p3); }
   .addr-item .req .k { flex-shrink: 0; opacity: .5; white-space: nowrap; }
   .addr-item .req .v { flex: 1 0 0; min-width: 0; opacity: .8; }
-  .addr-item .acts { flex-shrink: 0; display: flex; align-items: center; justify-content: flex-end; gap: var(--mid-12); }
+  /* 시안 em/em-12 (@em base : button-label-small 13px) → 0.9231em */
+  .addr-item .acts { flex-shrink: 0; display: flex; align-items: center; justify-content: flex-end; gap: 0.9231em; font-size: var(--fs-btn-s); }
   .addr-item .acts button { font-weight: 500; font-size: var(--fs-btn-s); line-height: 1.2; white-space: nowrap; }
   .addr-item .acts .del { color: var(--c-danger); }
   .addr-item .acts .div { width: 1px; height: 12px; background: var(--c-line); }
@@ -928,7 +935,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 9px 0;                           /* 시안 — 토큰 없음 → px */
+    gap: var(--mid-2);
+    /* 시안 em/em-9 (@em base : button-label-small 13px) → 0.6923em */
+    padding: 0.6923em 0;
     font-weight: 500;
     font-size: var(--fs-btn-s);
     line-height: 1.2;
