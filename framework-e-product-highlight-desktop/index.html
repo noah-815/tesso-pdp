@@ -70,17 +70,13 @@
   body[data-ratio="4-5"] { --thumb-ratio: 4 / 5; }
   body[data-ratio="3-4"] { --thumb-ratio: 3 / 4; }
 
-  /* 이미지 채움 2안 — 어느 쪽이든 비율과 카드 패딩(mid-12)은 그대로 유지한다
-     card : 폭을 mid 로 고정 → 카드 높이가 이미지에 맞춰진다 (시안 · 기본)
-     fill : 세로를 카드 내용 높이에 꽉 채우고 → 폭이 비율대로 따라온다 */
-  /* fill 안 — 세로는 카드 텍스트 높이에 맞추고 폭은 비율대로.
+  /* 이미지 채움 2안 — 어느 쪽이든 이미지 하단은 절대 뜨지 않는다.
+     (세로를 항상 카드 높이에 맞추고, 비율을 지키려 폭이 따라 늘어난다.
+      폭이 늘면 텍스트 열이 좁아져 잘릴 수 있는데 그게 의도된 우선순위다.)
+     card : mid 폭을 하한으로 둔다 → 텍스트가 짧으면 시안 그대로 mid
+     fill : 하한 없이 카드 텍스트 높이에 정확히 맞춘다
      폭이 높이에, 높이가 폭에 의존하는 순환이라 CSS 로는 풀리지 않아
-     폭만 JS 가 계산해 인라인으로 넣는다 (syncFill). */
-  body[data-imgfit="fill"] .highlight .card .image-area { align-self: stretch; }
-  body[data-imgfit="fill"] .highlight .card .image-area .thumb {
-    aspect-ratio: auto;
-    height: 100%;
-  }
+     폭·하한만 JS 가 계산해 인라인으로 넣는다 (syncFill). */
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; font-size: 14px; }   /* 1rem = 14px */
@@ -171,12 +167,11 @@
   }
   .highlight .card .row { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
 
-  /* imageArea — 너비는 mid, 이미지는 시안 비율(1:1) 유지.
-     카드가 텍스트 때문에 커져도 늘리지 않고 위쪽에 붙인다
-     (가운데 정렬이면 위아래로 여백이 갈라져 떠 보인다). */
+  /* imageArea — 세로는 카드 높이에 꽉 채우고, 폭은 비율대로 JS 가 넣는다.
+     (JS 가 없을 때의 폭 = 시안 mid) */
   .highlight .card .image-area {
     flex-shrink: 0;
-    align-self: flex-start;
+    align-self: stretch;
     display: flex;
     width: var(--w-image);
   }
@@ -185,7 +180,7 @@
     position: relative;
     flex: 1 0 0;
     min-width: 0;
-    aspect-ratio: var(--thumb-ratio);   /* 시안 1:1 · 데모에서 4:5 · 3:4 로 전환 */
+    height: 100%;                       /* 비율(--thumb-ratio)은 폭으로 맞춘다 → syncFill */
     border-radius: var(--radius-thumb);
     overflow: hidden;
     background: rgba(255, 255, 255, .08);
@@ -202,6 +197,7 @@
   .highlight .card .info {
     flex: 1 0 0;
     min-width: 0;
+    overflow: hidden;                   /* 이미지가 넓어지면 텍스트는 잘린다 */
     align-self: stretch;
     display: flex;
     flex-direction: column;
@@ -357,8 +353,8 @@
   <div class="demo-row">
     <strong>image fit</strong>
     <div class="demo-seg" id="fitToggle">
-      <button type="button" data-imgfit="card">폭 mid (시안)</button>
-      <button type="button" data-imgfit="fill">세로 꽉</button>
+      <button type="button" data-imgfit="card">폭 mid 하한 (시안)</button>
+      <button type="button" data-imgfit="fill">세로에 딱 맞춤</button>
     </div>
   </div>
 
@@ -404,16 +400,28 @@
     const b = e.target.closest('[data-ratio]'); if (b) setRatio(b.dataset.ratio);
   });
 
-  /* fill 안의 이미지 폭 — 카드 텍스트 높이 × 비율.
+  /* 이미지 폭 — 카드 높이 × 비율. 세로는 어느 안이든 꽉 채운다.
+     card 안은 mid 폭에서 나오는 높이를 하한(min-height)으로 둬서,
+     텍스트가 짧을 때는 시안의 mid 폭 그대로가 되게 한다.
      텍스트 높이는 폭에 의존하지 않으므로(모두 1줄 nowrap) 한 번 재면 확정된다. */
   function syncFill() {
     const area = $('.image-area');
-    if (document.body.dataset.imgfit !== 'fill') { area.style.width = ''; return; }
-    area.style.width = '0px';
-    const h = $('.info').getBoundingClientRect().height;
     const [a, b] = (getComputedStyle(document.body).getPropertyValue('--thumb-ratio') || '1/1')
       .split('/').map(v => parseFloat(v) || 1);
-    area.style.width = `${(h * a / b).toFixed(3)}px`;
+
+    /* mid 폭(= CSS 기본값)을 먼저 잰다 */
+    area.style.minHeight = '0px';
+    area.style.width = '';
+    const midW = area.getBoundingClientRect().width;
+
+    /* 이미지가 없다고 치고 텍스트 열의 자연 높이를 잰다 */
+    area.style.width = '0px';
+    const infoH = $('.info').getBoundingClientRect().height;
+
+    const minH = document.body.dataset.imgfit === 'fill' ? 0 : midW * b / a;
+    const rowH = Math.max(infoH, minH);
+    area.style.minHeight = minH ? `${minH.toFixed(3)}px` : '';
+    area.style.width = `${(rowH * a / b).toFixed(3)}px`;
   }
 
   /* 채움 방식 — 폭 mid 고정(시안) ↔ 세로 꽉(폭 가변) */
@@ -441,9 +449,9 @@
       `이미지 영역 <b>${w(img).toFixed(2)}</b> (mid) · 카드 텍스트 <b>${w(info).toFixed(2)}</b> (fill)<br>` +
       `사이 간격 <b>${gap.toFixed(2)}</b> (나머지) · H2 <b>${px('--fs-h2').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b><br>` +
       `썸네일 <b>${(document.body.dataset.ratio || '1-1').replace('-', ':')}</b> · ` +
-      `<b>${document.body.dataset.imgfit === 'fill' ? '세로 꽉' : '폭 mid'}</b> — ` +
+      `<b>${document.body.dataset.imgfit === 'fill' ? '세로 딱' : '폭 mid 하한'}</b> — ` +
       `${w($('.thumb')).toFixed(2)} × <b>${$('.thumb').getBoundingClientRect().height.toFixed(2)}</b> · ` +
-      `카드 텍스트 높이 <b>${info.getBoundingClientRect().height.toFixed(2)}</b> · ` +
+      `카드 내용 높이 <b>${info.getBoundingClientRect().height.toFixed(2)}</b> · ` +
       `카드 <b>${card.getBoundingClientRect().height.toFixed(2)}</b>`;
   }
   addEventListener('resize', () => { syncFill(); readout(); });
