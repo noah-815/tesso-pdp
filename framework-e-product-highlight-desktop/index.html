@@ -180,9 +180,10 @@
     align-items: flex-start;
     padding-top: var(--mid-2);
   }
+  /* flex-basis 0 이면 부모의 자연 높이 계산에 0 으로 잡혀 카드가 이미지 높이에
+     묶이고, 그 안에서 텍스트가 눌린다 → basis 는 auto 로 두고 여유가 있을 때만 늘린다 */
   .highlight .card .info .texts {
-    flex: 1 0 0;
-    min-height: 0;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -190,14 +191,20 @@
     width: 100%;
   }
   .highlight .card .info .title-area {
-    flex: 1 0 0;
-    min-height: 0;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--mid-6);
     width: 100%;
   }
+  /* 글줄 높이 아래로 눌리지 않게 — 압축되면 글자가 잘려 보인다 */
+  .highlight .card .info .category,
+  .highlight .card .info .name,
+  .highlight .card .info .price,
+  .highlight .card .info .button-area,
+  .highlight .text-area > * { flex-shrink: 0; }
+
   .highlight .card .info .category {
     width: 100%;
     font-family: var(--font-en);
