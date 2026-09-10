@@ -153,22 +153,21 @@
   }
   .highlight .card .row { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
 
-  /* imageArea — 너비는 mid, 높이는 카드 내용에 맞춰 늘어난다.
-     1:1 로 고정하면 카드가 텍스트 때문에 커졌을 때 썸네일만 작게 남아 떠 보인다.
-     min-height 로 최소 정사각을 보장 → 1920 에서는 시안 그대로 112×112. */
+  /* imageArea — 너비는 mid, 이미지는 시안 비율(1:1) 유지.
+     카드가 텍스트 때문에 커져도 늘리지 않고 위쪽에 붙인다
+     (가운데 정렬이면 위아래로 여백이 갈라져 떠 보인다). */
   .highlight .card .image-area {
     flex-shrink: 0;
-    align-self: stretch;
+    align-self: flex-start;
     display: flex;
     width: var(--w-image);
   }
   .highlight .card .image-area .thumb {
-    /* img 를 absolute 로 빼야 원본 비율이 높이를 밀지 않는다
-       (1380×1482 이미지가 폭 112 에서 120.27 을 만들어 카드를 늘리던 원인) */
+    /* img 는 absolute — 원본 비율(1380×1482)이 박스 높이를 밀지 않게 한다 */
     position: relative;
     flex: 1 0 0;
     min-width: 0;
-    min-height: var(--w-image);
+    aspect-ratio: 1 / 1;           /* 시안 비율 유지 */
     border-radius: var(--radius-thumb);
     overflow: hidden;
     background: rgba(255, 255, 255, .08);
