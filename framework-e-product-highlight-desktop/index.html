@@ -57,12 +57,18 @@
     --w-card:  calc( 412 * var(--us) + 8px);   /* 시안 420  */
     --w-image: calc( 104 * var(--us) + 8px);   /* 시안 112  */
 
+    /* 상품 이미지 비율 (데모 전환) — 시안 기본 1:1 */
+    --thumb-ratio: 1 / 1;
+
     /* Radius / Font / Color -------------------------------------- */
     --radius-xs: 4px;
     --radius-thumb: 2px;                   /* 시안 — 토큰 없음 → px */
     --font: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
     --font-en: "DM Sans", var(--font);
   }
+
+  body[data-ratio="4-5"] { --thumb-ratio: 4 / 5; }
+  body[data-ratio="3-4"] { --thumb-ratio: 3 / 4; }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; font-size: 14px; }   /* 1rem = 14px */
@@ -167,7 +173,7 @@
     position: relative;
     flex: 1 0 0;
     min-width: 0;
-    aspect-ratio: 1 / 1;           /* 시안 비율 유지 */
+    aspect-ratio: var(--thumb-ratio);   /* 시안 1:1 · 데모에서 4:5 · 3:4 로 전환 */
     border-radius: var(--radius-thumb);
     overflow: hidden;
     background: rgba(255, 255, 255, .08);
@@ -283,6 +289,12 @@
     border-radius: 3px;
     color: #777;
   }
+  .demo-row { display: flex; align-items: center; gap: 8px; }
+  .demo-row strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; font-family: var(--font); font-size: 11px; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
   .demo-readout { color: #999; font-variant-numeric: tabular-nums; }
   .demo-readout b { color: #111; font-weight: 600; }
 </style>
@@ -329,6 +341,16 @@
 
 <nav class="demo-nav" id="demoNav">
   <button type="button" class="demo-toggle" id="demoToggle" aria-label="패널 접기">–</button>
+
+  <div class="demo-row">
+    <strong>image ratio</strong>
+    <div class="demo-seg" id="ratioToggle">
+      <button type="button" data-ratio="1-1">1:1</button>
+      <button type="button" data-ratio="4-5">4:5</button>
+      <button type="button" data-ratio="3-4">3:4</button>
+    </div>
+  </div>
+
   <p class="demo-readout" id="readout">–</p>
 </nav>
 
@@ -336,6 +358,7 @@
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const UI_KEY = 'fw-e-highlight-ui';
+  const RATIO_KEY = 'fw-e-highlight-ratio';
   const w = el => el.getBoundingClientRect().width;
 
   function px(k) {
@@ -347,6 +370,18 @@
     return v;
   }
 
+  /* 상품 이미지 비율 — 1:1(시안) · 4:5 · 3:4 */
+  function setRatio(v) {
+    document.body.dataset.ratio = v;
+    document.querySelectorAll('#ratioToggle button')
+      .forEach(b => b.classList.toggle('is-on', b.dataset.ratio === v));
+    try { localStorage.setItem(RATIO_KEY, v); } catch (e) {}
+    readout();
+  }
+  $('#ratioToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-ratio]'); if (b) setRatio(b.dataset.ratio);
+  });
+
   function readout() {
     const sec = $('.highlight'), content = $('.content');
     const ta = $('.text-area'), card = $('.card'), img = $('.image-area'), info = $('.info');
@@ -357,7 +392,10 @@
       `여백 <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / <b>${parseFloat(cs.paddingTop).toFixed(2)}</b><br>` +
       `텍스트 영역 <b>${w(ta).toFixed(2)}</b> (mid) · 카드 <b>${w(card).toFixed(2)}</b> (mid) · ` +
       `이미지 영역 <b>${w(img).toFixed(2)}</b> (mid) · 카드 텍스트 <b>${w(info).toFixed(2)}</b> (fill)<br>` +
-      `사이 간격 <b>${gap.toFixed(2)}</b> (나머지) · H2 <b>${px('--fs-h2').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b>`;
+      `사이 간격 <b>${gap.toFixed(2)}</b> (나머지) · H2 <b>${px('--fs-h2').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b><br>` +
+      `썸네일 <b>${(document.body.dataset.ratio || '1-1').replace('-', ':')}</b> — ` +
+      `${w($('.thumb')).toFixed(2)} × <b>${$('.thumb').getBoundingClientRect().height.toFixed(2)}</b> · ` +
+      `카드 높이 <b>${card.getBoundingClientRect().height.toFixed(2)}</b>`;
   }
   addEventListener('resize', readout);
 
@@ -373,6 +411,9 @@
     }
   } catch (e) {}
 
+  let savedRatio = '1-1';
+  try { savedRatio = localStorage.getItem(RATIO_KEY) || '1-1'; } catch (e) {}
+  setRatio(savedRatio);
   readout();
 })();
 </script>
