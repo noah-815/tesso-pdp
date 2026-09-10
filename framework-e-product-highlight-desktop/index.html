@@ -153,22 +153,33 @@
   }
   .highlight .card .row { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
 
-  /* imageArea — 너비 mid · 썸네일은 그 안에서 1:1 */
+  /* imageArea — 너비는 mid, 높이는 카드 내용에 맞춰 늘어난다.
+     1:1 로 고정하면 카드가 텍스트 때문에 커졌을 때 썸네일만 작게 남아 떠 보인다.
+     min-height 로 최소 정사각을 보장 → 1920 에서는 시안 그대로 112×112. */
   .highlight .card .image-area {
     flex-shrink: 0;
+    align-self: stretch;
     display: flex;
-    align-items: center;
     width: var(--w-image);
   }
   .highlight .card .image-area .thumb {
+    /* img 를 absolute 로 빼야 원본 비율이 높이를 밀지 않는다
+       (1380×1482 이미지가 폭 112 에서 120.27 을 만들어 카드를 늘리던 원인) */
+    position: relative;
     flex: 1 0 0;
     min-width: 0;
-    aspect-ratio: 1 / 1;
+    min-height: var(--w-image);
     border-radius: var(--radius-thumb);
     overflow: hidden;
     background: rgba(255, 255, 255, .08);
   }
-  .highlight .card .image-area .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .highlight .card .image-area .thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   /* productInfo — 남는 폭을 채운다 (fill) */
   .highlight .card .info {
@@ -301,8 +312,8 @@
         <div class="info">
           <div class="texts">
             <div class="title-area">
-              <p class="category">category Name</p>
-              <p class="name">Product Name Max 1line</p>
+              <p class="category">DRINK</p>
+              <p class="name">전해질 보충 음료 블러드 오렌지</p>
             </div>
             <p class="price"><span class="num">40,000</span><span>원</span></p>
           </div>
