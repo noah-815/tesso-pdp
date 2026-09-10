@@ -54,7 +54,11 @@
 
     /* 이 화면의 너비 — 전부 mid 공식 ------------------------------ */
     --w-text:  calc(1054 * var(--us) + 8px);   /* 시안 1062 */
-    --w-card:  calc( 412 * var(--us) + 8px);   /* 시안 420  */
+    --w-card-mid: calc( 412 * var(--us) + 8px);   /* 시안 420  */
+    /* 데모 — 카드 너비 하한/상한 (기본은 제한 없음) */
+    --card-w-min: 0px;
+    --card-w-max: 99999px;
+    --w-card:  clamp(var(--card-w-min), var(--w-card-mid), var(--card-w-max));
     --w-image: calc( 104 * var(--us) + 8px);   /* 시안 112  */
 
     /* 상품 이미지 비율 (데모 전환) — 시안 기본 1:1 */
@@ -303,6 +307,27 @@
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; font-family: var(--font); font-size: 11px; }
   .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-num { display: flex; align-items: center; gap: 4px; color: #999; }
+  .demo-num input {
+    width: 52px;
+    padding: 3px 5px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--font);
+    font-size: 11px;
+    color: #111;
+    text-align: right;
+  }
+  .demo-reset {
+    padding: 3px 7px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--font);
+    font-size: 11px;
+    color: #2563eb;
+  }
   .demo-readout { color: #999; font-variant-numeric: tabular-nums; }
   .demo-readout b { color: #111; font-weight: 600; }
 </style>
@@ -367,6 +392,13 @@
     </div>
   </div>
 
+  <div class="demo-row">
+    <strong>card width</strong>
+    <label class="demo-num">min <input type="number" id="cardWMin" min="0" max="4000" step="1" placeholder="–"></label>
+    <label class="demo-num">max <input type="number" id="cardWMax" min="0" max="4000" step="1" placeholder="–"></label>
+    <button type="button" class="demo-reset" id="cardWReset">reset</button>
+  </div>
+
   <p class="demo-readout" id="readout">–</p>
 </nav>
 
@@ -376,6 +408,7 @@
   const UI_KEY = 'fw-e-highlight-ui';
   const RATIO_KEY = 'fw-e-highlight-ratio';
   const FIT_KEY = 'fw-e-highlight-fit';
+  const CARDW_KEY = 'fw-e-highlight-cardw';
   const w = el => el.getBoundingClientRect().width;
 
   function px(k) {
@@ -437,6 +470,26 @@
     const b = e.target.closest('[data-imgfit]'); if (b) setFit(b.dataset.imgfit);
   });
 
+  /* 상품 카드 너비 하한/상한 — 비우면 제한 없음.
+     mid 값은 그대로 두고 clamp() 로 감싼다 → 뷰포트가 넓/좁을 때만 걸린다. */
+  function applyCardW(save = true) {
+    const mn = $('#cardWMin').value.trim();
+    const mx = $('#cardWMax').value.trim();
+    const root = document.documentElement.style;
+    root.setProperty('--card-w-min', mn === '' ? '0px' : `${parseFloat(mn) || 0}px`);
+    root.setProperty('--card-w-max', mx === '' ? '99999px' : `${parseFloat(mx) || 0}px`);
+    if (save) { try { localStorage.setItem(CARDW_KEY, JSON.stringify([mn, mx])); } catch (e) {} }
+    syncFill();
+    readout();
+  }
+  $('#cardWMin').addEventListener('input', () => applyCardW());
+  $('#cardWMax').addEventListener('input', () => applyCardW());
+  $('#cardWReset').addEventListener('click', () => {
+    $('#cardWMin').value = '';
+    $('#cardWMax').value = '';
+    applyCardW();
+  });
+
   function readout() {
     const sec = $('.highlight'), content = $('.content');
     const ta = $('.text-area'), card = $('.card'), img = $('.image-area'), info = $('.info');
@@ -445,7 +498,7 @@
     $('#readout').innerHTML =
       `viewport <b>${innerWidth} × ${innerHeight}</b> · 섹션 <b>${w(sec).toFixed(0)} × ${sec.getBoundingClientRect().height.toFixed(0)}</b> · ` +
       `여백 <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / <b>${parseFloat(cs.paddingTop).toFixed(2)}</b><br>` +
-      `텍스트 영역 <b>${w(ta).toFixed(2)}</b> (mid) · 카드 <b>${w(card).toFixed(2)}</b> (mid) · ` +
+      `텍스트 영역 <b>${w(ta).toFixed(2)}</b> (mid) · 카드 <b>${w(card).toFixed(2)}</b> ${cardWTag()} · ` +
       `이미지 영역 <b>${w(img).toFixed(2)}</b> (mid) · 카드 텍스트 <b>${w(info).toFixed(2)}</b> (fill)<br>` +
       `사이 간격 <b>${gap.toFixed(2)}</b> (나머지) · H2 <b>${px('--fs-h2').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b><br>` +
       `썸네일 <b>${(document.body.dataset.ratio || '1-1').replace('-', ':')}</b> · ` +
@@ -453,6 +506,14 @@
       `${w($('.thumb')).toFixed(2)} × <b>${$('.thumb').getBoundingClientRect().height.toFixed(2)}</b> · ` +
       `카드 내용 높이 <b>${info.getBoundingClientRect().height.toFixed(2)}</b> · ` +
       `카드 <b>${card.getBoundingClientRect().height.toFixed(2)}</b>`;
+  }
+  /* 카드 너비가 mid 그대로인지, min/max 에 걸렸는지 */
+  function cardWTag() {
+    const mid = px('--w-card-mid'), now = w($('.card'));
+    if (Math.abs(now - mid) < 0.05) return '(mid)';
+    return now > mid
+      ? `(min 적용 · mid ${mid.toFixed(2)})`
+      : `(max 적용 · mid ${mid.toFixed(2)})`;
   }
   addEventListener('resize', () => { syncFill(); readout(); });
 
@@ -467,6 +528,15 @@
       $('#demoToggle').textContent = '+';
     }
   } catch (e) {}
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(CARDW_KEY) || '[]');
+    if (Array.isArray(saved)) {
+      $('#cardWMin').value = saved[0] || '';
+      $('#cardWMax').value = saved[1] || '';
+    }
+  } catch (e) {}
+  applyCardW(false);
 
   let savedFit = 'card';
   try { savedFit = localStorage.getItem(FIT_KEY) || 'card'; } catch (e) {}
