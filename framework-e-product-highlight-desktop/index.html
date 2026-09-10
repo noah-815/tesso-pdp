@@ -59,7 +59,7 @@
     --card-w-min: 0px;
     --card-w-max: 99999px;
     --w-card:  clamp(var(--card-w-min), var(--w-card-mid), var(--card-w-max));
-    --w-image: calc( 104 * var(--us) + 8px);   /* 시안 112  */
+    --w-image: calc( 102 * var(--us) + 8px);   /* 시안 110 — 비율과 무관하게 고정 */
 
     /* 상품 이미지 비율 (데모 전환) — 시안 기본 1:1 */
     --thumb-ratio: 1 / 1;
@@ -75,12 +75,11 @@
   body[data-ratio="3-4"] { --thumb-ratio: 3 / 4; }
 
   /* 이미지 채움 2안 — 어느 쪽이든 이미지 하단은 절대 뜨지 않는다.
-     (세로를 항상 카드 높이에 맞추고, 비율을 지키려 폭이 따라 늘어난다.
-      폭이 늘면 텍스트 열이 좁아져 잘릴 수 있는데 그게 의도된 우선순위다.)
-     card : mid 폭을 하한으로 둔다 → 텍스트가 짧으면 시안 그대로 mid
-     fill : 하한 없이 카드 텍스트 높이에 정확히 맞춘다
-     폭이 높이에, 높이가 폭에 의존하는 순환이라 CSS 로는 풀리지 않아
-     폭·하한만 JS 가 계산해 인라인으로 넣는다 (syncFill). */
+     card : 폭을 mid(110) 로 고정한다 → 비율을 바꿔도 폭은 그대로이고
+            세로만 바뀐다. 텍스트가 더 높으면 세로로 늘려 채우고(크롭) 붙인다.
+     fill : 비율을 그대로 지키고 폭이 텍스트 높이에 따라 변한다 (크롭 없음).
+     fill 의 폭은 높이에, 높이는 폭에 의존하는 순환이라 CSS 로는 풀리지 않아
+     JS 가 계산해 인라인으로 넣는다 (syncFill). */
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; font-size: 14px; }   /* 1rem = 14px */
@@ -381,8 +380,8 @@
   <div class="demo-row">
     <strong>image fit</strong>
     <div class="demo-seg" id="fitToggle">
-      <button type="button" data-imgfit="card">폭 mid 하한 (시안)</button>
-      <button type="button" data-imgfit="fill">세로에 딱 맞춤</button>
+      <button type="button" data-imgfit="card">폭 mid 고정 (시안)</button>
+      <button type="button" data-imgfit="fill">비율 유지 · 폭 가변</button>
     </div>
   </div>
 
@@ -436,9 +435,9 @@
     const b = e.target.closest('[data-ratio]'); if (b) setRatio(b.dataset.ratio);
   });
 
-  /* 이미지 폭 — 카드 높이 × 비율. 세로는 어느 안이든 꽉 채운다.
-     card 안은 mid 폭에서 나오는 높이를 하한(min-height)으로 둬서,
-     텍스트가 짧을 때는 시안의 mid 폭 그대로가 되게 한다.
+  /* card 안 : 폭은 CSS 의 mid 그대로 두고, 비율에서 나오는 높이만 하한으로 넣는다
+              → 비율을 바꿔도 폭은 동일하고, 텍스트가 더 높으면 세로로 늘어난다(크롭).
+     fill 안 : 비율을 지키려 폭을 텍스트 높이 × 비율로 계산해 넣는다.
      텍스트 높이는 폭에 의존하지 않으므로(모두 1줄 nowrap) 한 번 재면 확정된다. */
   function syncFill() {
     const area = $('.image-area');
@@ -450,14 +449,15 @@
     area.style.width = '';
     const midW = area.getBoundingClientRect().width;
 
+    if (document.body.dataset.imgfit !== 'fill') {
+      area.style.minHeight = `${(midW * b / a).toFixed(3)}px`;   /* 비율 높이 = 하한 */
+      return;                                                    /* 폭은 mid 고정 */
+    }
+
     /* 이미지가 없다고 치고 텍스트 열의 자연 높이를 잰다 */
     area.style.width = '0px';
     const infoH = $('.info').getBoundingClientRect().height;
-
-    const minH = document.body.dataset.imgfit === 'fill' ? 0 : midW * b / a;
-    const rowH = Math.max(infoH, minH);
-    area.style.minHeight = minH ? `${minH.toFixed(3)}px` : '';
-    area.style.width = `${(rowH * a / b).toFixed(3)}px`;
+    area.style.width = `${(infoH * a / b).toFixed(3)}px`;
   }
 
   /* 채움 방식 — 폭 mid 고정(시안) ↔ 세로 꽉(폭 가변) */
@@ -512,11 +512,20 @@
       `이미지 영역 <b>${w(img).toFixed(2)}</b> (mid) · 카드 텍스트 <b>${w(info).toFixed(2)}</b> (fill)<br>` +
       `사이 간격 <b>${gap.toFixed(2)}</b> (나머지) · H2 <b>${px('--fs-h2').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b><br>` +
       `썸네일 <b>${(document.body.dataset.ratio || '1-1').replace('-', ':')}</b> · ` +
-      `<b>${document.body.dataset.imgfit === 'fill' ? '세로 딱' : '폭 mid 하한'}</b> — ` +
+      `<b>${document.body.dataset.imgfit === 'fill' ? '폭 가변' : '폭 mid 고정'}</b> — ` +
       `${w($('.thumb')).toFixed(2)} × <b>${$('.thumb').getBoundingClientRect().height.toFixed(2)}</b> · ` +
       `카드 내용 높이 <b>${info.getBoundingClientRect().height.toFixed(2)}</b> · ` +
-      `카드 <b>${card.getBoundingClientRect().height.toFixed(2)}</b>`;
+      `카드 <b>${card.getBoundingClientRect().height.toFixed(2)}</b>${cropTag()}`;
   }
+  /* 비율 높이보다 더 늘어나 세로가 잘렸는지 (card 안에서만 생긴다) */
+  function cropTag() {
+    const t = $('.thumb').getBoundingClientRect();
+    const [a, b] = (getComputedStyle(document.body).getPropertyValue('--thumb-ratio') || '1/1')
+      .split('/').map(v => parseFloat(v) || 1);
+    const natural = t.width * b / a;
+    return t.height > natural + 0.05 ? ` · <b>세로 크롭</b> (비율 높이 ${natural.toFixed(2)})` : '';
+  }
+
   /* 카드 너비가 mid 그대로인지, min/max 에 걸렸는지 */
   function cardWTag() {
     const mid = px('--w-card-mid'), now = w($('.card'));
