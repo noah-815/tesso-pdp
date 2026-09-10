@@ -70,6 +70,18 @@
   body[data-ratio="4-5"] { --thumb-ratio: 4 / 5; }
   body[data-ratio="3-4"] { --thumb-ratio: 3 / 4; }
 
+  /* 이미지 채움 2안 — 어느 쪽이든 비율과 카드 패딩(mid-12)은 그대로 유지한다
+     card : 폭을 mid 로 고정 → 카드 높이가 이미지에 맞춰진다 (시안 · 기본)
+     fill : 세로를 카드 내용 높이에 꽉 채우고 → 폭이 비율대로 따라온다 */
+  /* fill 안 — 세로는 카드 텍스트 높이에 맞추고 폭은 비율대로.
+     폭이 높이에, 높이가 폭에 의존하는 순환이라 CSS 로는 풀리지 않아
+     폭만 JS 가 계산해 인라인으로 넣는다 (syncFill). */
+  body[data-imgfit="fill"] .highlight .card .image-area { align-self: stretch; }
+  body[data-imgfit="fill"] .highlight .card .image-area .thumb {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; font-size: 14px; }   /* 1rem = 14px */
   body {
@@ -343,6 +355,14 @@
   <button type="button" class="demo-toggle" id="demoToggle" aria-label="패널 접기">–</button>
 
   <div class="demo-row">
+    <strong>image fit</strong>
+    <div class="demo-seg" id="fitToggle">
+      <button type="button" data-imgfit="card">폭 mid (시안)</button>
+      <button type="button" data-imgfit="fill">세로 꽉</button>
+    </div>
+  </div>
+
+  <div class="demo-row">
     <strong>image ratio</strong>
     <div class="demo-seg" id="ratioToggle">
       <button type="button" data-ratio="1-1">1:1</button>
@@ -359,6 +379,7 @@
   const $ = (s, r = document) => r.querySelector(s);
   const UI_KEY = 'fw-e-highlight-ui';
   const RATIO_KEY = 'fw-e-highlight-ratio';
+  const FIT_KEY = 'fw-e-highlight-fit';
   const w = el => el.getBoundingClientRect().width;
 
   function px(k) {
@@ -376,10 +397,36 @@
     document.querySelectorAll('#ratioToggle button')
       .forEach(b => b.classList.toggle('is-on', b.dataset.ratio === v));
     try { localStorage.setItem(RATIO_KEY, v); } catch (e) {}
+    syncFill();
     readout();
   }
   $('#ratioToggle').addEventListener('click', e => {
     const b = e.target.closest('[data-ratio]'); if (b) setRatio(b.dataset.ratio);
+  });
+
+  /* fill 안의 이미지 폭 — 카드 텍스트 높이 × 비율.
+     텍스트 높이는 폭에 의존하지 않으므로(모두 1줄 nowrap) 한 번 재면 확정된다. */
+  function syncFill() {
+    const area = $('.image-area');
+    if (document.body.dataset.imgfit !== 'fill') { area.style.width = ''; return; }
+    area.style.width = '0px';
+    const h = $('.info').getBoundingClientRect().height;
+    const [a, b] = (getComputedStyle(document.body).getPropertyValue('--thumb-ratio') || '1/1')
+      .split('/').map(v => parseFloat(v) || 1);
+    area.style.width = `${(h * a / b).toFixed(3)}px`;
+  }
+
+  /* 채움 방식 — 폭 mid 고정(시안) ↔ 세로 꽉(폭 가변) */
+  function setFit(v) {
+    document.body.dataset.imgfit = v;
+    document.querySelectorAll('#fitToggle button')
+      .forEach(b => b.classList.toggle('is-on', b.dataset.imgfit === v));
+    try { localStorage.setItem(FIT_KEY, v); } catch (e) {}
+    syncFill();
+    readout();
+  }
+  $('#fitToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-imgfit]'); if (b) setFit(b.dataset.imgfit);
   });
 
   function readout() {
@@ -393,11 +440,13 @@
       `텍스트 영역 <b>${w(ta).toFixed(2)}</b> (mid) · 카드 <b>${w(card).toFixed(2)}</b> (mid) · ` +
       `이미지 영역 <b>${w(img).toFixed(2)}</b> (mid) · 카드 텍스트 <b>${w(info).toFixed(2)}</b> (fill)<br>` +
       `사이 간격 <b>${gap.toFixed(2)}</b> (나머지) · H2 <b>${px('--fs-h2').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b><br>` +
-      `썸네일 <b>${(document.body.dataset.ratio || '1-1').replace('-', ':')}</b> — ` +
+      `썸네일 <b>${(document.body.dataset.ratio || '1-1').replace('-', ':')}</b> · ` +
+      `<b>${document.body.dataset.imgfit === 'fill' ? '세로 꽉' : '폭 mid'}</b> — ` +
       `${w($('.thumb')).toFixed(2)} × <b>${$('.thumb').getBoundingClientRect().height.toFixed(2)}</b> · ` +
-      `카드 높이 <b>${card.getBoundingClientRect().height.toFixed(2)}</b>`;
+      `카드 텍스트 높이 <b>${info.getBoundingClientRect().height.toFixed(2)}</b> · ` +
+      `카드 <b>${card.getBoundingClientRect().height.toFixed(2)}</b>`;
   }
-  addEventListener('resize', readout);
+  addEventListener('resize', () => { syncFill(); readout(); });
 
   $('#demoToggle').addEventListener('click', () => {
     const min = $('#demoNav').classList.toggle('is-min');
@@ -411,9 +460,17 @@
     }
   } catch (e) {}
 
+  let savedFit = 'card';
+  try { savedFit = localStorage.getItem(FIT_KEY) || 'card'; } catch (e) {}
+  setFit(savedFit);
   let savedRatio = '1-1';
   try { savedRatio = localStorage.getItem(RATIO_KEY) || '1-1'; } catch (e) {}
   setRatio(savedRatio);
+  /* 웹폰트가 늦게 오면 텍스트 높이가 바뀌므로 로드 후 한 번 더 */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { syncFill(); readout(); });
+  }
+  syncFill();
   readout();
 })();
 </script>
