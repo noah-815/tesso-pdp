@@ -308,7 +308,10 @@
   .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
   .demo-num { display: flex; align-items: center; gap: 4px; color: #999; }
-  .demo-num input {
+  .demo-num input[type="checkbox"] { width: auto; margin: 0; accent-color: #2563eb; }
+  .demo-num input:disabled { color: #bbb; background: #f6f6f6; }
+  .demo-num.is-off { color: #ccc; }
+  .demo-num input[type="number"] {
     width: 52px;
     padding: 3px 5px;
     border: 1px solid rgba(0, 0, 0, 0.14);
@@ -394,8 +397,8 @@
 
   <div class="demo-row">
     <strong>card width</strong>
-    <label class="demo-num">min <input type="number" id="cardWMin" min="0" max="4000" step="1" placeholder="–"></label>
-    <label class="demo-num">max <input type="number" id="cardWMax" min="0" max="4000" step="1" placeholder="–"></label>
+    <label class="demo-num"><input type="checkbox" id="cardWMinOn"> min <input type="number" id="cardWMin" min="0" max="4000" step="1" placeholder="–"></label>
+    <label class="demo-num"><input type="checkbox" id="cardWMaxOn"> max <input type="number" id="cardWMax" min="0" max="4000" step="1" placeholder="–"></label>
     <button type="button" class="demo-reset" id="cardWReset">reset</button>
   </div>
 
@@ -473,20 +476,27 @@
   /* 상품 카드 너비 하한/상한 — 비우면 제한 없음.
      mid 값은 그대로 두고 clamp() 로 감싼다 → 뷰포트가 넓/좁을 때만 걸린다. */
   function applyCardW(save = true) {
-    const mn = $('#cardWMin').value.trim();
-    const mx = $('#cardWMax').value.trim();
+    const mnOn = $('#cardWMinOn').checked, mxOn = $('#cardWMaxOn').checked;
+    const mn = $('#cardWMin').value.trim(), mx = $('#cardWMax').value.trim();
+    /* 꺼져 있으면 값은 남겨두고 제한만 풀어 시안(mid) 과 바로 비교할 수 있게 한다 */
+    $('#cardWMin').disabled = !mnOn;
+    $('#cardWMax').disabled = !mxOn;
+    $('#cardWMin').closest('.demo-num').classList.toggle('is-off', !mnOn);
+    $('#cardWMax').closest('.demo-num').classList.toggle('is-off', !mxOn);
     const root = document.documentElement.style;
-    root.setProperty('--card-w-min', mn === '' ? '0px' : `${parseFloat(mn) || 0}px`);
-    root.setProperty('--card-w-max', mx === '' ? '99999px' : `${parseFloat(mx) || 0}px`);
-    if (save) { try { localStorage.setItem(CARDW_KEY, JSON.stringify([mn, mx])); } catch (e) {} }
+    root.setProperty('--card-w-min', mnOn && mn !== '' ? `${parseFloat(mn) || 0}px` : '0px');
+    root.setProperty('--card-w-max', mxOn && mx !== '' ? `${parseFloat(mx) || 0}px` : '99999px');
+    if (save) {
+      try { localStorage.setItem(CARDW_KEY, JSON.stringify([mnOn, mn, mxOn, mx])); } catch (e) {}
+    }
     syncFill();
     readout();
   }
-  $('#cardWMin').addEventListener('input', () => applyCardW());
-  $('#cardWMax').addEventListener('input', () => applyCardW());
+  ['#cardWMin', '#cardWMax'].forEach(k => $(k).addEventListener('input', () => applyCardW()));
+  ['#cardWMinOn', '#cardWMaxOn'].forEach(k => $(k).addEventListener('change', () => applyCardW()));
   $('#cardWReset').addEventListener('click', () => {
-    $('#cardWMin').value = '';
-    $('#cardWMax').value = '';
+    $('#cardWMinOn').checked = $('#cardWMaxOn').checked = false;
+    $('#cardWMin').value = $('#cardWMax').value = '';
     applyCardW();
   });
 
@@ -531,9 +541,11 @@
 
   try {
     const saved = JSON.parse(localStorage.getItem(CARDW_KEY) || '[]');
-    if (Array.isArray(saved)) {
-      $('#cardWMin').value = saved[0] || '';
-      $('#cardWMax').value = saved[1] || '';
+    if (Array.isArray(saved) && saved.length === 4) {
+      $('#cardWMinOn').checked = !!saved[0];
+      $('#cardWMin').value = saved[1] || '';
+      $('#cardWMaxOn').checked = !!saved[2];
+      $('#cardWMax').value = saved[3] || '';
     }
   } catch (e) {}
   applyCardW(false);
