@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Highlight — Desktop (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E — ProductHighlightSection / variant1 · 데스크탑
+     Figma 11530:194289 · 기준 폭 1920 · 1rem = 14px
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value ≤ 1rem 이면 고정 → C1 12 · P4 13 · P3 14
+        · 가변 : P1 18 · H2 52
+     2) Spacing (mid-*)  (값 − 8) × 100vw / 1920 + 8 · 값 < 8 은 고정
+     3) 이 화면의 반응형 규칙
+        · 섹션      : 뷰포트를 가로·세로 100 채운다 (100vw × 100vh)
+        · 텍스트 영역 : 너비 mid  (시안 1062)
+        · 상품 카드   : 너비 mid  (시안 420)
+        · 카드 내 이미지 영역 : 너비 mid (시안 112)
+        · 카드 내 텍스트 영역 : fill (flex 1 0 0)
+        · 텍스트 영역 ↔ 카드 사이 간격은 두 mid 너비를 뺀 나머지 (space-between)
+          시안의 342 는 1920 에서 자동으로 나온다
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --us: calc(100vw / 1920);              /* spacing 1px (mid-* 계산용) */
+
+    /* Typography ------------------------------------------------- */
+    --fs-c1: 12px;    /* caption-1   0.857rem → 고정 */
+    --fs-p4: 13px;    /* paragraph-4 0.929rem → 고정 */
+    --fs-p3: 14px;    /* paragraph-3 1rem     → 고정 */
+    --fs-p1: calc((1.2857 - 1) * 0.83vw + 1rem);   /* paragraph-1 18px @1920 — 가변 */
+    --fs-h2: calc((3.7143 - 1) * 0.83vw + 1rem);   /* heading-2   52px @1920 — 가변 */
+
+    --lh-c1: 1.2;
+    --lh-p3: 1.6;
+    --lh-p4: 1.6;
+    --lh-p1: 1.5;
+    --lh-h2: 1.35;
+
+    /* Spacing — mid-* -------------------------------------------- */
+    --mid-2:  2px;                         /* 값 < 8 → 고정 */
+    --mid-6:  6px;
+    --mid-10: calc(  2 * var(--us) + 8px);
+    --mid-12: calc(  4 * var(--us) + 8px);
+    --mid-16: calc(  8 * var(--us) + 8px);
+    --mid-48: calc( 40 * var(--us) + 8px);
+    --mid-80: calc( 72 * var(--us) + 8px);
+
+    /* 이 화면의 너비 — 전부 mid 공식 ------------------------------ */
+    --w-text:  calc(1054 * var(--us) + 8px);   /* 시안 1062 */
+    --w-card:  calc( 412 * var(--us) + 8px);   /* 시안 420  */
+    --w-image: calc( 104 * var(--us) + 8px);   /* 시안 112  */
+
+    /* Radius / Font / Color -------------------------------------- */
+    --radius-xs: 4px;
+    --radius-thumb: 2px;                   /* 시안 — 토큰 없음 → px */
+    --font: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    --font-en: "DM Sans", var(--font);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; font-size: 14px; }   /* 1rem = 14px */
+  body {
+    font-family: var(--font);
+    color: #111;
+    background: #000;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+
+  /* ── section ─────────────────────────────────────────────────── */
+  .highlight {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 뷰포트를 가로·세로 100 채운다 */
+    width: 100vw;
+    height: 100vh;
+    padding: var(--mid-80) var(--mid-48);
+    overflow: hidden;
+  }
+  /* media — 섹션을 꽉 채우는 배경 */
+  .highlight .media { position: absolute; inset: 0; overflow: hidden; }
+  .highlight .media img { width: 100%; height: 100%; object-fit: cover; }
+  .highlight .overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, .2); }
+
+  /* content — 텍스트 영역과 카드를 아래쪽에 붙이고 사이는 남는 만큼 */
+  .highlight .content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex: 1 0 0;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* ── textArea — 너비 mid ─────────────────────────────────────── */
+  .highlight .text-area {
+    flex: none;                            /* mid 너비를 그대로 유지 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: var(--mid-16);
+    width: var(--w-text);
+    height: 100%;
+    color: #fff;
+  }
+  .highlight .text-area .eyebrow {
+    width: 100%;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+  }
+  .highlight .text-area .headline {
+    width: 100%;
+    font-family: var(--font-en);
+    font-variation-settings: "opsz" 14;
+    font-weight: 500;
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+  }
+  .highlight .text-area .body {
+    width: 100%;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-p3);
+  }
+
+  /* ── overlayProductCard — 너비 mid ───────────────────────────── */
+  .highlight .card {
+    flex: none;                            /* mid 너비를 그대로 유지 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: var(--w-card);
+    padding: var(--mid-12);
+    border-radius: var(--radius-xs);
+    background: rgba(0, 0, 0, .25);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #fff;
+  }
+  .highlight .card .row { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
+
+  /* imageArea — 너비 mid · 썸네일은 그 안에서 1:1 */
+  .highlight .card .image-area {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    width: var(--w-image);
+  }
+  .highlight .card .image-area .thumb {
+    flex: 1 0 0;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-thumb);
+    overflow: hidden;
+    background: rgba(255, 255, 255, .08);
+  }
+  .highlight .card .image-area .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* productInfo — 남는 폭을 채운다 (fill) */
+  .highlight .card .info {
+    flex: 1 0 0;
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: var(--mid-2);
+  }
+  .highlight .card .info .texts {
+    flex: 1 0 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-10);
+    width: 100%;
+  }
+  .highlight .card .info .title-area {
+    flex: 1 0 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-6);
+    width: 100%;
+  }
+  .highlight .card .info .category {
+    width: 100%;
+    font-family: var(--font-en);
+    font-variation-settings: "opsz" 14;
+    font-size: var(--fs-c1);
+    line-height: var(--lh-c1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .highlight .card .info .name {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p1);
+    line-height: var(--lh-p1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .highlight .card .info .price {
+    display: flex;
+    align-items: center;
+    font-size: var(--fs-p4);
+    line-height: var(--lh-p4);
+    white-space: nowrap;
+  }
+  .highlight .card .info .price .num { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+  .highlight .card .info .button-area { display: flex; justify-content: flex-end; width: 100%; }
+  .highlight .card .info .icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;                           /* 시안 — 토큰 없음 → px */
+    height: 24px;
+    border-radius: var(--radius-xs);
+  }
+  .highlight .card .info .icon-btn img { width: 24px; height: 24px; }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto;
+    gap: 6px;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-family: var(--font);
+    font-size: 11px;
+    line-height: 1.5;
+    color: #111;
+    white-space: nowrap;
+  }
+  .demo-nav.is-min > *:not(.demo-toggle) { display: none; }
+  .demo-toggle {
+    justify-self: end;
+    padding: 2px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    color: #777;
+  }
+  .demo-readout { color: #999; font-variant-numeric: tabular-nums; }
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<section class="highlight" aria-label="Product highlight">
+  <div class="media"><img src="assets/media.png" alt=""></div>
+  <div class="overlay"></div>
+
+  <div class="content">
+    <div class="text-area">
+      <p class="eyebrow">New Collection</p>
+      <h2 class="headline">The Power of Thoughtful Details</h2>
+      <p class="body">
+        작은 선택 하나, 보이지 않는 디테일까지 고민하는 과정은 결국 결과의 완성도를 넘어, 경험의 차이를 만듭니다.<br>
+        사람들은 모든 요소를 기억하지는 않지만, 그 안에 담긴 감각과 인상은 오래 남습니다.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="image-area">
+          <div class="thumb"><img src="assets/thumb.png" alt=""></div>
+        </div>
+        <div class="info">
+          <div class="texts">
+            <div class="title-area">
+              <p class="category">category Name</p>
+              <p class="name">Product Name Max 1line</p>
+            </div>
+            <p class="price"><span class="num">40,000</span><span>원</span></p>
+          </div>
+          <div class="button-area">
+            <button type="button" class="icon-btn" aria-label="상품 보기">
+              <img src="assets/arrow-right.svg" alt="">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<nav class="demo-nav" id="demoNav">
+  <button type="button" class="demo-toggle" id="demoToggle" aria-label="패널 접기">–</button>
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const UI_KEY = 'fw-e-highlight-ui';
+  const w = el => el.getBoundingClientRect().width;
+
+  function px(k) {
+    const d = document.createElement('div');
+    d.style.width = `var(${k})`;
+    document.body.appendChild(d);
+    const v = parseFloat(getComputedStyle(d).width);
+    d.remove();
+    return v;
+  }
+
+  function readout() {
+    const sec = $('.highlight'), content = $('.content');
+    const ta = $('.text-area'), card = $('.card'), img = $('.image-area'), info = $('.info');
+    const cs = getComputedStyle(sec);
+    const gap = w(content) - w(ta) - w(card);
+    $('#readout').innerHTML =
+      `viewport <b>${innerWidth} × ${innerHeight}</b> · 섹션 <b>${w(sec).toFixed(0)} × ${sec.getBoundingClientRect().height.toFixed(0)}</b> · ` +
+      `여백 <b>${parseFloat(cs.paddingLeft).toFixed(2)}</b> / <b>${parseFloat(cs.paddingTop).toFixed(2)}</b><br>` +
+      `텍스트 영역 <b>${w(ta).toFixed(2)}</b> (mid) · 카드 <b>${w(card).toFixed(2)}</b> (mid) · ` +
+      `이미지 영역 <b>${w(img).toFixed(2)}</b> (mid) · 카드 텍스트 <b>${w(info).toFixed(2)}</b> (fill)<br>` +
+      `사이 간격 <b>${gap.toFixed(2)}</b> (나머지) · H2 <b>${px('--fs-h2').toFixed(2)}</b> · P1 <b>${px('--fs-p1').toFixed(2)}</b>`;
+  }
+  addEventListener('resize', readout);
+
+  $('#demoToggle').addEventListener('click', () => {
+    const min = $('#demoNav').classList.toggle('is-min');
+    $('#demoToggle').textContent = min ? '+' : '–';
+    try { localStorage.setItem(UI_KEY, min ? 'min' : 'open'); } catch (e) {}
+  });
+  try {
+    if (localStorage.getItem(UI_KEY) === 'min') {
+      $('#demoNav').classList.add('is-min');
+      $('#demoToggle').textContent = '+';
+    }
+  } catch (e) {}
+
+  readout();
+})();
+</script>
+
+</body>
+</html>
