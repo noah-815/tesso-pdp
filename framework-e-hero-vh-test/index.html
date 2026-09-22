@@ -422,6 +422,8 @@
 <div class="probe" id="pSvh" style="height:100svh"></div>
 <div class="probe" id="pLvh" style="height:100lvh"></div>
 <div class="probe" id="pDvh" style="height:100dvh"></div>
+<!-- safe-area 측정용 — iOS 에서 브라우저 바가 콘텐츠 위에 떠 있으면 하단 inset 이 잡힐 수 있다 -->
+<div class="probe" id="pSafe" style="padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)"></div>
 
 <script>
 (() => {
@@ -529,6 +531,10 @@
       /* 첫 화면 기준 판정: 카드 하단이 실제로 보이는 영역 하단보다 위에 있는가 */
       const visibleBottom = vvTop + vvH;
       const gap = visibleBottom - card.bottom;       /* + 여유 / − 가림 */
+      const safe = getComputedStyle(document.getElementById('pSafe'));
+      const safeTop = parseFloat(safe.paddingTop) || 0;
+      const safeBottom = parseFloat(safe.paddingBottom) || 0;
+      const gapSafe = gap - safeBottom;              /* 하단 safe-area 까지 뺀 여유 */
       const atTop = scrollY < 2;
       const verdict = $('#dbgVerdict');
       if (atTop) {
@@ -544,6 +550,8 @@
         ['hero 높이', px(hero.height)],
         ['hero 하단 (viewport 기준)', px(hero.bottom)],
         ['카드 하단 여유', atTop ? `${gap >= 0 ? '+' : ''}${px(gap)}` : '(맨 위에서 판정)'],
+        ['└ safe-area 제외', atTop ? `${gapSafe >= 0 ? '+' : ''}${px(gapSafe)}` : '–'],
+        ['safe-area 상 / 하', `${px(safeTop)} / ${px(safeBottom)}`],
         ['sep'],
         ['window.innerHeight', px(innerHeight)],
         ['visualViewport.height', vv ? px(vv.height) : '미지원'],
