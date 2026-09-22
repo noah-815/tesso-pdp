@@ -21,6 +21,24 @@ height: calc(100dvh - var(--header-h));   /* 100dvh 자리 = vh / svh / lvh / dv
 
 `&banner=1` 을 붙이면 띠배너가 켜진 상태(헤더 약 93px)로 열립니다.
 
+### 주소창 영역 포함 (iOS Safari 전용)
+
+최신 iOS 사파리는 하단 주소창이 콘텐츠 위에 반투명하게 떠 있습니다. 그 뒤까지 보이는 영역으로 보고
+히어로를 채우는 버전입니다. **아이폰·아이패드 사파리로 접속했을 때만** 패널에 토글이 나타납니다
+(크롬·카카오톡·네이버 인앱에서는 숨김). `&bar=include` 로 링크 공유 가능.
+
+```css
+height: calc(100lvh - var(--header-h));                    /* 바가 모두 사라졌을 때 높이 = 주소창 뒤까지 */
+padding-bottom: calc(mid-40 + max(100lvh - 100dvh, env(safe-area-inset-bottom)));
+                                                           /* 카드는 주소창 높이만큼 올린다 */
+```
+
+- 바가 보이는 동안 `100lvh − 100dvh` 가 바 높이 → 카드가 바 위에 뜨고, 스크롤로 바가 줄면 따라 내려옵니다.
+- 켜져 있으면 단위 선택은 무시됩니다 (버튼에 `dvh+바` 처럼 표시).
+- 디버그에 `주소창 크기 (lvh − dvh)` 가 추가됐습니다.
+
+링크: https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test/?unit=dvh&bar=include
+
 ## 화면 구성
 
 - **우하단 버튼** — 단위 선택 패널 (vh / svh / lvh / dvh, 띠배너, 현재 설정 링크 복사).

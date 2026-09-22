@@ -137,6 +137,23 @@
   html[data-unit="lvh"] .hero { height: calc(100vh - var(--header-h)); height: calc(100lvh - var(--header-h)); }
   html[data-unit="dvh"] .hero { height: calc(100vh - var(--header-h)); height: calc(100dvh - var(--header-h)); }
 
+  /* 주소창 영역 포함 (iOS Safari 전용 토글 · ?bar=include)
+     최신 iOS 는 하단 주소창이 콘텐츠 위에 반투명하게 떠 있다. 그 아래까지 "보이는 영역"으로 보고
+     히어로를 바가 모두 사라졌을 때의 높이(100lvh)로 채운다 → 배경은 주소창 뒤까지 깔린다.
+     대신 카드는 주소창에 가리지 않게 그만큼 위로 올린다.
+       주소창 크기 = max(100lvh − 100dvh, 하단 safe-area)
+       · 바가 보이는 동안 lvh − dvh 가 바 높이 → 카드가 바 위에 뜨고
+       · 스크롤로 바가 줄면 dvh 가 커지며 카드가 따라 내려온다
+       · 콘텐츠가 바 뒤까지 깔려 dvh = lvh 인 경우엔 safe-area 하단 inset 으로 대신 올린다
+     단위 선택(vh/svh/lvh/dvh)과 무관하게 이 식이 우선한다. */
+  html[data-bar="include"] .hero,
+  html[data-bar="include"][data-unit] .hero {
+    height: calc(100vh - var(--header-h));
+    height: calc(100lvh - var(--header-h));
+    padding-bottom: calc(var(--mid-40) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--mid-40) + max(100lvh - 100dvh, env(safe-area-inset-bottom, 0px)));
+  }
+
   .hero .media { position: absolute; inset: 0; overflow: hidden; }
   .hero .media img { width: 100%; height: 100%; object-fit: cover; }
   .hero .overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.2); }
@@ -336,6 +353,9 @@
   .unit-panel .seg button.is-on { background: #111; color: #fff; font-weight: 700; }
   .unit-panel .seg button:disabled { color: #ccc; text-decoration: line-through; }
   .unit-panel .toggle { display: flex; align-items: center; justify-content: space-between; padding-top: 4px; }
+  .unit-panel .bar-opt { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid #eee; }
+  .unit-panel .bar-opt .hint { font-size: 10.5px; line-height: 1.45; color: #888; }
+  html[data-bar="include"] .unit-panel .seg { opacity: 0.35; }
   .unit-panel .copy { padding: 7px 0; border: 1px solid #ddd; border-radius: 4px; color: #2563eb; }
 
   /* 단위별 100% 높이 측정용 (보이지 않음) */
@@ -415,6 +435,10 @@
     <button type="button" data-unit="dvh">dvh</button>
   </div>
   <label class="toggle"><span>띠배너</span><input type="checkbox" id="bannerToggle"></label>
+  <div class="bar-opt" id="barOpt" hidden>
+    <label class="toggle"><span>주소창 영역 포함 <b>(Safari)</b></span><input type="checkbox" id="barToggle"></label>
+    <span class="hint">떠 있는 하단 주소창 뒤까지 히어로를 채우고(100lvh), 카드는 주소창 높이만큼 올립니다. 켜면 위 단위 선택은 무시됩니다.</span>
+  </div>
   <button type="button" class="copy" id="copyLink">현재 설정 링크 복사</button>
 </div>
 
@@ -453,7 +477,7 @@
   function setUnit(u, push = true) {
     if (!UNITS.includes(u)) u = 'dvh';
     root.dataset.unit = u;
-    $('#unitFab').textContent = u;
+    $('#unitFab').textContent = root.dataset.bar ? `${u}+바` : u;
     $('#dbgUnit').textContent = supports(u) ? u : `${u} (미지원 → vh 폴백)`;
     document.querySelectorAll('#unitSeg button').forEach(b => b.classList.toggle('is-on', b.dataset.unit === u));
     if (push) {
@@ -479,6 +503,28 @@
     }
   }
   $('#bannerToggle').addEventListener('change', e => setBanner(e.target.checked));
+
+  /* 주소창 영역 포함 — iOS/iPadOS Safari 에서만 노출 (인앱 · 다른 브라우저 제외)
+     ?forceSafari=1 이면 다른 브라우저에서도 노출 (데스크탑 확인용) */
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const isSafari = isIOS && /Version\/[\d.]+.*Safari\//.test(ua)
+    && !/CriOS|FxiOS|EdgiOS|OPiOS|KAKAOTALK|NAVER|Whale|DaumApps|Line\/|Instagram|FBAN|FBAV/i.test(ua);
+  const barAvailable = isSafari || params.get('forceSafari') === '1';
+  function setBar(on, push = true) {
+    on = on && barAvailable;
+    if (on) root.dataset.bar = 'include'; else delete root.dataset.bar;
+    $('#barToggle').checked = on;
+    $('#unitFab').textContent = on ? `${root.dataset.unit}+바` : root.dataset.unit;
+    if (push) {
+      const p = new URLSearchParams(location.search);
+      on ? p.set('bar', 'include') : p.delete('bar');
+      history.replaceState(null, '', `${location.pathname}?${p}${location.hash}`);
+    }
+    update();
+  }
+  $('#barOpt').hidden = !barAvailable;
+  $('#barToggle').addEventListener('change', e => setBar(e.target.checked));
 
   /* 플로팅 버튼 ↔ 패널 */
   $('#unitFab').addEventListener('click', () => {
@@ -517,6 +563,10 @@
   }
   const UA = uaSummary();
   const px = n => `${Math.round(n * 10) / 10}px`;
+  const lvhMinusDvh = () => {
+    const l = document.getElementById('pLvh').offsetHeight, d = document.getElementById('pDvh').offsetHeight;
+    return l && d ? px(document.getElementById('pLvh').getBoundingClientRect().height - document.getElementById('pDvh').getBoundingClientRect().height) : '미지원';
+  };
   const probe = id => { const el = document.getElementById(id); return el.offsetHeight ? px(el.getBoundingClientRect().height) : '미지원'; };
 
   function update() {
@@ -545,7 +595,8 @@
         verdict.className = 'verdict';
       }
       const rows = [
-        ['unit', root.dataset.unit + (supports(root.dataset.unit) ? '' : ' (미지원)')],
+        ['unit', root.dataset.bar ? `100lvh (주소창 영역 포함 · 선택 ${root.dataset.unit} 무시)` : root.dataset.unit + (supports(root.dataset.unit) ? '' : ' (미지원)')],
+        ['주소창 크기 (lvh − dvh)', lvhMinusDvh()],
         ['--header-h', px(headerH)],
         ['hero 높이', px(hero.height)],
         ['hero 하단 (viewport 기준)', px(hero.bottom)],
@@ -589,6 +640,7 @@
   });
 
   setBanner(params.get('banner') === '1', false);
+  setBar(params.get('bar') === 'include', false);
   setUnit(params.get('unit') || 'dvh', !params.get('unit'));
 })();
 </script>
