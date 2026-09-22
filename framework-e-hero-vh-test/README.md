@@ -1,0 +1,54 @@
+# 모바일 히어로 높이 실기기 테스트
+
+Framework E `productHighlightSection/variant1` (Figma `13117:191153`) 을 모바일 히어로로 놓고,
+**브라우저 바와 헤더를 뺀 보이는 영역에 딱 맞는지 · 바가 숨으면 늘어나는지** 확인하는 페이지.
+
+```css
+height: calc(100vh  - var(--header-h));   /* 폴백 */
+height: calc(100dvh - var(--header-h));   /* 100dvh 자리 = vh / svh / lvh / dvh 토글 */
+```
+
+`--header-h` 는 ResizeObserver 가 `.site-header` 실제 높이를 재서 `:root` 에 넣습니다.
+
+## 링크
+
+| 단위 | 링크 |
+|---|---|
+| vh  | https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test/?unit=vh |
+| svh | https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test/?unit=svh |
+| lvh | https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test/?unit=lvh |
+| dvh | https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test/?unit=dvh |
+
+`&banner=1` 을 붙이면 띠배너가 켜진 상태(헤더 약 93px)로 열립니다.
+
+## 화면 구성
+
+- **우하단 버튼** — 단위 선택 패널 (vh / svh / lvh / dvh, 띠배너, 현재 설정 링크 복사).
+  선택하면 URL `?unit=` 도 바뀝니다. 브라우저가 지원하지 않는 단위는 비활성으로 표시.
+- **좌상단 디버그** (탭하면 접힘, 상태 기억)
+  - 맨 위 배지: 스크롤 0 일 때 **카드 보임 +N / 카드 가림 Npx** — 카드 하단과 `visualViewport` 하단의 차이
+  - unit · `--header-h` · 히어로 실제 높이 · `innerHeight` · `visualViewport.height/offsetTop` · `clientHeight`
+  - `100vh / svh / lvh / dvh` 가 이 기기에서 각각 몇 px 인지 (측정용 숨은 요소)
+  - scrollY · 폭 · DPR · UA 요약 (OS · 카카오톡/네이버 인앱 · Safari/Chrome 등)
+  - resize · scroll · visualViewport 이벤트마다 갱신
+- 히어로 아래 더미 섹션 3개 (각 `min-height: 100vh`)
+
+## 확인 방법
+
+1. 링크를 연 첫 화면에서 배지가 **카드 보임** 인지 (히어로 하단 padding 40 이 있어 정상이면 `+40` 근처)
+2. 아래로 스크롤해 브라우저 바를 숨긴 뒤 맨 위로 → `hero 높이` 가 늘었는지
+3. 같은 기기에서 `vh` ↔ `dvh` 번갈아 비교
+
+## 로컬 검증 (390 × 790, 브라우저 바 없음)
+
+| 항목 | 시안 | 구현 |
+|---|---|---|
+| 헤더 | 60 | 60 (`--header-h` 측정값) |
+| 히어로 | 730 | 730 |
+| 타이틀 y (히어로 상단 + mid-40) | 100 | 100 |
+| 카드 하단 (히어로 하단 − mid-40) | 750 | 750 |
+| 카드 높이 | 124 | 125.2 |
+
+카드는 텍스트 합(카테고리 14.4 + 8 + 상품명 24 + 8 + 가격 20.8 + 화살표 24 + 상단 2 = 101.2)이
+썸네일 100 보다 커서 1.2px 높습니다. 시안은 Figma 가 텍스트 높이를 반올림한 결과입니다.
+띠배너를 켜면 `--header-h` 가 92.8 로 바뀌고 히어로가 그만큼 줄어 카드 위치가 유지됩니다.

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ko" data-unit="dvh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hero Height Test — Mobile (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Inter:wght@600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     모바일 히어로 높이 실기기 테스트 · Figma 13117:191153
+
+     히어로 = 브라우저 바(주소창 · 하단 내비)와 헤더를 뺀 "보이는 영역"
+       height: calc(100vh  - var(--header-h));   ← 미지원 브라우저 폴백
+       height: calc(100dvh - var(--header-h));   ← 100dvh 자리를 vh / svh / lvh / dvh 로 전환
+     --header-h 는 JS(ResizeObserver)가 실제 헤더 높이를 재서 :root 에 넣는다.
+
+     Unit system — Framework E mobile (기준 폭 390)
+       · 타이포  size × min(100vw, 450px) / 390
+       · mid-*  (값 − 8) × 100vw / 390 + 8, 값 < 8 은 고정
+       · px-*   px 고정
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --tw: min(100vw, 450px);        /* 타이포 기준 폭 (450px 이후 고정) */
+    --ut: calc(var(--tw) / 390);    /* 타이포 1px */
+    --us: calc(100vw / 390);        /* spacing 1px */
+
+    --fs-c1: calc(12 * var(--ut));  /* caption-1   */
+    --fs-p4: calc(13 * var(--ut));  /* paragraph-4 */
+    --fs-p3: calc(14 * var(--ut));  /* paragraph-3 */
+    --fs-p1: calc(16 * var(--ut));  /* paragraph-1 */
+    --fs-h2: calc(40 * var(--ut));  /* heading-2   */
+    --fs-logo: 20px;                /* BRAND 로고 — 가변 제외 */
+
+    --mid-2:   2px;                 /* 값 < 8 → 고정 */
+    --mid-8:   8px;
+    --mid-12:  calc(  4 * var(--us) + 8px);
+    --mid-16:  calc(  8 * var(--us) + 8px);
+    --mid-40:  calc( 32 * var(--us) + 8px);
+    --mid-100: calc( 92 * var(--us) + 8px);   /* 카드 썸네일 폭 */
+    --px-16:   16px;
+
+    --radius-xs: 4px;
+    --radius-thumb: 2px;
+
+    --font: "DM Sans", "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    --font-kr: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+    --font-logo: "Inter", "Pretendard Variable", Pretendard, sans-serif;
+    --c-header: #372320;
+
+    /* JS 가 실제 높이로 덮어쓴다. 첫 페인트 전까지만 쓰이는 초기값 */
+    --header-h: 60px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }   /* display 지정한 요소에서도 hidden 이 이기게 */
+  html { -webkit-text-size-adjust: 100%; font-size: 14px; }
+  body {
+    font-family: var(--font);
+    font-variation-settings: "opsz" 14;
+    color: #111;
+    background: #fff;
+    word-break: keep-all;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { display: block; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  /* ── 헤더 — 히어로 위에 겹치지 않고 자리를 차지 · sticky ─────────── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: #fff;
+  }
+  /* 띠배너 — 데모. 켜면 헤더 높이가 늘고 --header-h 가 따라 바뀌는지 확인용 */
+  .strip-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    background: #111;
+    color: #fff;
+    font-family: var(--font-kr);
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+  }
+  .header-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;                   /* 시안 60 — 토큰 없음 → px */
+    padding: 0 max(var(--px-16), env(safe-area-inset-right, 0px)) 0 max(var(--px-16), env(safe-area-inset-left, 0px));
+    color: var(--c-header);
+  }
+  .header-bar .side {
+    display: flex;
+    align-items: center;
+    min-width: 48px;
+    height: 48px;
+    font-size: var(--fs-p4);
+    line-height: 1.6;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .header-bar .side.right { justify-content: flex-end; }
+  .header-bar .logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-logo);
+    font-weight: 600;
+    font-size: var(--fs-logo);
+    line-height: 28px;
+    white-space: nowrap;
+  }
+
+  /* ── productHighlightSection/variant1 — 히어로 ───────────────── */
+  .hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: var(--mid-40) var(--mid-16);
+    overflow: hidden;
+    /* 기본 = 폴백 (vh 선택 시에도 이 한 줄만 쓰인다) */
+    height: calc(100vh - var(--header-h));
+  }
+  html[data-unit="svh"] .hero { height: calc(100vh - var(--header-h)); height: calc(100svh - var(--header-h)); }
+  html[data-unit="lvh"] .hero { height: calc(100vh - var(--header-h)); height: calc(100lvh - var(--header-h)); }
+  html[data-unit="dvh"] .hero { height: calc(100vh - var(--header-h)); height: calc(100dvh - var(--header-h)); }
+
+  .hero .media { position: absolute; inset: 0; overflow: hidden; }
+  .hero .media img { width: 100%; height: 100%; object-fit: cover; }
+  .hero .overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.2); }
+
+  .hero .content {
+    position: relative;
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+  /* 텍스트 영역이 남는 높이를 차지 → 카드는 항상 히어로 하단에 붙는다 */
+  .hero .text-area {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-12);
+    width: 100%;
+    min-height: 0;
+  }
+  .hero .title {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-h2);
+    line-height: 1.3;
+    color: #fff;
+  }
+  .hero .desc {
+    width: 100%;
+    font-family: var(--font-kr);
+    font-size: var(--fs-p3);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* overlayProductCard */
+  .card {
+    flex-shrink: 0;
+    display: flex;
+    width: 100%;
+    padding: var(--mid-12);
+    border-radius: var(--radius-xs);
+    background: rgba(0, 0, 0, 0.25);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    color: #fff;
+    text-decoration: none;
+  }
+  .card .row { display: flex; align-items: flex-start; gap: var(--mid-16); width: 100%; }
+  .card .image-area { flex-shrink: 0; display: flex; width: var(--mid-100); }
+  .card .thumb {
+    position: relative;
+    flex: 1 0 0;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-thumb);
+    overflow: hidden;
+  }
+  .card .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .card .info {
+    display: flex;
+    flex: 1 0 0;
+    flex-direction: column;
+    align-self: stretch;
+    min-width: 0;
+    padding-top: var(--mid-2);
+  }
+  .card .texts { display: flex; flex: 1 1 auto; flex-direction: column; gap: var(--mid-8); }
+  .card .title-area { display: flex; flex-direction: column; gap: var(--mid-8); }
+  .card .category {
+    font-size: var(--fs-c1);
+    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card .name {
+    font-family: var(--font-kr);
+    font-weight: 500;
+    font-size: var(--fs-p1);
+    line-height: 1.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card .price { display: flex; align-items: center; font-size: var(--fs-p4); line-height: 1.6; white-space: nowrap; }
+  .card .price .unit { font-family: var(--font-kr); }
+  .card .button-area { display: flex; justify-content: flex-end; }
+  .card .icon-btn { display: flex; width: 24px; height: 24px; border-radius: var(--radius-xs); }
+  .card .icon-btn img { width: 24px; height: 24px; }
+
+  /* ── 스크롤 테스트용 더미 섹션 ─────────────────────────────────── */
+  .dummy {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 100vh;
+    padding: 40px 16px 56px;
+    font-family: var(--font-kr);
+    font-size: 14px;
+    line-height: 1.7;
+    color: #444;
+  }
+  .dummy:nth-of-type(odd) { background: #f4f2ef; }
+  .dummy h2 { font-size: 18px; line-height: 1.4; color: #111; }
+  .dummy .bar { height: 120px; border-radius: 4px; background: rgba(0, 0, 0, 0.06); }
+
+  /* ── 디버그 오버레이 (접기/펼치기) ─────────────────────────────── */
+  .debug {
+    position: fixed;
+    top: calc(var(--header-h) + 8px);
+    left: 8px;
+    z-index: 300;
+    max-width: calc(100vw - 16px);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.72);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10.5px;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+  .debug summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 600;
+  }
+  .debug summary::-webkit-details-marker { display: none; }
+  .debug summary::after { content: "▾"; opacity: 0.6; }
+  .debug:not([open]) summary::after { content: "▸"; }
+  .debug .verdict { padding: 1px 5px; border-radius: 3px; font-weight: 700; }
+  .debug .verdict.ok  { background: #1f9d55; }
+  .debug .verdict.bad { background: #d64545; }
+  .debug dl {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 1px 10px;
+    padding: 0 8px 8px;
+  }
+  .debug dt { opacity: 0.6; }
+  .debug dd { text-align: right; white-space: nowrap; }
+  .debug dd.ua { max-width: 60vw; overflow: hidden; text-overflow: ellipsis; }
+  .debug .sep { grid-column: 1 / -1; height: 1px; margin: 3px 0; background: rgba(255, 255, 255, 0.15); }
+
+  /* ── 단위 토글 — 우하단 플로팅 버튼 + 패널 ──────────────────────── */
+  .unit-fab {
+    position: fixed;
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    z-index: 310;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.72);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .unit-panel {
+    position: fixed;
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+    z-index: 310;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 196px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    font-family: var(--font-kr);
+    font-size: 12px;
+    color: #111;
+  }
+  .unit-panel .label { font-size: 11px; color: #888; }
+  .unit-panel .seg { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
+  .unit-panel .seg button { padding: 8px 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #666; }
+  .unit-panel .seg button + button { border-left: 1px solid #ddd; }
+  .unit-panel .seg button.is-on { background: #111; color: #fff; font-weight: 700; }
+  .unit-panel .seg button:disabled { color: #ccc; text-decoration: line-through; }
+  .unit-panel .toggle { display: flex; align-items: center; justify-content: space-between; padding-top: 4px; }
+  .unit-panel .copy { padding: 7px 0; border: 1px solid #ddd; border-radius: 4px; color: #2563eb; }
+
+  /* 단위별 100% 높이 측정용 (보이지 않음) */
+  .probe { position: fixed; top: 0; left: 0; width: 0; visibility: hidden; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div class="site-header" id="siteHeader">
+  <div class="strip-banner" id="stripBanner" hidden>신규 회원 10% 할인 쿠폰 — 띠배너 (헤더 높이 측정 테스트)</div>
+  <header class="header-bar">
+    <span class="side">Menu</span>
+    <span class="logo">BRAND</span>
+    <span class="side right">Bag [0]</span>
+  </header>
+</div>
+
+<main>
+  <section class="hero" id="hero" aria-label="Product highlight">
+    <div class="media"><img src="assets/media.jpg" alt=""></div>
+    <div class="overlay"></div>
+    <div class="content">
+      <div class="text-area">
+        <h1 class="title">The Power of Thoughtful Details</h1>
+        <p class="desc">작은 선택 하나, 보이지 않는 디테일까지 고민하는 과정은<br>결국 결과의 완성도를 넘어, 경험의 차이를 만듭니다.</p>
+      </div>
+      <a class="card" id="card" href="#s1">
+        <div class="row">
+          <div class="image-area"><div class="thumb"><img src="assets/thumb.jpg" alt=""></div></div>
+          <div class="info">
+            <div class="texts">
+              <div class="title-area">
+                <p class="category">CATEGORY</p>
+                <p class="name">전해질 보충 음료 블러드 오렌지</p>
+              </div>
+              <p class="price"><span>40,000</span><span class="unit">원</span></p>
+            </div>
+            <div class="button-area"><span class="icon-btn"><img src="assets/arrow-right.svg" alt=""></span></div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="dummy" id="s1">
+    <h2>더미 섹션 1</h2>
+    <p>아래로 스크롤해 브라우저 바(주소창 · 하단 내비게이션)가 사라지게 한 뒤, 다시 맨 위로 올라가 히어로가 늘어났는지 확인하세요.</p>
+    <p>디버그 오버레이의 <b>hero</b> 값과 <b>visualViewport</b> 값이 스크롤 전후로 어떻게 바뀌는지 비교하면 됩니다.</p>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  </section>
+  <section class="dummy">
+    <h2>더미 섹션 2</h2>
+    <p>vh 는 대부분의 모바일 브라우저에서 "바가 숨었을 때"(large) 높이라 첫 화면에서 하단이 가려질 수 있고, dvh 는 바의 노출 상태를 따라 실시간으로 바뀝니다.</p>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  </section>
+  <section class="dummy">
+    <h2>더미 섹션 3</h2>
+    <p>우하단 버튼으로 단위를 바꾸면 URL 의 <code>?unit=</code> 도 함께 바뀝니다. 그 상태로 링크를 복사해 다른 기기로 보내면 같은 조건으로 열립니다.</p>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  </section>
+</main>
+
+<!-- 디버그 오버레이 -->
+<details class="debug" id="debug" open>
+  <summary><span id="dbgUnit">dvh</span><span class="verdict" id="dbgVerdict">–</span></summary>
+  <dl id="dbgList"></dl>
+</details>
+
+<!-- 단위 토글 -->
+<button type="button" class="unit-fab" id="unitFab" aria-expanded="false" aria-controls="unitPanel">dvh</button>
+<div class="unit-panel" id="unitPanel" hidden>
+  <span class="label">히어로 높이 단위 (100□ − header)</span>
+  <div class="seg" id="unitSeg">
+    <button type="button" data-unit="vh">vh</button>
+    <button type="button" data-unit="svh">svh</button>
+    <button type="button" data-unit="lvh">lvh</button>
+    <button type="button" data-unit="dvh">dvh</button>
+  </div>
+  <label class="toggle"><span>띠배너</span><input type="checkbox" id="bannerToggle"></label>
+  <button type="button" class="copy" id="copyLink">현재 설정 링크 복사</button>
+</div>
+
+<div class="probe" id="pVh"  style="height:100vh"></div>
+<div class="probe" id="pSvh" style="height:100svh"></div>
+<div class="probe" id="pLvh" style="height:100lvh"></div>
+<div class="probe" id="pDvh" style="height:100dvh"></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const root = document.documentElement;
+  const UNITS = ['vh', 'svh', 'lvh', 'dvh'];
+  const supports = u => u === 'vh' || (window.CSS && CSS.supports && CSS.supports('height', `100${u}`));
+  let raf = 0;                     /* update() 의 rAF 핸들 — 헤더 측정이 먼저 호출하므로 맨 위에 */
+
+  /* ── 1. --header-h : 실제 헤더 높이를 재서 :root 에 ─────────────── */
+  const header = $('#siteHeader');
+  let headerH = 0;
+  function syncHeader() {
+    const h = header.getBoundingClientRect().height;
+    if (Math.abs(h - headerH) < 0.01) return;
+    headerH = h;
+    root.style.setProperty('--header-h', `${h}px`);
+    update();
+  }
+  if ('ResizeObserver' in window) new ResizeObserver(syncHeader).observe(header);
+  else addEventListener('resize', syncHeader);           /* 구형 폴백 */
+  syncHeader();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncHeader);
+
+  /* ── 2. 단위 — URL ?unit= 우선, 없으면 dvh ─────────────────────── */
+  const params = new URLSearchParams(location.search);
+  function setUnit(u, push = true) {
+    if (!UNITS.includes(u)) u = 'dvh';
+    root.dataset.unit = u;
+    $('#unitFab').textContent = u;
+    $('#dbgUnit').textContent = supports(u) ? u : `${u} (미지원 → vh 폴백)`;
+    document.querySelectorAll('#unitSeg button').forEach(b => b.classList.toggle('is-on', b.dataset.unit === u));
+    if (push) {
+      const p = new URLSearchParams(location.search);
+      p.set('unit', u);
+      history.replaceState(null, '', `${location.pathname}?${p}${location.hash}`);
+    }
+    update();
+  }
+  document.querySelectorAll('#unitSeg button').forEach(b => {
+    if (!supports(b.dataset.unit)) b.disabled = true;
+    b.addEventListener('click', () => setUnit(b.dataset.unit));
+  });
+
+  /* 띠배너 — ?banner=1 로도 지정 */
+  function setBanner(on, push = true) {
+    $('#stripBanner').hidden = !on;
+    $('#bannerToggle').checked = on;
+    if (push) {
+      const p = new URLSearchParams(location.search);
+      on ? p.set('banner', '1') : p.delete('banner');
+      history.replaceState(null, '', `${location.pathname}?${p}${location.hash}`);
+    }
+  }
+  $('#bannerToggle').addEventListener('change', e => setBanner(e.target.checked));
+
+  /* 플로팅 버튼 ↔ 패널 */
+  $('#unitFab').addEventListener('click', () => {
+    const open = $('#unitPanel').hidden;
+    $('#unitPanel').hidden = !open;
+    $('#unitFab').setAttribute('aria-expanded', String(open));
+  });
+  $('#copyLink').addEventListener('click', async () => {
+    const btn = $('#copyLink');
+    try {
+      await navigator.clipboard.writeText(location.href);
+      btn.textContent = '복사됨';
+    } catch (e) {
+      window.prompt('링크를 복사하세요', location.href);
+    }
+    setTimeout(() => { btn.textContent = '현재 설정 링크 복사'; }, 1400);
+  });
+
+  /* ── 3. 디버그 오버레이 ───────────────────────────────────────── */
+  function uaSummary() {
+    const ua = navigator.userAgent;
+    const os = /iPhone|iPad|iPod/.test(ua) ? `iOS ${(ua.match(/OS (\d+)_(\d+)/) || []).slice(1).join('.')}`
+             : /Android/.test(ua) ? `Android ${(ua.match(/Android ([\d.]+)/) || [])[1] || ''}`
+             : /Mac OS X/.test(ua) ? 'macOS' : /Windows/.test(ua) ? 'Windows' : 'other';
+    const app = /KAKAOTALK/i.test(ua) ? 'KakaoTalk 인앱'
+              : /NAVER\(inapp|NAVER/i.test(ua) ? 'NAVER 인앱'
+              : /Instagram/i.test(ua) ? 'Instagram 인앱'
+              : /FBAN|FBAV/i.test(ua) ? 'Facebook 인앱'
+              : /SamsungBrowser/i.test(ua) ? 'Samsung Internet'
+              : /CriOS/i.test(ua) ? 'Chrome (iOS)'
+              : /FxiOS/i.test(ua) ? 'Firefox (iOS)'
+              : /EdgA|EdgiOS|Edg\//i.test(ua) ? 'Edge'
+              : /Chrome\//i.test(ua) ? 'Chrome'
+              : /Safari\//i.test(ua) ? 'Safari' : 'unknown';
+    return `${os} · ${app}`;
+  }
+  const UA = uaSummary();
+  const px = n => `${Math.round(n * 10) / 10}px`;
+  const probe = id => { const el = document.getElementById(id); return el.offsetHeight ? px(el.getBoundingClientRect().height) : '미지원'; };
+
+  function update() {
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      const hero = $('#hero').getBoundingClientRect();
+      const card = $('#card').getBoundingClientRect();
+      const vv = window.visualViewport;
+      const vvH = vv ? vv.height : innerHeight;
+      const vvTop = vv ? vv.offsetTop : 0;
+      /* 첫 화면 기준 판정: 카드 하단이 실제로 보이는 영역 하단보다 위에 있는가 */
+      const visibleBottom = vvTop + vvH;
+      const gap = visibleBottom - card.bottom;       /* + 여유 / − 가림 */
+      const atTop = scrollY < 2;
+      const verdict = $('#dbgVerdict');
+      if (atTop) {
+        verdict.textContent = gap >= -0.5 ? `카드 보임 +${Math.round(gap)}` : `카드 가림 ${Math.round(-gap)}px`;
+        verdict.className = `verdict ${gap >= -0.5 ? 'ok' : 'bad'}`;
+      } else {
+        verdict.textContent = '스크롤 중';
+        verdict.className = 'verdict';
+      }
+      const rows = [
+        ['unit', root.dataset.unit + (supports(root.dataset.unit) ? '' : ' (미지원)')],
+        ['--header-h', px(headerH)],
+        ['hero 높이', px(hero.height)],
+        ['hero 하단 (viewport 기준)', px(hero.bottom)],
+        ['카드 하단 여유', atTop ? `${gap >= 0 ? '+' : ''}${px(gap)}` : '(맨 위에서 판정)'],
+        ['sep'],
+        ['window.innerHeight', px(innerHeight)],
+        ['visualViewport.height', vv ? px(vv.height) : '미지원'],
+        ['visualViewport.offsetTop', vv ? px(vv.offsetTop) : '–'],
+        ['documentElement.clientHeight', px(root.clientHeight)],
+        ['sep'],
+        ['100vh', probe('pVh')],
+        ['100svh', probe('pSvh')],
+        ['100lvh', probe('pLvh')],
+        ['100dvh', probe('pDvh')],
+        ['sep'],
+        ['scrollY', px(scrollY)],
+        ['viewport 폭', px(innerWidth)],
+        ['DPR', String(window.devicePixelRatio)],
+        ['UA', UA],
+      ];
+      $('#dbgList').innerHTML = rows.map(r => r[0] === 'sep'
+        ? '<span class="sep"></span>'
+        : `<dt>${r[0]}</dt><dd${r[0] === 'UA' ? ' class="ua"' : ''}>${r[1]}</dd>`).join('');
+    });
+  }
+  addEventListener('resize', update, { passive: true });
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('orientationchange', () => setTimeout(update, 300));
+  if (window.visualViewport) {
+    visualViewport.addEventListener('resize', update);
+    visualViewport.addEventListener('scroll', update);
+  }
+
+  /* 오버레이 접힘 상태 기억 */
+  const DBG_KEY = 'hero-vh-test-debug';
+  try { if (localStorage.getItem(DBG_KEY) === 'closed') $('#debug').open = false; } catch (e) {}
+  $('#debug').addEventListener('toggle', () => {
+    try { localStorage.setItem(DBG_KEY, $('#debug').open ? 'open' : 'closed'); } catch (e) {}
+  });
+
+  setBanner(params.get('banner') === '1', false);
+  setUnit(params.get('unit') || 'dvh', !params.get('unit'));
+})();
+</script>
+</body>
+</html>
