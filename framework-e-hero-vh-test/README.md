@@ -39,6 +39,17 @@ padding-bottom: calc(mid-40 + max(100lvh - 100dvh, env(safe-area-inset-bottom)))
 
 링크: https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test/?unit=dvh&bar=include
 
+### 히어로 위치 — 최상단 / 섹션 중간
+
+히어로가 첫 화면이 아니라 **다른 섹션들 사이**에 오는 케이스도 패널에서 전환할 수 있습니다 (`?pos=mid`).
+링크로 열면 히어로가 헤더 바로 아래에 맞물린 위치에서 시작하고, 패널의 **히어로 맞추기** 버튼으로 언제든 그 위치로 이동합니다.
+
+판정 기준은 **히어로 상단이 헤더 바로 아래에 맞물렸을 때**로, 최상단 케이스의 첫 화면도 같은 조건입니다.
+디버그의 `hero 상단 − header` 가 0 (맞물림) 일 때만 카드 가림 여부를 판정합니다.
+
+- 섹션 중간 · dvh: https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test/?unit=dvh&pos=mid
+- 섹션 중간 · vh: https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test/?unit=vh&pos=mid
+
 ## 화면 구성
 
 - **우하단 버튼** — 단위 선택 패널 (vh / svh / lvh / dvh, 띠배너, 현재 설정 링크 복사).

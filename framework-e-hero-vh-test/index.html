@@ -265,6 +265,9 @@
   .dummy h2 { font-size: 18px; line-height: 1.4; color: #111; }
   .dummy .bar { height: 120px; border-radius: 4px; background: rgba(0, 0, 0, 0.06); }
 
+  /* 히어로가 중간에 오는 케이스 — 히어로 위에 들어가는 섹션 */
+  .dummy.lead { min-height: 60vh; background: #fff; }
+
   /* ── 디버그 오버레이 (접기/펼치기) ─────────────────────────────── */
   .debug {
     position: fixed;
@@ -351,6 +354,7 @@
   .unit-panel .seg button { padding: 8px 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #666; }
   .unit-panel .seg button + button { border-left: 1px solid #ddd; }
   .unit-panel .seg button.is-on { background: #111; color: #fff; font-weight: 700; }
+  .unit-panel #posSeg { grid-template-columns: repeat(2, 1fr); }
   .unit-panel .seg button:disabled { color: #ccc; text-decoration: line-through; }
   .unit-panel .toggle { display: flex; align-items: center; justify-content: space-between; padding-top: 4px; }
   .unit-panel .bar-opt { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid #eee; }
@@ -374,6 +378,13 @@
 </div>
 
 <main>
+  <section class="dummy lead" id="leadSection" hidden>
+    <h2>히어로 위 섹션</h2>
+    <p>히어로가 첫 화면이 아니라 <b>섹션 중간</b>에 오는 케이스입니다. 아래로 스크롤해 히어로가 헤더 바로 아래에 맞물리게 한 뒤, 하단 요소가 브라우저 바에 가리는지 확인하세요.</p>
+    <p>패널의 <b>히어로 맞추기</b> 버튼을 누르면 그 위치로 정확히 이동합니다.</p>
+    <div class="bar"></div>
+  </section>
+
   <section class="hero" id="hero" aria-label="Product highlight">
     <div class="media"><img src="assets/media.jpg" alt=""></div>
     <div class="overlay"></div>
@@ -434,6 +445,12 @@
     <button type="button" data-unit="lvh">lvh</button>
     <button type="button" data-unit="dvh">dvh</button>
   </div>
+  <span class="label">히어로 위치</span>
+  <div class="seg" id="posSeg">
+    <button type="button" data-pos="top">최상단</button>
+    <button type="button" data-pos="mid">섹션 중간</button>
+  </div>
+  <button type="button" class="copy" id="gotoHero">히어로 맞추기</button>
   <label class="toggle"><span>띠배너</span><input type="checkbox" id="bannerToggle"></label>
   <div class="bar-opt" id="barOpt" hidden>
     <label class="toggle"><span>주소창 영역 포함 <b>(Safari)</b></span><input type="checkbox" id="barToggle"></label>
@@ -526,6 +543,28 @@
   $('#barOpt').hidden = !barAvailable;
   $('#barToggle').addEventListener('change', e => setBar(e.target.checked));
 
+  /* 히어로 위치 — 최상단 / 섹션 중간 (?pos=mid) */
+  function setPos(v, push = true) {
+    if (v !== 'mid') v = 'top';
+    root.dataset.pos = v;
+    $('#leadSection').hidden = v !== 'mid';
+    document.querySelectorAll('#posSeg button').forEach(b => b.classList.toggle('is-on', b.dataset.pos === v));
+    if (push) {
+      const p = new URLSearchParams(location.search);
+      v === 'mid' ? p.set('pos', 'mid') : p.delete('pos');
+      history.replaceState(null, '', `${location.pathname}?${p}${location.hash}`);
+      if (v === 'mid') gotoHero(); else scrollTo(0, 0);
+    }
+    update();
+  }
+  /* 히어로 상단이 헤더 바로 아래에 오도록 이동 */
+  function gotoHero() {
+    const top = $('#hero').getBoundingClientRect().top + scrollY - headerH;
+    scrollTo(0, Math.max(0, Math.round(top)));
+  }
+  document.querySelectorAll('#posSeg button').forEach(b => b.addEventListener('click', () => setPos(b.dataset.pos)));
+  $('#gotoHero').addEventListener('click', gotoHero);
+
   /* 플로팅 버튼 ↔ 패널 */
   $('#unitFab').addEventListener('click', () => {
     const open = $('#unitPanel').hidden;
@@ -585,7 +624,9 @@
       const safeTop = parseFloat(safe.paddingTop) || 0;
       const safeBottom = parseFloat(safe.paddingBottom) || 0;
       const gapSafe = gap - safeBottom;              /* 하단 safe-area 까지 뺀 여유 */
-      const atTop = scrollY < 2;
+      /* 히어로 상단이 헤더 바로 아래에 맞물렸을 때 판정한다.
+         (최상단 케이스의 scrollY = 0 도 이 조건을 만족한다) */
+      const atTop = Math.abs(hero.top - headerH) < 2;
       const verdict = $('#dbgVerdict');
       if (atTop) {
         verdict.textContent = gap >= -0.5 ? `카드 보임 +${Math.round(gap)}` : `카드 가림 ${Math.round(-gap)}px`;
@@ -600,7 +641,8 @@
         ['--header-h', px(headerH)],
         ['hero 높이', px(hero.height)],
         ['hero 하단 (viewport 기준)', px(hero.bottom)],
-        ['카드 하단 여유', atTop ? `${gap >= 0 ? '+' : ''}${px(gap)}` : '(맨 위에서 판정)'],
+        ['hero 상단 − header', `${px(hero.top - headerH)}${atTop ? ' (맞물림)' : ''}`],
+        ['카드 하단 여유', atTop ? `${gap >= 0 ? '+' : ''}${px(gap)}` : '(히어로 맞춘 뒤 판정)'],
         ['└ safe-area 제외', atTop ? `${gapSafe >= 0 ? '+' : ''}${px(gapSafe)}` : '–'],
         ['safe-area 상 / 하', `${px(safeTop)} / ${px(safeBottom)}`],
         ['sep'],
@@ -639,9 +681,16 @@
     try { localStorage.setItem(DBG_KEY, $('#debug').open ? 'open' : 'closed'); } catch (e) {}
   });
 
+  setPos(params.get('pos') === 'mid' ? 'mid' : 'top', false);
   setBanner(params.get('banner') === '1', false);
   setBar(params.get('bar') === 'include', false);
   setUnit(params.get('unit') || 'dvh', !params.get('unit'));
+  /* ?pos=mid 로 열었으면 히어로가 맞물린 위치에서 시작 */
+  if (root.dataset.pos === 'mid') {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    addEventListener('load', () => setTimeout(gotoHero, 60));
+    setTimeout(gotoHero, 0);
+  }
 })();
 </script>
 </body>
