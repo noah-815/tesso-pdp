@@ -14,7 +14,19 @@ Framework E `introSection/variant3` (Figma `13117:191273`) 버전. 동작·패�
 | dvh | https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test-intro/?unit=dvh |
 | 주소창 영역 포함 (iOS Safari) | https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test-intro/?unit=dvh&bar=include |
 
-### 히어로 위치 — 최상단 / 섹션 중간
+### 히어로가 두 곳에 있습니다 — 최상단 · 섹션 중간
+
+같은 히어로가 **맨 위**와 **섹션 사이(첫 더미 섹션 뒤)** 두 곳에 들어 있습니다.
+패널의 **상단 히어로 / 중간 히어로** 버튼으로 각각 헤더 바로 아래에 맞물리는 위치로 이동합니다.
+`?pos=mid` 로 열면 중간 히어로에서 시작합니다.
+
+판정은 **헤더 바로 아래에 맞물린 히어로**를 대상으로 하며, 디버그 첫 줄 `판정 대상` 에
+상단/중간 중 어느 쪽인지 표시됩니다. 맞물리지 않은 동안은 `스크롤 중` 입니다.
+
+- 중간 히어로 · dvh: https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test-intro/?unit=dvh&pos=mid
+- 중간 히어로 · vh: https://noah-815.github.io/tesso-pdp/framework-e-hero-vh-test-intro/?unit=vh&pos=mid
+
+## 히어로 위치 — 최상단 / 섹션 중간
 
 히어로가 첫 화면이 아니라 **다른 섹션들 사이**에 오는 케이스도 패널에서 전환할 수 있습니다 (`?pos=mid`).
 링크로 열면 히어로가 헤더 바로 아래에 맞물린 위치에서 시작하고, 패널의 **히어로 맞추기** 버튼으로 언제든 그 위치로 이동합니다.
