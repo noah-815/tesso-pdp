@@ -219,6 +219,16 @@ img { display: block; }
   z-index: 1;
 }
 
+/* A(center): 메인 이미지·섬네일은 모션 없이 즉시 전환, 가로 드래그 페이징 미제공
+   (a-center-v2 는 data-fade="stack" 자체 규칙을 쓰므로 제외) */
+[data-gallery-mode="center"] .gallery__main {
+  cursor: default;
+  touch-action: auto;
+}
+
+[data-gallery-mode="center"]:not([data-fade="stack"]) .gallery__photo,
+[data-gallery-mode="center"]:not([data-fade="stack"]) .gallery__thumb { transition: none; }
+
 /* ==================== 우측 상품 정보 (productInfo) ==================== */
 .info {
   width: 548px;

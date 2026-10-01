@@ -4,7 +4,8 @@
                 무한 루프 + 클릭한 섬네일이 맨 위로 슬라이드(300ms),
                 메인 크로스페이드, 양방향 동기화
    · center   : 루프 없음 + 클릭(선택)한 섬네일이 레일 중앙 정렬.
-                레일은 양 끝에서 멈추고, 메인 크로스페이드는 동일
+                레일은 양 끝에서 멈추고, 메인 이미지는 모션 없이 즉시 전환,
+                메인 영역 가로 드래그 페이징 없음
    ========================================================================== */
 (function () {
   var MODE = document.body.dataset.galleryMode || 'loop-top';
@@ -272,10 +273,7 @@
       setScroll(clamp(scroll + e.deltaY), false);
     }, { passive: false });
 
-    bindMainSwipe(
-      function () { select(current - 1); },
-      function () { select(current + 1); }
-    );
+    /* 메인 이미지 가로 드래그 페이징은 미제공 — 전환은 섬네일 선택으로만 */
 
     window.addEventListener('resize', function () {
       measure();
