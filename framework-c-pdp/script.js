@@ -40,13 +40,17 @@
     return list;
   }
 
+  /* A(center, v2 제외): 메인 이미지를 모션 없이 즉시 교체 */
+  var INSTANT = MODE === 'center' && document.body.dataset.fade !== 'stack';
+
   var photos = [];
   IMAGES.forEach(function (img, k) {
     var el = document.createElement('img');
     el.className = 'gallery__photo' + (k === 0 ? ' is-visible' : '');
     el.src = img.src;
     el.alt = img.alt;
-    if (k > 0) el.loading = 'lazy';
+    /* 즉시 전환(A)에서는 미리 로드해 둬야 교체 순간 빈 화면이 비치지 않는다 */
+    if (k > 0 && !INSTANT) el.loading = 'lazy';
     main.appendChild(el);
     photos.push(el);
   });
@@ -56,7 +60,22 @@
      연타 시 이전 is-leaving 타이머를 취소하고 is-leaving은 항상 최대 1개 유지 */
   var FADE_STACK = document.body.dataset.fade === 'stack';
   var leaveTimer = null;
+  var swapToken = 0;
   function crossfade(current) {
+    if (INSTANT) {
+      /* 들어올 이미지가 디코드된 뒤 한 프레임에 교체 → 배경이 비치는 깜빡임(페이드처럼 보임) 제거 */
+      var token = ++swapToken;
+      var swap = function () {
+        if (token !== swapToken) return;   // 연타 시 마지막 선택만 반영
+        photos.forEach(function (p, k) {
+          p.classList.toggle('is-visible', k === current);
+        });
+      };
+      var next = photos[current];
+      if (next.decode) next.decode().then(swap, swap);
+      else swap();
+      return;
+    }
     if (!FADE_STACK) {
       photos.forEach(function (p, k) {
         p.classList.toggle('is-visible', k === current);
