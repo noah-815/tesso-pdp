@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search — Desktop (Framework A)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework A · search (Desktop) — 반응형
+     Figma 914:52374 · 디자인 기준 폭 1920 · 1rem = 16px
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value = rem (1rem = 16px), 0.0083 × screen width = 0.83vw
+        · size value ≤ 1rem(16px) 은 뷰포트와 무관하게 px 고정
+        → 가변은 P1(24, 검색어) 과 로고(22) 뿐. P3(16) · P4(14) 는 고정
+     2) Spacing — 시안에 맵핑된 토큰 그대로
+        · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
+        · em-*  : 해당 요소 폰트 크기 기준 N px (배지 padding)
+        · ch-*  : 숫자 폭 기준 (페이지 번호 최소 크기)
+        · global/desktop-margin-vw = 48 → 2.5vw
+        · 토큰 없는 값(헤더 74 · 36 / 22, 아이콘) = px 고정
+        · pagination 영역 상하는 두 카드 스타일 모두 mid-56
+     3) 상품 간 수평 간격 — 데모 패널에서 전환
+        · 1vw            : 19.2px @1920
+        · mid-20         : 20px @1920, 좁아져도 8px 아래로 내려가지 않는다
+        · vw-20 (시안)   : 20 × 100vw / 1920 = 1.0417vw
+        · vw-24          : 24 × 100vw / 1920 = 1.25vw
+     4) 카드 스타일 — 데모 패널에서 전환
+        · standard (914:52374)  : 정보가 썸네일 아래 · 행 간격 mid-64
+        · overlay  (1353:51826) : 정보가 썸네일 하단에 겹침 · 상품명 1줄
+                                  행 간격 = 열 간격과 같은 단위·값
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --us: calc(100vw / 1920);            /* spacing 1px */
+    --page-pad: 2.5vw;                   /* global/desktop-margin-vw = 48 */
+
+    /* Typography ------------------------------------------------- */
+    --fs-p4:   14px;                     /* paragraph-4 0.875rem → 고정 */
+    --fs-p3:   16px;                     /* paragraph-3 1rem     → 고정 */
+    --fs-p1:   calc((1.5   - 1) * 0.83vw + 1rem);   /* paragraph-1 24px @1920 — 가변 */
+    --fs-logo: calc((1.375 - 1) * 0.83vw + 1rem);   /* 로고        22px @1920 — 가변 */
+    --lh-body: 1.6;
+    --lh-p1: 1.5;
+
+    /* Spacing — mid-* ------------------------------------------- */
+    --mid-2:  2px;                       /* 값 < 8 → 고정 */
+    --mid-4:  4px;
+    --mid-6:  6px;
+    --mid-16: calc( 8 * var(--us) + 8px);
+    --mid-20: calc(12 * var(--us) + 8px);
+    --mid-24: calc(16 * var(--us) + 8px);
+    --mid-28: calc(20 * var(--us) + 8px);
+    --mid-56: calc(48 * var(--us) + 8px);
+    --mid-64: calc(56 * var(--us) + 8px);
+    --mid-80: calc(72 * var(--us) + 8px);
+
+    /* 상품 간 수평 간격 (데모 전환) — 기본 1vw */
+    --col-gap: 1vw;
+
+    /* Color ------------------------------------------------------ */
+    --c-text: #111;
+    --c-muted: #888;                     /* price-original · page-number-inactive */
+    --c-logo: #1a1a1a;
+
+    /* Font — 시안이 요소별로 KR / EN 을 지정한다 ------------------ */
+    --font-kr: "Noto Sans KR", "Noto Sans", sans-serif;
+    --font-en: "Noto Sans", "Noto Sans KR", sans-serif;
+  }
+
+  body[data-gap="vw1"]   { --col-gap: 1vw; }
+  body[data-gap="mid20"] { --col-gap: var(--mid-20); }
+  body[data-gap="vw20"]  { --col-gap: calc(20 * var(--us)); }
+  body[data-gap="vw24"]  { --col-gap: calc(24 * var(--us)); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    font-size: 16px;                     /* 1rem = 16px */
+  }
+
+  body {
+    background: #fff;
+    color: var(--c-text);
+    font-family: var(--font-kr);
+    line-height: var(--lh-body);
+  }
+
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── set14_header ───────────────────────────────────────────── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 74px;                        /* 토큰 없음 → px */
+    padding: 22px 36px;
+    background: #fff;
+  }
+
+  .header__inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .header__icons { display: flex; align-items: center; }
+
+  .header__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;                         /* 토큰 없음 → px */
+    height: 44px;
+  }
+
+  .header__icon img { width: 24px; height: 24px; }
+
+  .header__logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-en);
+    font-weight: 600;
+    font-size: var(--fs-logo);           /* 22px @1920 — 가변 */
+    line-height: 28px;
+    color: var(--c-logo);
+    white-space: nowrap;
+  }
+
+  /* ── search — annotation: 스크롤 시 고정되지 않음 ──────────────── */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-24);
+    width: 100%;
+    padding: var(--mid-28) var(--page-pad);
+  }
+
+  .search-bar__input {
+    flex: 1 0 0;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: none;
+    font-family: var(--font-kr);
+    font-weight: 500;
+    font-size: var(--fs-p1);             /* 24px @1920 — 가변 */
+    line-height: var(--lh-p1);
+    color: var(--c-text);
+    caret-color: var(--c-text);
+  }
+
+  .search-bar__input::-webkit-search-cancel-button { display: none; }
+
+  .search-bar__total {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--mid-6);
+    font-size: var(--fs-p3);             /* 16px — 고정 */
+    line-height: var(--lh-body);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .search-bar__total .count { font-family: var(--font-en); }
+
+  /* ── productGroup — 3열 ─────────────────────────────────────── */
+  .product-group {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--col-gap);          /* 데모 전환 — 1vw / mid-20 / vw-20 */
+    row-gap: var(--mid-64);
+    width: 100%;
+    padding: var(--mid-28) var(--page-pad) var(--mid-80);
+  }
+
+  /* productCard/default */
+  .card { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; overflow: hidden; }
+
+  .card__image { position: relative; width: 100%; overflow: hidden; }
+
+  .card__thumb { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #f2f2f2; }
+  .card__thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  .card__badge-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--mid-16) 0 0 var(--mid-16);
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5714em 0.7143em;          /* em-8 / em-10 @ 14px */
+    background: #111;
+    color: #fff;
+    font-family: var(--font-en);
+    font-weight: 500;
+    font-size: var(--fs-p4);             /* 14px — 고정 */
+    line-height: var(--lh-body);
+    white-space: nowrap;
+  }
+
+  .card__info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-2);
+    width: 100%;
+    padding-top: var(--mid-16);
+  }
+
+  /* Product Name — Max 2line */
+  .card__name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    width: 100%;
+    overflow: hidden;
+    font-weight: 500;
+    font-size: var(--fs-p3);             /* 16px — 고정 */
+    line-height: var(--lh-body);
+    word-break: break-word;
+  }
+
+  .card__price { display: flex; align-items: baseline; gap: var(--mid-4); }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    font-weight: 500;
+    font-size: var(--fs-p3);
+    line-height: var(--lh-body);
+    white-space: nowrap;
+  }
+
+  .price .num { font-family: var(--font-en); }
+
+  .price--original { position: relative; color: var(--c-muted); }
+
+  .price--original::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(50% + 0.5px);
+    height: 1px;
+    background: currentColor;
+    transform: translateY(-50%);
+  }
+
+  /* ── productCard — overlay (1353:51826) ─────────────────────────
+     행 간격은 열 간격과 같은 단위·값을 쓴다 (패널의 column gap 선택을 그대로 따라간다) */
+  body[data-card="overlay"] .product-group { row-gap: var(--col-gap); }
+  body[data-card="overlay"] .card { position: relative; }
+
+  body[data-card="overlay"] .card__info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0 var(--mid-24) var(--mid-28);
+  }
+
+  /* Product Name — Max 1line */
+  body[data-card="overlay"] .card__name {
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── pagination ─────────────────────────────────────────────────
+     annotation: 한 페이지 당 12개 노출 · 12개 이하면 pagination 미노출 */
+  .pagination-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--mid-56) 0;            /* 두 스타일 공통 — 높이 144 @1920 (standard 시안은 60px 고정 · 152) */
+    overflow: hidden;
+  }
+
+  .pagination { display: flex; align-items: center; justify-content: center; gap: var(--mid-4); }
+
+  .pagination__nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;                         /* 토큰 없음 → px */
+    height: 32px;
+  }
+
+  .pagination__nav img { width: 20px; height: 20px; }
+  .pagination__nav:disabled { cursor: default; }
+
+  .pagination__list { display: flex; align-items: center; gap: var(--mid-2); }
+
+  .pagination__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--mid-2);
+  }
+
+  /* 시안 ch/ch-25 — 번호 영역 최소 25 × 25 */
+  .pagination__item span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 25px;
+    min-height: 25px;
+    font-family: var(--font-en);
+    font-weight: 500;
+    font-size: var(--fs-p4);             /* 14px — 고정 */
+    line-height: var(--lh-body);
+    color: var(--c-muted);
+    white-space: nowrap;
+  }
+
+  .pagination__item.is-active span { color: var(--c-text); }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-family: var(--font-kr);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .demo-nav.is-min > *:not(.demo-toggle) { display: none; }
+
+  .demo-toggle {
+    grid-column: 1 / -1;
+    justify-self: end;
+    padding: 2px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    color: #777;
+  }
+
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { justify-self: start; display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; font-size: 11px; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 4px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header__inner">
+    <div class="header__icons">
+      <button type="button" class="header__icon" aria-label="메뉴"><img src="assets/menu.svg" alt=""></button>
+    </div>
+    <a class="header__logo" href="#">BRAND</a>
+    <div class="header__icons">
+      <button type="button" class="header__icon" aria-label="검색"><img src="assets/search.svg" alt=""></button>
+      <button type="button" class="header__icon" aria-label="계정"><img src="assets/account.svg" alt=""></button>
+      <button type="button" class="header__icon" aria-label="장바구니"><img src="assets/bag.svg" alt=""></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="search-bar">
+    <input class="search-bar__input" id="searchInput" type="search" value="나이키스킴스 리프트 메쉬" aria-label="검색어">
+    <p class="search-bar__total"><span>검색 결과</span><span class="count" id="resultCount">999</span></p>
+  </div>
+
+  <div class="product-group" id="productGroup"></div>
+
+  <div class="pagination-area" id="paginationArea">
+    <nav class="pagination" aria-label="페이지">
+      <button type="button" class="pagination__nav" aria-label="이전" disabled><img src="assets/chevron-left.svg" alt=""></button>
+      <div class="pagination__list" id="pageList"></div>
+      <button type="button" class="pagination__nav" aria-label="다음"><img src="assets/chevron-right.svg" alt=""></button>
+    </nav>
+  </div>
+</main>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <button type="button" class="demo-toggle" id="demoToggle" aria-label="패널 접기">–</button>
+  <strong>card style</strong>
+  <div class="demo-seg" id="cardToggle">
+    <button type="button" data-card="standard">standard</button>
+    <button type="button" data-card="overlay">overlay</button>
+  </div>
+  <strong>column gap</strong>
+  <div class="demo-seg" id="gapToggle">
+    <button type="button" data-gap="vw1">1vw</button>
+    <button type="button" data-gap="mid20">mid-20</button>
+    <button type="button" data-gap="vw20">vw-20 (시안)</button>
+    <button type="button" data-gap="vw24">vw-24</button>
+  </div>
+  <strong>results</strong>
+  <div class="demo-seg" id="countToggle">
+    <button type="button" data-count="999">999</button>
+    <button type="button" data-count="9">9 (12개 이하)</button>
+  </div>
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const UI_KEY = 'fw-a-search-ui';
+  const GAP_KEY = 'fw-a-search-gap';
+  const COUNT_KEY = 'fw-a-search-count';
+  const CARD_KEY = 'fw-a-search-card';
+  let cardStyle = 'standard';
+  const PER_PAGE = 12;                 /* annotation: 한 페이지 당 12개 */
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+
+  const cardHTML = i => `
+    <a class="card" href="#">
+      <div class="card__image">
+        <div class="card__thumb"><img src="assets/thumb.jpg" alt=""></div>
+        ${i === 0 ? '<div class="card__badge-area"><span class="badge">SOLD OUT</span></div>' : ''}
+      </div>
+      <div class="card__info">
+        <p class="card__name">${cardStyle === 'overlay' ? 'Product Name Max 1line' : 'Product Name Max 2line Product Name Max 2line'}</p>
+        <div class="card__price">
+          <p class="price"><span class="num">000,000</span><span>원</span></p>
+          <p class="price price--original"><span class="num">000,000</span><span>원</span></p>
+        </div>
+      </div>
+    </a>`;
+
+  $('#pageList').innerHTML = Array.from({ length: 10 }, (_, i) =>
+    `<button type="button" class="pagination__item${i === 0 ? ' is-active' : ''}" aria-label="${i + 1}페이지"><span>${i + 1}</span></button>`).join('');
+  $('#pageList').addEventListener('click', e => {
+    const b = e.target.closest('.pagination__item'); if (!b) return;
+    $$('.pagination__item').forEach(x => x.classList.toggle('is-active', x === b));
+  });
+
+  /* 결과 수 — 12개 이하면 pagination 미노출 */
+  function setCount(v) {
+    const total = Number(v);
+    $('#resultCount').textContent = total;
+    $('#productGroup').innerHTML = Array.from({ length: Math.min(total, PER_PAGE) }, (_, i) => cardHTML(i)).join('');
+    $('#paginationArea').hidden = total <= PER_PAGE;
+    $$('#countToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.count === v));
+    store(COUNT_KEY, v);
+    readout();
+  }
+  $('#countToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-count]'); if (b) setCount(b.dataset.count);
+  });
+
+  /* 카드 스타일 — standard / overlay (시안 문구가 달라 카드를 다시 그린다) */
+  function setCard(v, render = true) {
+    cardStyle = v === 'overlay' ? 'overlay' : 'standard';
+    document.body.dataset.card = cardStyle;
+    $$('#cardToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.card === cardStyle));
+    store(CARD_KEY, cardStyle);
+    if (render) setCount($('#countToggle .is-on') ? $('#countToggle .is-on').dataset.count : '999');
+  }
+  $('#cardToggle').addEventListener('click', e => {
+    const b = e.target.closest('button[data-card]'); if (b) setCard(b.dataset.card);
+  });
+
+  /* 상품 간 수평 간격 — 1vw / mid-20 / vw-20 / vw-24 */
+  function setGap(v) {
+    document.body.dataset.gap = v;
+    $$('#gapToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.gap === v));
+    store(GAP_KEY, v);
+    readout();
+  }
+  $('#gapToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-gap]'); if (b) setGap(b.dataset.gap);
+  });
+
+  $('#demoToggle').addEventListener('click', () => {
+    const min = $('#demoNav').classList.toggle('is-min');
+    $('#demoToggle').textContent = min ? '+' : '–';
+    store(UI_KEY, min ? 'min' : 'open');
+  });
+  if (load(UI_KEY, 'open') === 'min') {
+    $('#demoNav').classList.add('is-min');
+    $('#demoToggle').textContent = '+';
+  }
+
+  const f = n => n.toFixed(2);
+  const LABEL = { vw1: '1vw', mid20: 'mid-20', vw20: 'vw-20', vw24: 'vw-24' };
+  function readout() {
+    const g = $('#productGroup'), cs = getComputedStyle(g), card = $('.card');
+    if (!card) return;
+    $('#readout').innerHTML =
+      `viewport <b>${innerWidth}</b> · 좌우 마진 <b>${f(parseFloat(cs.paddingLeft))}</b> (2.5vw)<br>` +
+      `수평 간격 <b>${f(parseFloat(cs.columnGap))}</b> (${LABEL[document.body.dataset.gap]}) · 수직 간격 <b>${f(parseFloat(cs.rowGap))}</b> (${cardStyle === 'overlay' ? LABEL[document.body.dataset.gap] : 'mid-64'})<br>` +
+      `카드 <b>${f(card.getBoundingClientRect().width)} × ${f(card.getBoundingClientRect().height)}</b> (${cardStyle}) · 검색어 <b>${f(parseFloat(getComputedStyle($('#searchInput')).fontSize))}</b> (P1)`;
+  }
+  addEventListener('resize', readout);
+
+  setCard(load(CARD_KEY, 'standard'), false);
+  setGap(load(GAP_KEY, 'vw1'));
+  setCount(load(COUNT_KEY, '999'));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(readout);
+})();
+</script>
+
+</body>
+</html>
