@@ -30,7 +30,7 @@
         · vw-20 (시안)   : 20 × 100vw / 1920 = 1.0417vw
         · vw-24          : 24 × 100vw / 1920 = 1.25vw
      4) 카드 스타일 — 데모 패널에서 전환
-        · standard (914:52374)  : 정보가 썸네일 아래 · 행 간격 mid-64
+        · standard (914:52374)  : 정보가 썸네일 아래 · 행 간격 mid-64 (시안) / mid-56 전환
         · overlay  (1353:51826) : 정보가 썸네일 하단에 겹침 · 상품명 1줄
                                   행 간격 = 열 간격과 같은 단위·값
      ───────────────────────────────────────────────────────────── */
@@ -61,6 +61,8 @@
 
     /* 상품 간 수평 간격 (데모 전환) — 기본 1vw */
     --col-gap: 1vw;
+    /* standard 카드의 행 간격 (데모 전환) — 시안 mid-64 */
+    --row-gap: var(--mid-64);
 
     /* Color ------------------------------------------------------ */
     --c-text: #111;
@@ -76,6 +78,9 @@
   body[data-gap="mid20"] { --col-gap: var(--mid-20); }
   body[data-gap="vw20"]  { --col-gap: calc(20 * var(--us)); }
   body[data-gap="vw24"]  { --col-gap: calc(24 * var(--us)); }
+
+  body[data-rowgap="mid64"] { --row-gap: var(--mid-64); }
+  body[data-rowgap="mid56"] { --row-gap: var(--mid-56); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -187,7 +192,7 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     column-gap: var(--col-gap);          /* 데모 전환 — 1vw / mid-20 / vw-20 */
-    row-gap: var(--mid-64);
+    row-gap: var(--row-gap);             /* standard — mid-64 / mid-56 */
     width: 100%;
     padding: var(--mid-28) var(--page-pad) var(--mid-80);
   }
@@ -381,6 +386,8 @@
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; font-size: 11px; }
   .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-seg.is-off { opacity: 0.4; pointer-events: none; }
+  .demo-note { color: #999; }
 
   .demo-readout {
     grid-column: 1 / -1;
@@ -442,6 +449,11 @@
     <button type="button" data-gap="vw20">vw-20 (시안)</button>
     <button type="button" data-gap="vw24">vw-24</button>
   </div>
+  <strong>row gap</strong>
+  <div class="demo-seg" id="rowToggle">
+    <button type="button" data-rowgap="mid64">mid-64 (시안)</button>
+    <button type="button" data-rowgap="mid56">mid-56</button>
+  </div>
   <strong>results</strong>
   <div class="demo-seg" id="countToggle">
     <button type="button" data-count="999">999</button>
@@ -458,6 +470,7 @@
   const GAP_KEY = 'fw-a-search-gap';
   const COUNT_KEY = 'fw-a-search-count';
   const CARD_KEY = 'fw-a-search-card';
+  const ROW_KEY = 'fw-a-search-rowgap';
   let cardStyle = 'standard';
   const PER_PAGE = 12;                 /* annotation: 한 페이지 당 12개 */
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -505,10 +518,25 @@
     document.body.dataset.card = cardStyle;
     $$('#cardToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.card === cardStyle));
     store(CARD_KEY, cardStyle);
+    /* overlay 는 행 간격이 열 간격을 따르므로 row gap 선택은 standard 에서만 쓴다 */
+    $('#rowToggle').classList.toggle('is-off', cardStyle === 'overlay');
     if (render) setCount($('#countToggle .is-on') ? $('#countToggle .is-on').dataset.count : '999');
   }
   $('#cardToggle').addEventListener('click', e => {
     const b = e.target.closest('button[data-card]'); if (b) setCard(b.dataset.card);
+  });
+
+  /* standard 카드의 행 간격 — mid-64 / mid-56 */
+  const ROW_LABEL = { mid64: 'mid-64', mid56: 'mid-56' };
+  function setRowGap(v) {
+    if (!ROW_LABEL[v]) v = 'mid64';
+    document.body.dataset.rowgap = v;
+    $$('#rowToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.rowgap === v));
+    store(ROW_KEY, v);
+    readout();
+  }
+  $('#rowToggle').addEventListener('click', e => {
+    const b = e.target.closest('button[data-rowgap]'); if (b) setRowGap(b.dataset.rowgap);
   });
 
   /* 상품 간 수평 간격 — 1vw / mid-20 / vw-20 / vw-24 */
@@ -539,12 +567,13 @@
     if (!card) return;
     $('#readout').innerHTML =
       `viewport <b>${innerWidth}</b> · 좌우 마진 <b>${f(parseFloat(cs.paddingLeft))}</b> (2.5vw)<br>` +
-      `수평 간격 <b>${f(parseFloat(cs.columnGap))}</b> (${LABEL[document.body.dataset.gap]}) · 수직 간격 <b>${f(parseFloat(cs.rowGap))}</b> (${cardStyle === 'overlay' ? LABEL[document.body.dataset.gap] : 'mid-64'})<br>` +
+      `수평 간격 <b>${f(parseFloat(cs.columnGap))}</b> (${LABEL[document.body.dataset.gap]}) · 수직 간격 <b>${f(parseFloat(cs.rowGap))}</b> (${cardStyle === 'overlay' ? LABEL[document.body.dataset.gap] : ROW_LABEL[document.body.dataset.rowgap]})<br>` +
       `카드 <b>${f(card.getBoundingClientRect().width)} × ${f(card.getBoundingClientRect().height)}</b> (${cardStyle}) · 검색어 <b>${f(parseFloat(getComputedStyle($('#searchInput')).fontSize))}</b> (P1)`;
   }
   addEventListener('resize', readout);
 
   setCard(load(CARD_KEY, 'standard'), false);
+  setRowGap(load(ROW_KEY, 'mid64'));
   setGap(load(GAP_KEY, 'vw1'));
   setCount(load(COUNT_KEY, '999'));
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(readout);
