@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overlay Card — Desktop (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Inter:wght@600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E · visual banner (variant8) + OverlayCard (Desktop) — 반응형
+     Figma 14388:294619 · 디자인 기준 폭 1920 · 1rem = 14px
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value = rem (1rem = 14px), 0.0083 × screen width = 0.83vw
+        · size value ≤ 1rem(14px) 은 뷰포트와 무관하게 px 고정
+        → 가변은 H3(40) · P2(16) · 로고(20)
+     2) Spacing — 시안에 맵핑된 토큰 그대로
+        · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
+        · em-*  : 해당 요소 폰트 크기 기준 N px (버튼 padding)
+        · 토큰 없는 값(헤더 54 · 좌우 16 · 메뉴 간격 12 / 8) = px 고정
+     3) OverlayCard 너비 — 시안 450 (토큰 없음). 데모 패널에서 비교
+        · mid : (N − 8) × 100vw / 1920 + 8
+        · vw  : N × 100vw / 1920   (450 → 23.4375vw)
+        · min / max px 를 켜면 그 사이로 묶는다 (clamp)
+     4) 인트로 섹션(미디어 영역) 높이 — 헤더를 뺀 화면 높이 (100vh − 헤더 54)
+        이미지는 object-fit: cover 로 채운다
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --us: calc(100vw / 1920);            /* spacing 1px */
+    --header-h: 54px;                    /* set06_header — 토큰 없음 → px */
+
+    /* Typography ------------------------------------------------- */
+    --fs-btn: 13px;                                     /* button-label-medium → 고정 */
+    --fs-p3:  14px;                                     /* paragraph-3 1rem    → 고정 */
+    --fs-p2:   calc((1.1429 - 1) * 0.83vw + 1rem);      /* paragraph-2 16px @1920 — 가변 */
+    --fs-logo: calc((1.4286 - 1) * 0.83vw + 1rem);      /* 로고        20px @1920 — 가변 */
+    --fs-h3:   calc((2.8571 - 1) * 0.83vw + 1rem);      /* heading-3   40px @1920 — 가변 (데모 패널에서 값 변경) */
+
+    /* Spacing — mid-* ------------------------------------------- */
+    --mid-4:  4px;                       /* 값 < 8 → 고정 */
+    --mid-10: calc( 2 * var(--us) + 8px);
+    --mid-28: calc(20 * var(--us) + 8px);
+    --mid-32: calc(24 * var(--us) + 8px);
+    --mid-36: calc(28 * var(--us) + 8px);
+    --mid-48: calc(40 * var(--us) + 8px);
+
+    /* OverlayCard 너비 — 데모 패널이 값을 심는다 -------------------
+       --cw-val : mid-N / vw-N 의 N (시안 450)
+       --cw-min / --cw-max : 꺼져 있으면 0px / 100000px (= 제한 없음) */
+    --cw-val: 450;
+    --cw-base: calc((var(--cw-val) - 8) * var(--us) + 8px);
+    --cw-min: 0px;
+    --cw-max: 100000px;
+
+    --radius-xs: 4px;
+    --radius-md: 8px;
+
+    /* Color ------------------------------------------------------ */
+    --c-header: #372320;
+    --c-header-bg: #fff;                 /* background/base */
+
+    /* Font ------------------------------------------------------- */
+    --font-en: "DM Sans", "Pretendard", sans-serif;
+    --font-kr: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-logo: "Inter", sans-serif;
+  }
+
+  body[data-cwunit="mid"] { --cw-base: calc((var(--cw-val) - 8) * var(--us) + 8px); }
+  body[data-cwunit="vw"]  { --cw-base: calc(var(--cw-val) * var(--us)); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;                     /* 1rem = 14px */
+  }
+
+  body {
+    background: #fff;
+    color: #111;
+    font-family: var(--font-kr);
+    font-size: var(--fs-p3);
+    line-height: 1.6;
+  }
+
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* DM Sans 는 시안처럼 optical size 14 로 고정 */
+  .en { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+
+  /* ── set06_header ───────────────────────────────────────────── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--header-h);
+    padding: 0 16px;
+    background: var(--c-header-bg);
+  }
+
+  .header__container {
+    position: relative;
+    flex: 1 0 0;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header__nav { display: flex; gap: 12px; height: 100%; }
+
+  .header__item {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 8px;
+    font-size: var(--fs-p3);             /* 14px — 고정 */
+    line-height: 1.6;
+    color: var(--c-header);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .header__logo {
+    position: absolute;
+    top: calc(50% + 0.5px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-logo);
+    font-weight: 600;
+    font-size: var(--fs-logo);           /* 20px @1920 — 가변 */
+    line-height: 28px;
+    color: var(--c-header);
+    white-space: nowrap;
+  }
+
+  /* ── variant8 — 미디어 + OverlayCard ────────────────────────── */
+  .banner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--header-h));    /* 헤더 제외 화면 높이 */
+    height: calc(100dvh - var(--header-h));   /* 지원 브라우저는 dvh */
+    padding: var(--mid-48) var(--mid-36);
+    background: rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+  }
+
+  .banner__media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask: url("assets/media-mask.svg") no-repeat 0 0 / 100% 100%;
+            mask: url("assets/media-mask.svg") no-repeat 0 0 / 100% 100%;
+  }
+
+  .banner__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .banner__overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.2); }
+
+  .banner__content {
+    position: relative;
+    flex: 1 0 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  /* OverlayCard */
+  .overlay-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-32);
+    width: max(var(--cw-min), min(var(--cw-base), var(--cw-max)));
+    max-width: 100%;
+    padding: var(--mid-32) var(--mid-28);
+    border-radius: var(--radius-md);
+    background: rgba(0, 0, 0, 0.25);
+    -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(30px);
+  }
+
+  .overlay-card__text { display: flex; flex-direction: column; gap: var(--mid-10); width: 100%; color: #fff; }
+
+  .overlay-card__eyebrow { font-weight: 500; font-size: var(--fs-p2); line-height: 1.5; }   /* 16px @1920 — 가변 */
+  .overlay-card__title   { font-weight: 500; font-size: var(--fs-h3); line-height: 1.4; }   /* 40px @1920 — 가변 */
+  .overlay-card__desc    { font-size: var(--fs-p3); line-height: 1.6; color: rgba(255, 255, 255, 0.8); }   /* 14px — 고정 */
+
+  /* onMediaButton — em-13 / em-26 @13px (+ 선 1px) */
+  .on-media-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mid-4);
+    padding: 1em 2em;
+    border: 1px solid transparent;
+    border-radius: var(--radius-xs);
+    background: #fff;
+    color: #111;
+    font-weight: 500;
+    font-size: var(--fs-btn);            /* 13px — 고정 */
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* 아래 확인용 여백 — 시안에 없음 */
+  .spacer { height: 60vh; }
+
+  /* ── 데모 패널 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-family: var(--font-kr);
+    font-size: 11px;
+    line-height: 1.4;
+    color: #111;
+    white-space: nowrap;
+  }
+
+  .demo-nav.is-min > *:not(.demo-toggle) { display: none; }
+  .demo-toggle { grid-column: 1 / -1; justify-self: end; padding: 2px 6px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; color: #777; }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { justify-self: start; display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; font-size: 11px; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+
+  .demo-value { justify-self: start; display: flex; align-items: center; gap: 6px; color: #777; }
+  .demo-value input[type="number"] {
+    width: 56px;
+    padding: 3px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--font-kr);
+    font-size: 11px;
+    color: #111;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-value input[type="number"]:disabled { opacity: 0.4; }
+  .demo-value input[type="text"] {
+    width: 220px;
+    padding: 3px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--font-kr);
+    font-size: 11px;
+    color: #111;
+  }
+  .demo-value label { display: flex; align-items: center; gap: 4px; }
+  .demo-value .calc { font-variant-numeric: tabular-nums; }
+  .demo-reset { justify-self: start; padding: 3px 7px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; background: #fff; font-size: 11px; color: #2563eb; }
+
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 4px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .demo-readout b { color: #111; font-weight: 600; }
+  .demo-readout .is-clamped { color: #2563eb; }
+</style>
+</head>
+<body data-cwunit="mid">
+
+<!-- set06_header -->
+<header class="header">
+  <div class="header__container">
+    <nav class="header__nav">
+      <a class="header__item en" href="#">Shop</a>
+      <a class="header__item en" href="#">About</a>
+      <a class="header__item en" href="#">Journal</a>
+      <a class="header__item en" href="#">Info</a>
+      <a class="header__item en" href="#">The Story</a>
+    </nav>
+    <div class="header__nav">
+      <a class="header__item en" href="#">Search</a>
+      <a class="header__item en" href="#">Sign in</a>
+      <a class="header__item en" href="#">Bag [0]</a>
+    </div>
+    <a class="header__logo" href="#">BRAND</a>
+  </div>
+</header>
+
+<!-- variant8 -->
+<section class="banner">
+  <div class="banner__media"><img src="assets/media.png" alt=""></div>
+  <div class="banner__overlay"></div>
+  <div class="banner__content">
+    <div class="overlay-card" id="card">
+      <div class="overlay-card__text">
+        <p class="overlay-card__eyebrow en">Lorem ipsum</p>
+        <h2 class="overlay-card__title en" id="cardTitle">Lorem ipsum dolor</h2>
+        <p class="overlay-card__desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Graecis praetorem, consuetudinum, maiores, tribus saluti reprehensa.</p>
+      </div>
+      <a class="on-media-btn en" href="#">Button Label</a>
+    </div>
+  </div>
+</section>
+<div class="spacer"></div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <button type="button" class="demo-toggle" id="demoToggle" aria-label="패널 접기">–</button>
+  <strong>card width</strong>
+  <div class="demo-seg" id="unitToggle">
+    <button type="button" data-unit="mid">mid</button>
+    <button type="button" data-unit="vw">vw</button>
+  </div>
+  <strong>값 (N)</strong>
+  <div class="demo-value">
+    <input type="number" id="cwVal" min="100" max="1200" step="10" value="450" aria-label="카드 너비 값">
+    <span class="calc" id="cwCalc">–</span>
+  </div>
+  <strong>min px</strong>
+  <div class="demo-value">
+    <label><input type="checkbox" id="minOn"> on</label>
+    <input type="number" id="minVal" min="0" max="2000" step="10" value="400" aria-label="카드 최소 너비 (px)">
+    <span>px</span>
+  </div>
+  <strong>max px</strong>
+  <div class="demo-value">
+    <label><input type="checkbox" id="maxOn"> on</label>
+    <input type="number" id="maxVal" min="0" max="2000" step="10" value="520" aria-label="카드 최대 너비 (px)">
+    <span>px</span>
+  </div>
+  <strong>title text</strong>
+  <div class="demo-value">
+    <input type="text" id="titleText" value="Lorem ipsum dolor" aria-label="타이틀 문구" placeholder="타이틀 문구 입력">
+  </div>
+  <strong>heading size</strong>
+  <div class="demo-value">
+    <input type="number" id="h3Val" min="10" max="120" step="1" value="40" aria-label="heading 크기 (1920 기준 px)">
+    <span class="calc" id="h3Calc">–</span>
+  </div>
+  <span></span>
+  <button type="button" class="demo-reset" id="reset">reset (mid-450 · min/max off · heading 40 · 시안 문구)</button>
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const KEY = 'fw-e-overlay-card', UI_KEY = 'fw-e-overlay-card-ui';
+  const DEF = { unit: 'mid', val: 450, minOn: false, min: 400, maxOn: false, max: 520, h3: 40, title: 'Lorem ipsum dolor' };
+  const REM = 14;
+  const root = document.documentElement.style;
+  let state = { ...DEF };
+  try { state = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch (e) {}
+
+  const clampNum = (v, lo, hi, d) => { const n = Math.round(Number(v)); return Number.isFinite(n) && v !== '' ? Math.max(lo, Math.min(hi, n)) : d; };
+
+  function apply() {
+    state.unit = state.unit === 'vw' ? 'vw' : 'mid';
+    document.body.dataset.cwunit = state.unit;
+    root.setProperty('--cw-val', state.val);
+    root.setProperty('--cw-min', state.minOn ? `${state.min}px` : '0px');
+    root.setProperty('--cw-max', state.maxOn ? `${state.max}px` : '100000px');
+    /* heading — 값은 1920 기준 px. 1rem(14) 이하는 고정, 초과는 가변 공식 */
+    root.setProperty('--fs-h3', state.h3 <= REM ? `${state.h3}px` : `calc((${(state.h3 / REM).toFixed(4)} - 1) * 0.83vw + 1rem)`);
+    $$('#unitToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.unit === state.unit));
+    $('#cardTitle').textContent = state.title;
+    if (document.activeElement !== $('#titleText')) $('#titleText').value = state.title;
+    $('#minOn').checked = state.minOn;
+    $('#maxOn').checked = state.maxOn;
+    $('#minVal').disabled = !state.minOn;
+    $('#maxVal').disabled = !state.maxOn;
+    [['#cwVal', state.val], ['#minVal', state.min], ['#maxVal', state.max], ['#h3Val', state.h3]].forEach(([id, v]) => {
+      if (document.activeElement !== $(id)) $(id).value = v;
+    });
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    readout();
+  }
+
+  $('#unitToggle').addEventListener('click', e => {
+    const b = e.target.closest('button[data-unit]'); if (b) { state.unit = b.dataset.unit; apply(); }
+  });
+  /* 입력 중에는 유효한 값일 때만 반영하고, 범위 보정은 blur 에서 */
+  [['#cwVal', 'val', 100, 1200], ['#minVal', 'min', 0, 2000], ['#maxVal', 'max', 0, 2000], ['#h3Val', 'h3', 10, 120]].forEach(([id, k, lo, hi]) => {
+    $(id).addEventListener('input', e => { const n = Number(e.target.value); if (e.target.value !== '' && n >= lo && n <= hi) { state[k] = Math.round(n); apply(); } });
+    $(id).addEventListener('blur', e => { state[k] = clampNum(e.target.value, lo, hi, state[k]); e.target.value = state[k]; apply(); });
+  });
+  /* 타이틀 문구 — 입력하는 대로 반영. 비우면 빈 타이틀 그대로 확인 가능 */
+  $('#titleText').addEventListener('input', e => { state.title = e.target.value; apply(); });
+  $('#minOn').addEventListener('change', e => { state.minOn = e.target.checked; apply(); });
+  $('#maxOn').addEventListener('change', e => { state.maxOn = e.target.checked; apply(); });
+  $('#reset').addEventListener('click', () => { state = { ...DEF }; apply(); });
+
+  $('#demoToggle').addEventListener('click', () => {
+    const min = $('#demoNav').classList.toggle('is-min');
+    $('#demoToggle').textContent = min ? '+' : '–';
+    try { localStorage.setItem(UI_KEY, min ? 'min' : 'open'); } catch (e) {}
+  });
+  try {
+    if (localStorage.getItem(UI_KEY) === 'min') { $('#demoNav').classList.add('is-min'); $('#demoToggle').textContent = '+'; }
+  } catch (e) {}
+
+  const f = n => n.toFixed(2);
+  function readout() {
+    const vw = innerWidth;
+    const us = vw / 1920;
+    /* 공식값(제한 전) vs 실제 렌더 너비 */
+    const base = state.unit === 'vw' ? state.val * us : (state.val - 8) * us + 8;
+    const card = $('#card').getBoundingClientRect().width;
+    const label = `${state.unit}-${state.val}`;
+    $('#cwCalc').textContent = `${label} → ${f(base)}px`;
+    let why = '';
+    if (state.minOn && base < state.min) why = ` ← min ${state.min}`;
+    else if (state.maxOn && base > state.max) why = ` ← max ${state.max}`;
+    const title = parseFloat(getComputedStyle($('.overlay-card__title')).fontSize);
+    $('#h3Calc').textContent = `${state.h3} → ${f(title)}px ${state.h3 <= REM ? '(고정)' : '(가변)'}`;
+    const lines = Math.round($('.overlay-card__title').getBoundingClientRect().height / (title * 1.4));
+    $('#readout').innerHTML =
+      `viewport <b>${vw}</b> · 카드 <b class="${why ? 'is-clamped' : ''}">${f(card)}</b>${why}<br>` +
+      `카드 높이 <b>${f($('#card').getBoundingClientRect().height)}</b> · 배너 <b>${f($('.banner').getBoundingClientRect().height)}</b><br>` +
+      `H3 <b>${f(title)}</b> (${lines}줄) · P2 <b>${f(parseFloat(getComputedStyle($('.overlay-card__eyebrow')).fontSize))}</b> · 패딩 <b>${f(parseFloat(getComputedStyle($('#card')).paddingLeft))}</b> / <b>${f(parseFloat(getComputedStyle($('#card')).paddingTop))}</b>`;
+  }
+  addEventListener('resize', readout);
+
+  apply();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(readout);
+})();
+</script>
+</body>
+</html>
