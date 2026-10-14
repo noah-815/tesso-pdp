@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stat Card — Desktop (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E · variant6 (statCard 목록) (Desktop) — 반응형
+     Figma 14413:338342 · 디자인 기준 폭 1920 · 1rem = 14px
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value = rem (1rem = 14px), 0.0083 × screen width = 0.83vw
+        · size value ≤ 1rem(14px) 은 뷰포트와 무관하게 px 고정
+        → 가변은 숫자(72) · H3(40) · P2(16) / 고정은 P3(14)
+     2) Spacing — 시안에 맵핑된 토큰 그대로
+        · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
+        · vw-*  : N × 100vw / 1920
+        · global/desktop-margin-vw = 19 → 1vw
+     3) 카드 간격 — 시안 vw-16 · 카드 패딩 — 시안 mid-40. 데모 패널에서 각각 vw / mid 비교 + 값 조정
+     4) 카드 선 — 시안에서 선이 레이아웃에 들어가지 않음(카드 높이 254 = 패딩 40×2 + 내용)
+        → border 대신 안쪽 그림자 1px 로 그려 패딩 = 토큰 그대로
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --us: calc(100vw / 1920);            /* spacing 1px */
+    --page-pad: 1vw;                     /* global/desktop-margin-vw = 19 */
+
+    /* Typography ------------------------------------------------- */
+    --fs-p3:   14px;                                    /* paragraph-3 1rem → 고정 */
+    --fs-p2:   calc((1.1429 - 1) * 0.83vw + 1rem);      /* paragraph-2 16px @1920 — 가변 */
+    --fs-h3:   calc((2.8571 - 1) * 0.83vw + 1rem);      /* heading-3   40px @1920 — 가변 */
+    --fs-stat: calc((5.1429 - 1) * 0.83vw + 1rem);      /* 숫자        72px @1920 — 가변 (토큰 없음) */
+
+    /* Spacing — mid-* ------------------------------------------- */
+    --mid-16:  calc(  8 * var(--us) + 8px);
+    --mid-32:  calc( 24 * var(--us) + 8px);
+    --mid-40:  calc( 32 * var(--us) + 8px);    /* 텍스트 ↔ 카드 간격 */
+    --mid-120: calc(112 * var(--us) + 8px);
+
+    /* 카드 간격 — 데모 패널이 값을 심는다 (vw-N / mid-N 의 N, 시안 vw-16) */
+    --gap-val: 16;
+    --card-gap: calc(var(--gap-val) * var(--us));
+
+    /* 카드 패딩 — 데모 패널이 값을 심는다 (mid-N / vw-N 의 N, 시안 mid-40) */
+    --pad-val: 40;
+    --card-pad: calc((var(--pad-val) - 8) * var(--us) + 8px);
+
+    --radius-md: 8px;
+
+    /* Color ------------------------------------------------------ */
+    --c-text: #111;
+    --c-sub: rgba(17, 17, 17, 0.6);
+    --c-line: rgba(0, 0, 0, 0.1);
+
+    /* Font ------------------------------------------------------- */
+    --font-en: "DM Sans", "Pretendard", sans-serif;
+    --font-kr: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  body[data-gapunit="vw"]  { --card-gap: calc(var(--gap-val) * var(--us)); }
+  body[data-gapunit="mid"] { --card-gap: calc((var(--gap-val) - 8) * var(--us) + 8px); }
+  body[data-padunit="mid"] { --card-pad: calc((var(--pad-val) - 8) * var(--us) + 8px); }
+  body[data-padunit="vw"]  { --card-pad: calc(var(--pad-val) * var(--us)); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;                     /* 1rem = 14px */
+  }
+
+  body {
+    background: #fff;
+    color: var(--c-text);
+    font-family: var(--font-kr);
+    font-size: var(--fs-p3);
+    line-height: 1.6;
+  }
+
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  /* DM Sans 는 시안처럼 optical size 14 로 고정 */
+  .en { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+
+  /* ── variant6 ───────────────────────────────────────────────── */
+  .stat-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--mid-40);
+    padding: var(--mid-120) var(--page-pad);
+    background: #fff;
+  }
+
+  .stat-section__text { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
+  .stat-section__title { font-weight: 500; font-size: var(--fs-h3); line-height: 1.4; }   /* 40px @1920 — 가변 */
+  .stat-section__desc  { font-size: var(--fs-p3); line-height: 1.6; color: var(--c-sub); } /* 14px — 고정 */
+
+  /* cardList — 균등 분할 */
+  .stat-list { display: flex; align-items: stretch; gap: var(--card-gap); width: 100%; }
+
+  /* statCard */
+  .stat-card {
+    flex: 1 0 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: var(--card-pad);            /* 시안 mid-40 — 데모에서 vw 와 전환 */
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 0 0 1px var(--c-line);   /* 선은 레이아웃 밖 (시안) */
+  }
+
+  .stat-card__text { display: flex; flex-direction: column; gap: var(--mid-32); width: 100%; }
+  .stat-card__num  { font-weight: 500; font-size: var(--fs-stat); line-height: 1.3; }       /* 72px @1920 — 가변 */
+  .stat-card__desc { font-size: var(--fs-p2); line-height: 1.5; color: var(--c-sub); }    /* 16px @1920 — 가변 */
+
+  /* 위 · 아래 확인용 여백 — 시안에 없음 */
+  .spacer { height: 30vh; background: #f4f4f4; }
+
+  /* ── 데모 패널 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-family: var(--font-kr);
+    font-size: 11px;
+    line-height: 1.4;
+    color: #111;
+    white-space: nowrap;
+  }
+
+  .demo-nav.is-min > *:not(.demo-toggle) { display: none; }
+  .demo-toggle { grid-column: 1 / -1; justify-self: end; padding: 2px 6px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; color: #777; }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { justify-self: start; display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; font-size: 11px; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+
+  .demo-value { justify-self: start; display: flex; align-items: center; gap: 6px; color: #777; }
+  .demo-value input[type="number"] {
+    width: 56px;
+    padding: 3px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--font-kr);
+    font-size: 11px;
+    color: #111;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-value input[type="text"] {
+    width: 220px;
+    padding: 3px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--font-kr);
+    font-size: 11px;
+    color: #111;
+  }
+  .demo-value .calc { font-variant-numeric: tabular-nums; }
+  .demo-reset { justify-self: start; padding: 3px 7px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; background: #fff; font-size: 11px; color: #2563eb; }
+
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 4px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+</head>
+<body data-gapunit="vw" data-padunit="mid">
+
+<div class="spacer"></div>
+
+<!-- variant6 -->
+<section class="stat-section">
+  <div class="stat-section__text">
+    <h2 class="stat-section__title en" id="sectionTitle">Lorem ipsum dolor</h2>
+    <p class="stat-section__desc">Lorem ipsum dolor sit amet consectetur. Amet libero elementum orci ac cursus elementum ut vulputate morbi.</p>
+  </div>
+  <div class="stat-list" id="statList">
+    <div class="stat-card">
+      <div class="stat-card__text">
+        <p class="stat-card__num en">95+</p>
+        <p class="stat-card__desc">Lorem ipsum dolor sit amet consectetur. Eget consectetur non velit amet neque a.</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__text">
+        <p class="stat-card__num en">200%</p>
+        <p class="stat-card__desc">Lorem ipsum dolor sit amet consectetur. Eget consectetur non velit amet neque a.</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__text">
+        <p class="stat-card__num en">160</p>
+        <p class="stat-card__desc">Lorem ipsum dolor sit amet consectetur. Eget consectetur non velit amet neque a.</p>
+      </div>
+    </div>
+    <!-- 4번째 카드 — 시안에서는 숨김 -->
+    <div class="stat-card" data-extra hidden>
+      <div class="stat-card__text">
+        <p class="stat-card__num en">48h</p>
+        <p class="stat-card__desc">Lorem ipsum dolor sit amet consectetur. Eget consectetur non velit amet neque a.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="spacer"></div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <button type="button" class="demo-toggle" id="demoToggle" aria-label="패널 접기">–</button>
+  <strong>card gap</strong>
+  <div class="demo-value">
+    <span class="demo-seg" id="gapToggle">
+      <button type="button" data-unit="vw">vw (시안)</button>
+      <button type="button" data-unit="mid">mid</button>
+    </span>
+    <input type="number" id="gapVal" min="0" max="200" step="1" value="16" aria-label="카드 간격 값">
+    <span class="calc" id="gapCalc">–</span>
+  </div>
+  <strong>card padding</strong>
+  <div class="demo-value">
+    <span class="demo-seg" id="padToggle">
+      <button type="button" data-unit="mid">mid (시안)</button>
+      <button type="button" data-unit="vw">vw</button>
+    </span>
+    <input type="number" id="padVal" min="0" max="200" step="1" value="40" aria-label="카드 패딩 값">
+    <span class="calc" id="padCalc">–</span>
+  </div>
+  <strong>cards</strong>
+  <div class="demo-seg" id="countToggle">
+    <button type="button" data-count="3">3개 (시안)</button>
+    <button type="button" data-count="4">4개</button>
+  </div>
+  <span></span>
+  <button type="button" class="demo-reset" id="reset">reset (시안 값)</button>
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const KEY = 'fw-e-stat-card-v2', UI_KEY = 'fw-e-stat-card-ui';
+  const DEF = { gapUnit: 'vw', gap: 16, padUnit: 'mid', pad: 40, count: 3 };
+  const root = document.documentElement.style;
+  let state = { ...DEF };
+  try { state = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch (e) {}
+
+  const clampNum = (v, lo, hi, d) => { const n = Math.round(Number(v)); return Number.isFinite(n) && v !== '' ? Math.max(lo, Math.min(hi, n)) : d; };
+  /* mid-N : (N − 8) × 100vw / 1920 + 8 (N < 8 은 그대로) · vw-N : N × 100vw / 1920 */
+  const calcPx = (unit, n) => unit === 'vw' ? n * innerWidth / 1920 : n < 8 ? n : (n - 8) * innerWidth / 1920 + 8;
+
+  function apply() {
+    state.gapUnit = state.gapUnit === 'mid' ? 'mid' : 'vw';
+    state.padUnit = state.padUnit === 'vw' ? 'vw' : 'mid';
+    state.count = Number(state.count) === 4 ? 4 : 3;
+    document.body.dataset.gapunit = state.gapUnit;
+    document.body.dataset.padunit = state.padUnit;
+    root.setProperty('--gap-val', state.gap);
+    root.setProperty('--pad-val', state.pad);
+    /* mid 에서 값이 8 미만이면 공식 대신 값 그대로 (body 의 단위 규칙보다 우선하도록 body 에 직접) */
+    document.body.style.setProperty('--card-gap', state.gapUnit === 'mid' && state.gap < 8 ? `${state.gap}px` : '');
+    document.body.style.setProperty('--card-pad', state.padUnit === 'mid' && state.pad < 8 ? `${state.pad}px` : '');
+    $$('[data-extra]').forEach(c => { c.hidden = state.count < 4; });
+
+    $$('#gapToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.unit === state.gapUnit));
+    $$('#padToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.unit === state.padUnit));
+    $$('#countToggle button').forEach(b => b.classList.toggle('is-on', Number(b.dataset.count) === state.count));
+    [['#gapVal', state.gap], ['#padVal', state.pad]].forEach(([id, v]) => {
+      if (document.activeElement !== $(id)) $(id).value = v;
+    });
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    readout();
+  }
+
+  $('#gapToggle').addEventListener('click', e => {
+    const b = e.target.closest('button[data-unit]'); if (b) { state.gapUnit = b.dataset.unit; apply(); }
+  });
+  $('#padToggle').addEventListener('click', e => {
+    const b = e.target.closest('button[data-unit]'); if (b) { state.padUnit = b.dataset.unit; apply(); }
+  });
+  $('#countToggle').addEventListener('click', e => {
+    const b = e.target.closest('button[data-count]'); if (b) { state.count = Number(b.dataset.count); apply(); }
+  });
+  /* 입력 중에는 유효한 값일 때만 반영하고, 범위 보정은 blur 에서 */
+  [['#gapVal', 'gap', 0, 200], ['#padVal', 'pad', 0, 200]].forEach(([id, k, lo, hi]) => {
+    $(id).addEventListener('input', e => { const n = Number(e.target.value); if (e.target.value !== '' && n >= lo && n <= hi) { state[k] = Math.round(n); apply(); } });
+    $(id).addEventListener('blur', e => { state[k] = clampNum(e.target.value, lo, hi, state[k]); e.target.value = state[k]; apply(); });
+  });
+  $('#reset').addEventListener('click', () => { state = { ...DEF }; apply(); });
+
+  $('#demoToggle').addEventListener('click', () => {
+    const min = $('#demoNav').classList.toggle('is-min');
+    $('#demoToggle').textContent = min ? '+' : '–';
+    try { localStorage.setItem(UI_KEY, min ? 'min' : 'open'); } catch (e) {}
+  });
+  try {
+    if (localStorage.getItem(UI_KEY) === 'min') { $('#demoNav').classList.add('is-min'); $('#demoToggle').textContent = '+'; }
+  } catch (e) {}
+
+  const f = n => n.toFixed(2);
+  const box = el => (typeof el === 'string' ? $(el) : el).getBoundingClientRect();
+  const fs = s => parseFloat(getComputedStyle($(s)).fontSize);
+  function readout() {
+    const vw = innerWidth;
+    const gap = parseFloat(getComputedStyle($('#statList')).columnGap);
+    const cards = $$('.stat-card').filter(c => !c.hidden);
+    const pad = parseFloat(getComputedStyle(cards[0]).paddingLeft);
+    $('#gapCalc').textContent = `${state.gapUnit}-${state.gap} → ${f(gap)}px`;
+    $('#padCalc').textContent = `${state.padUnit}-${state.pad} → ${f(pad)}px`;
+    /* 숫자가 카드 안쪽 폭을 넘치는지 (줄바꿈 · 넘침) */
+    const numOver = cards.some(c => { const n = $('.stat-card__num', c); return n.scrollWidth > n.clientWidth + 0.5 || box(n).height > fs('.stat-card__num') * 1.3 * 1.5; });
+    const descLines = Math.max(...cards.map(c => Math.round(box($('.stat-card__desc', c)).height / (fs('.stat-card__desc') * 1.5))));
+    $('#readout').innerHTML =
+      `viewport <b>${vw}</b> · 좌우 마진 <b>${f(parseFloat(getComputedStyle($('.stat-section')).paddingLeft))}</b> (1vw) · 간격 <b>${f(gap)}</b><br>` +
+      `카드 <b>${f(box(cards[0]).width)}</b> × <b>${f(box(cards[0]).height)}</b> · 패딩 <b>${f(pad)}</b> · 안쪽 폭 <b>${f(box(cards[0]).width - pad * 2)}</b><br>` +
+      `숫자 ${numOver ? '<b style="color:#2563eb">넘침</b>' : '<b>한 줄</b>'} (${f(fs('.stat-card__num'))}) · 설명 <b>${descLines}</b>줄 · 섹션 <b>${f(box('.stat-section').height)}</b>`;
+  }
+  addEventListener('resize', readout);
+
+  apply();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(readout);
+})();
+</script>
+</body>
+</html>
