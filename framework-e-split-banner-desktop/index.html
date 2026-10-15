@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Split Banner — Desktop (Framework E)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Inter:wght@600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Framework E · 2분할 배너 (variant1 · 이미지 + 텍스트) (Desktop) — 반응형
+     Figma 14413:338453 · 디자인 기준 폭 1920 · 1rem = 14px
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value = rem (1rem = 14px), 0.0083 × screen width = 0.83vw
+        · size value ≤ 1rem(14px) 은 뷰포트와 무관하게 px 고정
+        → 가변은 H3(40) · 로고(20) / 고정은 P3(14) · 버튼(13)
+     2) Spacing — 시안에 맵핑된 토큰 그대로
+        · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
+        · vw-*  : N × 100vw / 1920   (global/desktop-margin-vw 19 = vw-19)
+        · em-*  : 해당 요소 폰트 크기 기준 N px (버튼 padding)
+     3) 데모 패널에서 mid / vw 비교 + 값 조정
+        · 섹션 상하 — 시안 mid-20
+        · 내용 영역 좌우 — 시안 mid-120
+        (섹션 좌우는 global/desktop-margin-vw 19 = vw-19 고정)
+     4) 섹션 높이 — 이미지 비율(941 : 1176) 이 정한다 (시안 1216 = 1176 + 상하 20 × 2)
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --us: calc(100vw / 1920);            /* spacing 1px */
+    --header-h: 54px;                    /* set06_header — 토큰 없음 → px */
+
+    /* Typography ------------------------------------------------- */
+    --fs-btn:  13px;                                    /* button-label-medium → 고정 */
+    --fs-p3:   14px;                                    /* paragraph-3 1rem    → 고정 */
+    --fs-logo: calc((1.4286 - 1) * 0.83vw + 1rem);      /* 로고        20px @1920 — 가변 */
+    --fs-h3:   calc((2.8571 - 1) * 0.83vw + 1rem);      /* heading-3   40px @1920 — 가변 */
+
+    /* Spacing — mid-* ------------------------------------------- */
+    --mid-4:  4px;                       /* 값 < 8 → 고정 */
+    --mid-12: calc( 4 * var(--us) + 8px);
+    --mid-36: calc(28 * var(--us) + 8px);
+
+    /* 데모 패널이 값을 심는다 (mid-N / vw-N 의 N) */
+    --sec-y-val: 20;                     /* 섹션 상하 — 시안 mid-20 */
+    --box-x-val: 120;                    /* 내용 영역 좌우 — 시안 mid-120 */
+    --sec-y: calc((var(--sec-y-val) - 8) * var(--us) + 8px);
+    --sec-x: calc(19 * var(--us));       /* 섹션 좌우 — global/desktop-margin-vw 19 (vw-19) */
+    --box-x: calc((var(--box-x-val) - 8) * var(--us) + 8px);
+
+    --radius-xs: 4px;
+    --radius-md: 8px;
+
+    /* Color ------------------------------------------------------ */
+    --c-header: #372320;
+    --c-text: #111;
+    --c-sub: rgba(17, 17, 17, 0.6);
+
+    /* Font ------------------------------------------------------- */
+    --font-en: "DM Sans", "Pretendard", sans-serif;
+    --font-kr: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-logo: "Inter", sans-serif;
+  }
+
+  body[data-secy="mid"] { --sec-y: calc((var(--sec-y-val) - 8) * var(--us) + 8px); }
+  body[data-secy="vw"]  { --sec-y: calc(var(--sec-y-val) * var(--us)); }
+  body[data-boxx="mid"] { --box-x: calc((var(--box-x-val) - 8) * var(--us) + 8px); }
+  body[data-boxx="vw"]  { --box-x: calc(var(--box-x-val) * var(--us)); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;                     /* 1rem = 14px */
+  }
+
+  body {
+    background: #fff;
+    color: var(--c-text);
+    font-family: var(--font-kr);
+    font-size: var(--fs-p3);
+    line-height: 1.6;
+  }
+
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* DM Sans 는 시안처럼 optical size 14 로 고정 */
+  .en { font-family: var(--font-en); font-variation-settings: "opsz" 14; }
+
+  /* ── set06_header ───────────────────────────────────────────── */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--header-h);
+    padding: 0 16px;
+    background: #fff;                    /* background/base */
+  }
+
+  .header__container {
+    position: relative;
+    flex: 1 0 0;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header__nav { display: flex; gap: 12px; height: 100%; }
+
+  .header__item {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 8px;
+    font-size: var(--fs-p3);             /* 14px — 고정 */
+    line-height: 1.6;
+    color: var(--c-header);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .header__logo {
+    position: absolute;
+    top: calc(50% + 0.5px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-logo);
+    font-weight: 600;
+    font-size: var(--fs-logo);           /* 20px @1920 — 가변 */
+    line-height: 28px;
+    color: var(--c-header);
+    white-space: nowrap;
+  }
+
+  /* ── variant1 — 이미지 + 내용 2분할 ─────────────────────────── */
+  .split {
+    display: flex;
+    align-items: center;
+    padding: var(--sec-y) var(--sec-x);       /* 시안 mid-20 (데모에서 vw 와 전환) / vw-19 */
+    background: #fff;
+  }
+
+  .split__image {
+    position: relative;
+    flex: 1 0 0;
+    min-width: 0;
+    aspect-ratio: 941 / 1176;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .split__media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask: url("assets/media-mask.svg") no-repeat 0 0 / 100% 100%;
+            mask: url("assets/media-mask.svg") no-repeat 0 0 / 100% 100%;
+  }
+
+  .split__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  .split__content {
+    flex: 1 0 0;
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  /* contentBox — 안쪽 좌우 mid-120 */
+  .split__box {
+    flex: 1 0 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mid-36);
+    width: 100%;
+    padding: 0 var(--box-x);                  /* 시안 mid-120 — 데모에서 전환 */
+  }
+
+  .split__text { display: flex; flex-direction: column; align-items: center; gap: var(--mid-12); width: 100%; text-align: center; }
+  .split__overline { font-size: var(--fs-p3); line-height: 1.6; }                                 /* 14px — 고정 */
+  .split__title    { font-weight: 500; font-size: var(--fs-h3); line-height: 1.4; }              /* 40px @1920 — 가변 */
+  .split__desc     { font-size: var(--fs-p3); line-height: 1.6; color: var(--c-sub); }           /* 14px — 고정 */
+
+  /* button/filled — em-13 / em-26 @13px (+ 선 1px) */
+  .btn-filled {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mid-4);
+    padding: 1em 2em;
+    border: 1px solid transparent;
+    border-radius: var(--radius-xs);
+    background: #111;                    /* button/filled/background */
+    color: #fff;                         /* button/filled/label */
+    font-weight: 500;
+    font-size: var(--fs-btn);            /* 13px — 고정 */
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* 아래 확인용 여백 — 시안에 없음 */
+  .spacer { height: 40vh; background: #f4f4f4; }
+
+  /* ── 데모 패널 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-family: var(--font-kr);
+    font-size: 11px;
+    line-height: 1.4;
+    color: #111;
+    white-space: nowrap;
+  }
+
+  .demo-nav.is-min > *:not(.demo-toggle) { display: none; }
+  .demo-toggle { grid-column: 1 / -1; justify-self: end; padding: 2px 6px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; color: #777; }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { justify-self: start; display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; font-size: 11px; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+
+  .demo-value { justify-self: start; display: flex; align-items: center; gap: 6px; color: #777; }
+  .demo-value input[type="number"] {
+    width: 56px;
+    padding: 3px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--font-kr);
+    font-size: 11px;
+    color: #111;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-value .calc { font-variant-numeric: tabular-nums; }
+  .demo-reset { justify-self: start; padding: 3px 7px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; background: #fff; font-size: 11px; color: #2563eb; }
+
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 4px;
+    margin-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+</head>
+<body data-secy="mid" data-boxx="mid">
+
+<!-- set06_header -->
+<header class="header">
+  <div class="header__container">
+    <nav class="header__nav">
+      <a class="header__item en" href="#">Shop</a>
+      <a class="header__item en" href="#">About</a>
+      <a class="header__item en" href="#">Journal</a>
+      <a class="header__item en" href="#">Info</a>
+      <a class="header__item en" href="#">The Story</a>
+    </nav>
+    <div class="header__nav">
+      <a class="header__item en" href="#">Search</a>
+      <a class="header__item en" href="#">Sign in</a>
+      <a class="header__item en" href="#">Bag [0]</a>
+    </div>
+    <a class="header__logo" href="#">BRAND</a>
+  </div>
+</header>
+
+<!-- variant1 -->
+<section class="split">
+  <div class="split__image">
+    <div class="split__media"><img src="assets/media.png" alt=""></div>
+  </div>
+  <div class="split__content">
+    <div class="split__box">
+      <div class="split__text">
+        <p class="split__overline en">Lorem ipsum</p>
+        <h2 class="split__title en">Lorem ipsum dolor sit amet</h2>
+        <p class="split__desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Graecis praetorem, consuetudinum, maiores, tribus saluti reprehensa.</p>
+      </div>
+      <a class="btn-filled en" href="#">Button Label</a>
+    </div>
+  </div>
+</section>
+<div class="spacer"></div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <button type="button" class="demo-toggle" id="demoToggle" aria-label="패널 접기">–</button>
+  <strong>섹션 상하</strong>
+  <div class="demo-value" data-key="secy">
+    <span class="demo-seg">
+      <button type="button" data-unit="mid">mid (시안)</button>
+      <button type="button" data-unit="vw">vw</button>
+    </span>
+    <input type="number" min="0" max="300" step="1" aria-label="섹션 상하 패딩 값">
+    <span class="calc">–</span>
+  </div>
+  <strong>내용 좌우</strong>
+  <div class="demo-value" data-key="boxx">
+    <span class="demo-seg">
+      <button type="button" data-unit="mid">mid (시안)</button>
+      <button type="button" data-unit="vw">vw</button>
+    </span>
+    <input type="number" min="0" max="400" step="1" aria-label="내용 영역 좌우 패딩 값">
+    <span class="calc">–</span>
+  </div>
+  <span></span>
+  <button type="button" class="demo-reset" id="reset">reset (mid-20 · mid-120)</button>
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const KEY = 'fw-e-split-banner', UI_KEY = 'fw-e-split-banner-ui';
+  /* key → CSS 변수 / 시안 값 */
+  const OPTS = {
+    secy: { val: '--sec-y-val', prop: '--sec-y', def: { unit: 'mid', n: 20 },  max: 300 },
+    boxx: { val: '--box-x-val', prop: '--box-x', def: { unit: 'mid', n: 120 }, max: 400 },
+  };
+  const defaults = () => Object.fromEntries(Object.entries(OPTS).map(([k, o]) => [k, { ...o.def }]));
+  const root = document.documentElement.style;
+  let state = defaults();
+  try { const saved = JSON.parse(localStorage.getItem(KEY) || '{}'); Object.keys(OPTS).forEach(k => { if (saved[k]) state[k] = { ...state[k], ...saved[k] }; }); } catch (e) {}
+
+  const clampNum = (v, lo, hi, d) => { const n = Math.round(Number(v)); return Number.isFinite(n) && v !== '' ? Math.max(lo, Math.min(hi, n)) : d; };
+
+  function apply() {
+    Object.entries(OPTS).forEach(([k, o]) => {
+      const s = state[k];
+      s.unit = s.unit === 'vw' ? 'vw' : 'mid';
+      document.body.dataset[k] = s.unit;
+      root.setProperty(o.val, s.n);
+      /* mid 에서 값이 8 미만이면 공식 대신 값 그대로 (body 의 단위 규칙보다 우선하도록 body 에 직접) */
+      document.body.style.setProperty(o.prop, s.unit === 'mid' && s.n < 8 ? `${s.n}px` : '');
+      const row = $(`.demo-value[data-key="${k}"]`);
+      $$('button[data-unit]', row).forEach(b => b.classList.toggle('is-on', b.dataset.unit === s.unit));
+      const input = $('input', row);
+      if (document.activeElement !== input) input.value = s.n;
+    });
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    readout();
+  }
+
+  Object.entries(OPTS).forEach(([k, o]) => {
+    const row = $(`.demo-value[data-key="${k}"]`);
+    row.addEventListener('click', e => {
+      const b = e.target.closest('button[data-unit]'); if (b) { state[k].unit = b.dataset.unit; apply(); }
+    });
+    /* 입력 중에는 유효한 값일 때만 반영하고, 범위 보정은 blur 에서 */
+    const input = $('input', row);
+    input.addEventListener('input', e => { const n = Number(e.target.value); if (e.target.value !== '' && n >= 0 && n <= o.max) { state[k].n = Math.round(n); apply(); } });
+    input.addEventListener('blur', e => { state[k].n = clampNum(e.target.value, 0, o.max, state[k].n); e.target.value = state[k].n; apply(); });
+  });
+  $('#reset').addEventListener('click', () => { state = defaults(); apply(); });
+
+  $('#demoToggle').addEventListener('click', () => {
+    const min = $('#demoNav').classList.toggle('is-min');
+    $('#demoToggle').textContent = min ? '+' : '–';
+    try { localStorage.setItem(UI_KEY, min ? 'min' : 'open'); } catch (e) {}
+  });
+  try {
+    if (localStorage.getItem(UI_KEY) === 'min') { $('#demoNav').classList.add('is-min'); $('#demoToggle').textContent = '+'; }
+  } catch (e) {}
+
+  const f = n => n.toFixed(2);
+  const box = s => $(s).getBoundingClientRect();
+  function readout() {
+    const sec = getComputedStyle($('.split'));
+    const px = {
+      secy: parseFloat(sec.paddingTop),
+      boxx: parseFloat(getComputedStyle($('.split__box')).paddingLeft),
+    };
+    Object.keys(OPTS).forEach(k => {
+      $(`.demo-value[data-key="${k}"] .calc`).textContent = `${state[k].unit}-${state[k].n} → ${f(px[k])}px`;
+    });
+    const title = parseFloat(getComputedStyle($('.split__title')).fontSize);
+    const lines = Math.round(box('.split__title').height / (title * 1.4));
+    const descLines = Math.round(box('.split__desc').height / (14 * 1.6));
+    $('#readout').innerHTML =
+      `viewport <b>${innerWidth}</b> · 섹션 좌우 <b>${f(parseFloat(sec.paddingLeft))}</b> (vw-19) · 섹션 높이 <b>${f(box('.split').height)}</b><br>` +
+      `이미지 <b>${f(box('.split__image').width)}</b> × <b>${f(box('.split__image').height)}</b> · 내용 영역 <b>${f(box('.split__content').width)}</b> · 텍스트 폭 <b>${f(box('.split__text').width)}</b><br>` +
+      `H3 <b>${f(title)}</b> (${lines}줄) · 설명 <b>${descLines}</b>줄`;
+  }
+  addEventListener('resize', readout);
+
+  apply();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(readout);
+})();
+</script>
+</body>
+</html>
