@@ -266,6 +266,18 @@
     text-align: right;
     font-variant-numeric: tabular-nums;
   }
+  .demo-value textarea {
+    width: 260px;
+    padding: 4px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--font-kr);
+    font-size: 11px;
+    line-height: 1.4;
+    color: #111;
+    resize: vertical;
+  }
   .demo-value .calc { font-variant-numeric: tabular-nums; }
   .demo-reset { justify-self: start; padding: 3px 7px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; background: #fff; font-size: 11px; color: #2563eb; }
 
@@ -312,7 +324,7 @@
       <div class="split__text">
         <p class="split__overline en">Lorem ipsum</p>
         <h2 class="split__title en">Lorem ipsum dolor sit amet</h2>
-        <p class="split__desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Graecis praetorem, consuetudinum, maiores, tribus saluti reprehensa.</p>
+        <p class="split__desc" id="splitDesc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Graecis praetorem, consuetudinum, maiores, tribus saluti reprehensa.</p>
       </div>
       <a class="btn-filled en" href="#">Button Label</a>
     </div>
@@ -341,8 +353,12 @@
     <input type="number" min="0" max="400" step="1" aria-label="내용 영역 좌우 패딩 값">
     <span class="calc">–</span>
   </div>
+  <strong>description</strong>
+  <div class="demo-value">
+    <textarea id="descText" rows="3" aria-label="설명 문구" placeholder="설명 문구 입력"></textarea>
+  </div>
   <span></span>
-  <button type="button" class="demo-reset" id="reset">reset (mid-20 · mid-120)</button>
+  <button type="button" class="demo-reset" id="reset">reset (mid-20 · mid-120 · 시안 문구)</button>
   <p class="demo-readout" id="readout">–</p>
 </nav>
 
@@ -356,10 +372,11 @@
     secy: { val: '--sec-y-val', prop: '--sec-y', def: { unit: 'mid', n: 20 },  max: 300 },
     boxx: { val: '--box-x-val', prop: '--box-x', def: { unit: 'mid', n: 120 }, max: 400 },
   };
-  const defaults = () => Object.fromEntries(Object.entries(OPTS).map(([k, o]) => [k, { ...o.def }]));
+  const DESC = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Graecis praetorem, consuetudinum, maiores, tribus saluti reprehensa.';
+  const defaults = () => ({ ...Object.fromEntries(Object.entries(OPTS).map(([k, o]) => [k, { ...o.def }])), desc: DESC });
   const root = document.documentElement.style;
   let state = defaults();
-  try { const saved = JSON.parse(localStorage.getItem(KEY) || '{}'); Object.keys(OPTS).forEach(k => { if (saved[k]) state[k] = { ...state[k], ...saved[k] }; }); } catch (e) {}
+  try { const saved = JSON.parse(localStorage.getItem(KEY) || '{}'); Object.keys(OPTS).forEach(k => { if (saved[k]) state[k] = { ...state[k], ...saved[k] }; }); if (typeof saved.desc === 'string') state.desc = saved.desc; } catch (e) {}
 
   const clampNum = (v, lo, hi, d) => { const n = Math.round(Number(v)); return Number.isFinite(n) && v !== '' ? Math.max(lo, Math.min(hi, n)) : d; };
 
@@ -376,6 +393,9 @@
       const input = $('input', row);
       if (document.activeElement !== input) input.value = s.n;
     });
+    /* 설명 문구 — 입력하는 대로 반영 */
+    $('#splitDesc').textContent = state.desc;
+    if (document.activeElement !== $('#descText')) $('#descText').value = state.desc;
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
     readout();
   }
@@ -390,6 +410,7 @@
     input.addEventListener('input', e => { const n = Number(e.target.value); if (e.target.value !== '' && n >= 0 && n <= o.max) { state[k].n = Math.round(n); apply(); } });
     input.addEventListener('blur', e => { state[k].n = clampNum(e.target.value, 0, o.max, state[k].n); e.target.value = state[k].n; apply(); });
   });
+  $('#descText').addEventListener('input', e => { state.desc = e.target.value; apply(); });
   $('#reset').addEventListener('click', () => { state = defaults(); apply(); });
 
   $('#demoToggle').addEventListener('click', () => {
